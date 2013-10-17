@@ -5,6 +5,7 @@
 //  Created by Keiichiro Watanabe on 2013/10/17.
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
+// sato takuya
 
 #import "SCUI.h"
 #import "ViewController.h"
