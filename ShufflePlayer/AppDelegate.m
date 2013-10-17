@@ -6,9 +6,17 @@
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
 
+#import "SCUI.h"
 #import "AppDelegate.h"
 
 @implementation AppDelegate
+
++ (void) initialize
+{
+    [SCSoundCloud  setClientID:@"cef5e6d3c083503120892b041572abff"
+                        secret:@"65e92b9a3659531e926a96bae165cd82"
+                   redirectURL:[NSURL URLWithString:@"test://oauth"]];
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
