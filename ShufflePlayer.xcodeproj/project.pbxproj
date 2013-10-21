@@ -32,6 +32,11 @@
 		04285233181015B9008CBA33 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285231181015B9008CBA33 /* CoreText.framework */; };
 		04285235181015CA008CBA33 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285234181015CA008CBA33 /* QuartzCore.framework */; };
 		04285237181015D3008CBA33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285236181015D3008CBA33 /* Security.framework */; };
+		04A0211D18159BC00002B91B /* no_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A0211C18159BC00002B91B /* no_image.png */; };
+		04A021261815A6C00002B91B /* button_next.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021221815A6C00002B91B /* button_next.png */; };
+		04A021271815A6C00002B91B /* button_play.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021231815A6C00002B91B /* button_play.png */; };
+		04A021281815A6C00002B91B /* button_prev.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021241815A6C00002B91B /* button_prev.png */; };
+		04A021291815A6C00002B91B /* button_stop.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021251815A6C00002B91B /* button_stop.png */; };
 		04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E4F1810164C001839A8 /* SoundCloud.bundle */; };
 		04C00E591810194A001839A8 /* TrackListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C00E571810194A001839A8 /* TrackListViewController.m */; };
 		04C00E5A1810194A001839A8 /* TrackListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E581810194A001839A8 /* TrackListViewController.xib */; };
@@ -178,6 +183,11 @@
 		04285231181015B9008CBA33 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		04285234181015CA008CBA33 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		04285236181015D3008CBA33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		04A0211C18159BC00002B91B /* no_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = no_image.png; sourceTree = "<group>"; };
+		04A021221815A6C00002B91B /* button_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_next.png; sourceTree = "<group>"; };
+		04A021231815A6C00002B91B /* button_play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_play.png; sourceTree = "<group>"; };
+		04A021241815A6C00002B91B /* button_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_prev.png; sourceTree = "<group>"; };
+		04A021251815A6C00002B91B /* button_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_stop.png; sourceTree = "<group>"; };
 		04C00E4F1810164C001839A8 /* SoundCloud.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SoundCloud.bundle; sourceTree = "<group>"; };
 		04C00E561810194A001839A8 /* TrackListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackListViewController.h; path = ../TrackListViewController.h; sourceTree = "<group>"; };
 		04C00E571810194A001839A8 /* TrackListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackListViewController.m; path = ../TrackListViewController.m; sourceTree = "<group>"; };
@@ -268,6 +278,11 @@
 		042851C41810145D008CBA33 /* ShufflePlayer */ = {
 			isa = PBXGroup;
 			children = (
+				04A021221815A6C00002B91B /* button_next.png */,
+				04A021231815A6C00002B91B /* button_play.png */,
+				04A021241815A6C00002B91B /* button_prev.png */,
+				04A021251815A6C00002B91B /* button_stop.png */,
+				04A0211C18159BC00002B91B /* no_image.png */,
 				04C00E561810194A001839A8 /* TrackListViewController.h */,
 				04C00E571810194A001839A8 /* TrackListViewController.m */,
 				04C00E581810194A001839A8 /* TrackListViewController.xib */,
@@ -525,12 +540,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04A021271815A6C00002B91B /* button_play.png in Resources */,
 				04C00E5A1810194A001839A8 /* TrackListViewController.xib in Resources */,
 				042851D71810145D008CBA33 /* Images.xcassets in Resources */,
 				04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */,
 				04C00E5C181019F7001839A8 /* example.mp3 in Resources */,
+				04A021261815A6C00002B91B /* button_next.png in Resources */,
+				04A021291815A6C00002B91B /* button_stop.png in Resources */,
 				042851C91810145D008CBA33 /* InfoPlist.strings in Resources */,
 				042851D21810145D008CBA33 /* Main.storyboard in Resources */,
+				04A021281815A6C00002B91B /* button_prev.png in Resources */,
+				04A0211D18159BC00002B91B /* no_image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
