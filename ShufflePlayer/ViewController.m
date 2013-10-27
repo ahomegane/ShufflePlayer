@@ -6,6 +6,16 @@
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
 
+//アカウントは必須か
+//ジャンル選択
+//バックリンク
+//画像サイズ
+//切り替え時の遅延　ロード中の検知
+//一時停止
+//波形
+//曲が終了したら次の曲へ
+//ログインいていないときにアラートがでない
+
 #import "SCUI.h"
 #import "ViewController.h"
 #import "TrackListViewController.h"
@@ -16,6 +26,10 @@
     int trackIndex;
     NSArray *tracks;
     NSDictionary *track;
+    SCAccount *scaccount;
+    
+    UIImageView *artworkImageView;
+    UIButton *titleButton;
     
     UIImage *playImage;
     UIImage *stopImage;
@@ -32,7 +46,7 @@
 {
     [super viewDidLoad];
     
-    [self setControls];
+    [self setElement];
     
     SCRequestResponseHandler handler;
     handler = ^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -43,9 +57,8 @@
                                              error:&jsonError];
         if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
             tracks = (NSArray *)jsonResponse;
-            
-            trackIndex = 1;
-            [self changeTrackData:trackIndex];
+            trackIndex = 0;
+            track = [tracks objectAtIndex:trackIndex];
             [self setMusic];
         }
     };
@@ -60,9 +73,38 @@
 
 }
 
-- (void)changeTrackData:(int)index
+
+- (void)setElement
 {
-    track = [tracks objectAtIndex:index];
+    artworkImageView = [[UIImageView alloc] init];
+    artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
+    artworkImageView.frame = CGRectMake(30,70,260,260);
+    [self.view addSubview:artworkImageView];
+    
+    titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    titleButton.frame = CGRectMake(30,340,260,20);
+    [self.view addSubview:titleButton];
+    
+    playImage = [UIImage imageNamed:@"button_play.png"];
+    UIButton *playButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    playButton.frame = CGRectMake(139,390,41,48);
+    [playButton setImage:playImage forState:UIControlStateNormal];
+    [self.view addSubview:playButton];
+    [playButton addTarget:self action:@selector( playMusic: ) forControlEvents:UIControlEventTouchUpInside ];
+    
+    UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
+    UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    prevButton.frame = CGRectMake(29,390,40,48);
+    [prevButton setImage:prevImage forState:UIControlStateNormal];
+    [self.view addSubview:prevButton];
+    [prevButton addTarget:self action:@selector( prevMusic: ) forControlEvents:UIControlEventTouchUpInside ];
+    
+    UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
+    UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    nextButton.frame = CGRectMake(249,390,40,48);
+    [nextButton setImage:nextImage forState:UIControlStateNormal];
+    [self.view addSubview:nextButton];
+    [nextButton addTarget:self action:@selector( nextMusic: ) forControlEvents:UIControlEventTouchUpInside ];
 }
 
 - (void)setMusic
@@ -72,63 +114,80 @@
     NSString *artworkUrl = [track objectForKey:@"artwork_url"];
     NSLog(@"%@", artworkUrl);
     UIImage *artworkImage;
-    UIImageView *artworkImageView;
     if (! [artworkUrl isEqual:[NSNull null]]) {
         NSData *artworkData = [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
         artworkImage = [[UIImage alloc] initWithData:artworkData];
-        artworkImageView = [[UIImageView alloc] initWithImage:artworkImage];
-        artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
     } else {
         artworkImage = [UIImage imageWithContentsOfFile: [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"]];
-        artworkImageView = [[UIImageView alloc] initWithImage:artworkImage];
     }
-    artworkImageView.frame = CGRectMake(30,
-                                        70,
-                                        260,
-                                        260);
-    [self.view addSubview:artworkImageView];
+    artworkImageView.image = artworkImage;
     
     NSString *title = [track objectForKey:@"title"];
-    UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    titleButton.frame = CGRectMake(30,340,260,20);
     [titleButton setTitle:title forState:UIControlStateNormal];
-    [self.view addSubview:titleButton];
 }
 
-- (void)setControls
+-(void)prevMusic:(UIButton *)prevButton
 {
-    if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
-    UIButton *playButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    playButton.frame = CGRectMake(139,390,41,48);
-    [playButton setImage:playImage forState:UIControlStateNormal];
-    [self.view addSubview:playButton];
-    
-    [playButton addTarget:self action:@selector( playMusic: ) forControlEvents:UIControlEventTouchUpInside ];
-    
-    UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
-    UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    prevButton.frame = CGRectMake(29,390,40,48);
-    [prevButton setImage:prevImage forState:UIControlStateNormal];
-    [self.view addSubview:prevButton];
-    
-    UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
-    UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    nextButton.frame = CGRectMake(249,390,40,48);
-    [nextButton setImage:nextImage forState:UIControlStateNormal];
-    [self.view addSubview:nextButton];
+    if (trackIndex == 0) return;
+    trackIndex--;
+    track = [tracks objectAtIndex:trackIndex];
+    [self setMusic];
+    if (isPlay) {
+        [player stop];
+        [self playMusic:nil];
+    }
+}
+
+-(void)nextMusic:(UIButton *)nextButton
+{
+    if (trackIndex == [tracks count] - 1) return;
+    trackIndex++;
+    track = [tracks objectAtIndex:trackIndex];
+    [self setMusic];
+    if (isPlay) {
+        [player stop];
+        [self playMusic:nil];
+    }
 }
 
 -(void)playMusic:(UIButton *)playButton
 {
     
-    if (isPlay) {
+    if (isPlay && playButton) {
         isPlay = false;
         if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
         [playButton setImage:playImage forState:UIControlStateNormal];
-        [player stop];
+        [player pause];
         return;
     }
     
+    if (! scaccount) scaccount = [self getAccount];
+    if (! scaccount) return;
+    
+    isPlay = true;
+    if (playButton) {
+        if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
+        [playButton setImage:stopImage forState:UIControlStateNormal];
+    }
+    
+    NSString *streamURL = [track objectForKey:@"stream_url"];
+    NSLog(@"%@", streamURL);
+    
+    [SCRequest performMethod:SCRequestMethodGET
+                  onResource:[NSURL URLWithString:streamURL]
+             usingParameters:nil
+                 withAccount:scaccount
+      sendingProgressHandler:nil
+             responseHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                 NSError *playerError;
+                 player = [[AVAudioPlayer alloc] initWithData:data error:&playerError];
+                 [player prepareToPlay];
+                 [player play];
+             }];
+}
+
+- (id)getAccount
+{
     SCAccount *account = [SCSoundCloud account];
     if (account == nil) {
         UIAlertView *alert = [[UIAlertView alloc]
@@ -138,27 +197,9 @@
                               cancelButtonTitle:@"OK"
                               otherButtonTitles:nil];
         [alert show];
-        return;
+        return nil;
     }
-    
-    isPlay = true;
-    if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
-    [playButton setImage:stopImage forState:UIControlStateNormal];
-
-    NSString *streamURL = [track objectForKey:@"stream_url"];
-    NSLog(@"%@", streamURL);
-    
-    [SCRequest performMethod:SCRequestMethodGET
-                  onResource:[NSURL URLWithString:streamURL]
-             usingParameters:nil
-                 withAccount:account
-      sendingProgressHandler:nil
-             responseHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                 NSError *playerError;
-                 player = [[AVAudioPlayer alloc] initWithData:data error:&playerError];
-                 [player prepareToPlay];
-                 [player play];
-             }];
+    return account;
 }
 
 - (void)didReceiveMemoryWarning
