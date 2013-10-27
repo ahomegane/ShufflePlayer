@@ -10,11 +10,12 @@
 //ジャンル選択
 //バックリンク
 //画像サイズ
+//ログインいていないときにアラートがでない
+
+//AVAudioPlayer
 //切り替え時の遅延　ロード中の検知
 //一時停止
-//波形
 //曲が終了したら次の曲へ
-//ログインいていないときにアラートがでない
 
 #import "SCUI.h"
 #import "ViewController.h"
@@ -24,11 +25,12 @@
 {
     bool isPlay;
     int trackIndex;
-    NSArray *tracks;
+    NSMutableArray *tracks;
     NSDictionary *track;
     SCAccount *scaccount;
     
     UIImageView *artworkImageView;
+    UIImageView *waveformImageView;
     UIButton *titleButton;
     
     UIImage *playImage;
@@ -56,23 +58,43 @@
                                              options:0
                                              error:&jsonError];
         if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
-            tracks = (NSArray *)jsonResponse;
+            tracks = [(NSArray *)jsonResponse mutableCopy];
+            tracks = [self filterTracks:tracks];
             trackIndex = 0;
             track = [tracks objectAtIndex:trackIndex];
             [self setMusic];
         }
     };
     
-    NSString *resourceURL = @"https://api.soundcloud.com/tracks.json?client_id=cef5e6d3c083503120892b041572abff";
+    NSString *resourceURL = @"https://api.soundcloud.com/tracks.json";
     [SCRequest performMethod:SCRequestMethodGET
                   onResource:[NSURL URLWithString:resourceURL]
-             usingParameters:nil
+             usingParameters: [NSDictionary dictionaryWithObjectsAndKeys:
+                               @"cef5e6d3c083503120892b041572abff", @"client_id",
+//                               @"ahomegane", @"q",
+                               @"hiphop", @"genres",
+                               @"japan", @"tags",
+                               @"public,streamable", @"filter",
+                               nil]
                  withAccount:nil
       sendingProgressHandler:nil
              responseHandler:handler];
 
 }
 
+- (id)filterTracks:(NSMutableArray *)_tracks
+{
+    for(int i = 0; i < [_tracks count]; i++){
+        NSDictionary *_track = [_tracks objectAtIndex:i];
+        int favorite = [[_track objectForKey:@"favoritings_count"] intValue];
+        int contentSize = [[_track objectForKey:@"original_content_size"] intValue] /  1000000;
+        if (contentSize > 7 || favorite < 3) {
+            [_tracks removeObjectAtIndex:i];
+            i--;
+        }
+    }
+    return _tracks;
+}
 
 - (void)setElement
 {
@@ -81,27 +103,33 @@
     artworkImageView.frame = CGRectMake(30,70,260,260);
     [self.view addSubview:artworkImageView];
     
+    waveformImageView = [[UIImageView alloc] init];
+    waveformImageView.contentMode = UIViewContentModeScaleAspectFit;
+    waveformImageView.frame = CGRectMake(30,330,260,41);
+    waveformImageView.backgroundColor = [UIColor lightGrayColor];
+    [self.view addSubview:waveformImageView];
+    
     titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    titleButton.frame = CGRectMake(30,340,260,20);
+    titleButton.frame = CGRectMake(30,380,260,20);
     [self.view addSubview:titleButton];
     
     playImage = [UIImage imageNamed:@"button_play.png"];
     UIButton *playButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    playButton.frame = CGRectMake(139,390,41,48);
+    playButton.frame = CGRectMake(139,430,41,48);
     [playButton setImage:playImage forState:UIControlStateNormal];
     [self.view addSubview:playButton];
     [playButton addTarget:self action:@selector( playMusic: ) forControlEvents:UIControlEventTouchUpInside ];
     
     UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
     UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    prevButton.frame = CGRectMake(29,390,40,48);
+    prevButton.frame = CGRectMake(29,430,40,48);
     [prevButton setImage:prevImage forState:UIControlStateNormal];
     [self.view addSubview:prevButton];
     [prevButton addTarget:self action:@selector( prevMusic: ) forControlEvents:UIControlEventTouchUpInside ];
     
     UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
     UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    nextButton.frame = CGRectMake(249,390,40,48);
+    nextButton.frame = CGRectMake(249,430,40,48);
     [nextButton setImage:nextImage forState:UIControlStateNormal];
     [self.view addSubview:nextButton];
     [nextButton addTarget:self action:@selector( nextMusic: ) forControlEvents:UIControlEventTouchUpInside ];
@@ -121,6 +149,11 @@
         artworkImage = [UIImage imageWithContentsOfFile: [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"]];
     }
     artworkImageView.image = artworkImage;
+    
+    NSString *waveformUrl = [track objectForKey:@"waveform_url"];
+    NSData *waveformData = [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
+    UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
+    waveformImageView.image = waveformImage;
     
     NSString *title = [track objectForKey:@"title"];
     [titleButton setTitle:title forState:UIControlStateNormal];
