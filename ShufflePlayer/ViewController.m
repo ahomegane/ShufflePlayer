@@ -14,10 +14,9 @@
 
 //AVAudioPlayer
 //http://lab.dolice.net/blog/2013/07/14/objc-av-audio-player/
+//http://blog.volv.jp/memo/2011/06/avaudioplayer.html
 //切り替え時の遅延　ロード中の検知
-//一時停止
-//曲が終了したら次の曲へ
-//曲進行中の表示
+//バックグラウンド再生でほかのアプリで音楽が再生されて戻ってきたとき
 
 #import "SCUI.h"
 #import "ViewController.h"
@@ -31,11 +30,12 @@
     NSDictionary *track;
     SCAccount *scaccount;
     NSString *permalinkUrl;
+    NSTimer *sequenceTimer;
     
     UIImageView *artworkImageView;
     UIImageView *waveformImageView;
+    UIImageView *waveformSequenceView;
     UIButton *titleButton;
-    
     UIImage *playImage;
     UIImage *stopImage;
 }
@@ -82,6 +82,8 @@
                  withAccount:nil
       sendingProgressHandler:nil
              responseHandler:handler];
+    
+    sequenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(playSequence) userInfo:nil repeats:YES];
 
 }
 
@@ -105,11 +107,15 @@
     artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
     artworkImageView.frame = CGRectMake(30,70,260,260);
     [self.view addSubview:artworkImageView];
-    
+
+    waveformSequenceView = [[UIImageView alloc] init];
+    waveformSequenceView.frame = CGRectMake(30,330,0,41);
+    waveformSequenceView.backgroundColor = [UIColor lightGrayColor];
+    [self.view addSubview:waveformSequenceView];
+
     waveformImageView = [[UIImageView alloc] init];
     waveformImageView.contentMode = UIViewContentModeScaleAspectFit;
     waveformImageView.frame = CGRectMake(30,330,260,41);
-    waveformImageView.backgroundColor = [UIColor lightGrayColor];
     [self.view addSubview:waveformImageView];
     
     titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -175,6 +181,7 @@
     trackIndex--;
     track = [tracks objectAtIndex:trackIndex];
     [self setMusic];
+    isPause = false;
     if (player.playing) {
         [player stop];
         [self playMusic:nil];
@@ -187,6 +194,7 @@
     trackIndex++;
     track = [tracks objectAtIndex:trackIndex];
     [self setMusic];
+    isPause = false;
     if (player.playing) {
         [player stop];
         [self playMusic:nil];
@@ -196,24 +204,21 @@
 -(void)playMusic:(UIButton *)playButton
 {
     
-    if (playButton) {
-        if (player.playing) {
-            if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
-            [playButton setImage:playImage forState:UIControlStateNormal];
-            [player pause];
-            isPause = true;
-            return;
-        }
+    if (playButton && player.playing) {
+        if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
+        [playButton setImage:playImage forState:UIControlStateNormal];
+        [player pause];
+        isPause = true;
+        return;
+    }
         
-        if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
-        [playButton setImage:stopImage forState:UIControlStateNormal];
+    if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
+    [playButton setImage:stopImage forState:UIControlStateNormal];
 
-        if (isPause) {
-            [player prepareToPlay];
-            [player play];
-            isPause = false;
-            return;
-        }
+    if (playButton && isPause) {
+        [player play];
+        isPause = false;
+        return;
     }
     
     if (! scaccount) scaccount = [self getAccount];
@@ -228,13 +233,23 @@
                  withAccount:scaccount
       sendingProgressHandler:nil
              responseHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                 [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+                 
                  NSError *playerError;
                  player = [[AVAudioPlayer alloc] initWithData:data error:&playerError];
+                 
+                 //バックグラウンド再生
+                 AVAudioSession* audioSession = [AVAudioSession sharedInstance];
+                 NSError* sessionError = nil;
+                 [audioSession setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
+                 [audioSession setActive:YES error:&sessionError];
+
                  [player prepareToPlay];
                  player.currentTime = 0;
                  [player play];
+                 [player setDelegate:self];
              }];
-
+    
 }
 
 - (id)getAccount
@@ -281,6 +296,44 @@
     }];
 }
 
+- (void)playSequence {
+    if (player.playing) {
+        NSLog(@"%@", [NSString stringWithFormat:@"%f", player.currentTime]);
+        CGRect rect = waveformSequenceView.frame;
+        waveformSequenceView.frame = CGRectMake(rect.origin.x, rect.origin.y, 260 * player.currentTime / player.duration, rect.size.height);
+    }
+}
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
+    // Music completed
+    if (flag) {
+        [self nextMusic:nil];
+        [self playMusic:nil];
+    }
+}
+
+//RemoteControlDelegate
+//http://blog.valeur3.com/?p=663
+- (void)remoteControlReceivedWithEvent:(UIEvent *)event
+{
+    NSLog(@"receive remote control events");
+}
+//FirstResponderDelegate
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    
+    //ファーストレスポンダ登録
+    [self becomeFirstResponder];
+}
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    //ファーストレスポンダ解除
+    [self resignFirstResponder];
+}
 
 - (IBAction) getTracks:(id) sender
 {
