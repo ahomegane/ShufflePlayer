@@ -13,9 +13,11 @@
 //ログインいていないときにアラートがでない
 
 //AVAudioPlayer
+//http://lab.dolice.net/blog/2013/07/14/objc-av-audio-player/
 //切り替え時の遅延　ロード中の検知
 //一時停止
 //曲が終了したら次の曲へ
+//曲進行中の表示
 
 #import "SCUI.h"
 #import "ViewController.h"
@@ -23,11 +25,12 @@
 
 @interface ViewController ()
 {
-    bool isPlay;
+    bool isPause;
     int trackIndex;
     NSMutableArray *tracks;
     NSDictionary *track;
     SCAccount *scaccount;
+    NSString *permalinkUrl;
     
     UIImageView *artworkImageView;
     UIImageView *waveformImageView;
@@ -137,8 +140,6 @@
 
 - (void)setMusic
 {
-    NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
-    
     NSString *artworkUrl = [track objectForKey:@"artwork_url"];
     NSLog(@"%@", artworkUrl);
     UIImage *artworkImage;
@@ -156,7 +157,16 @@
     waveformImageView.image = waveformImage;
     
     NSString *title = [track objectForKey:@"title"];
+    permalinkUrl = [track objectForKey:@"permalink_url"];
     [titleButton setTitle:title forState:UIControlStateNormal];
+    [titleButton addTarget:self action:@selector( openUrl ) forControlEvents:UIControlEventTouchUpInside ];
+}
+
+-(void)openUrl
+{
+    if (! permalinkUrl) return;
+    NSURL* url = [NSURL URLWithString:permalinkUrl];
+    [[UIApplication sharedApplication] openURL:url];
 }
 
 -(void)prevMusic:(UIButton *)prevButton
@@ -165,7 +175,7 @@
     trackIndex--;
     track = [tracks objectAtIndex:trackIndex];
     [self setMusic];
-    if (isPlay) {
+    if (player.playing) {
         [player stop];
         [self playMusic:nil];
     }
@@ -177,7 +187,7 @@
     trackIndex++;
     track = [tracks objectAtIndex:trackIndex];
     [self setMusic];
-    if (isPlay) {
+    if (player.playing) {
         [player stop];
         [self playMusic:nil];
     }
@@ -186,22 +196,28 @@
 -(void)playMusic:(UIButton *)playButton
 {
     
-    if (isPlay && playButton) {
-        isPlay = false;
-        if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
-        [playButton setImage:playImage forState:UIControlStateNormal];
-        [player pause];
-        return;
+    if (playButton) {
+        if (player.playing) {
+            if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
+            [playButton setImage:playImage forState:UIControlStateNormal];
+            [player pause];
+            isPause = true;
+            return;
+        }
+        
+        if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
+        [playButton setImage:stopImage forState:UIControlStateNormal];
+
+        if (isPause) {
+            [player prepareToPlay];
+            [player play];
+            isPause = false;
+            return;
+        }
     }
     
     if (! scaccount) scaccount = [self getAccount];
     if (! scaccount) return;
-    
-    isPlay = true;
-    if (playButton) {
-        if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
-        [playButton setImage:stopImage forState:UIControlStateNormal];
-    }
     
     NSString *streamURL = [track objectForKey:@"stream_url"];
     NSLog(@"%@", streamURL);
@@ -215,8 +231,10 @@
                  NSError *playerError;
                  player = [[AVAudioPlayer alloc] initWithData:data error:&playerError];
                  [player prepareToPlay];
+                 player.currentTime = 0;
                  [player play];
              }];
+
 }
 
 - (id)getAccount
