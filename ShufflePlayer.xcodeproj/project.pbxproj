@@ -42,6 +42,8 @@
 		04C00E5A1810194A001839A8 /* TrackListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E581810194A001839A8 /* TrackListViewController.xib */; };
 		04C00E5C181019F7001839A8 /* example.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E5B181019F7001839A8 /* example.mp3 */; };
 		04C00E5E18101AA3001839A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C00E5D18101AA3001839A8 /* AVFoundation.framework */; };
+		D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D093D5111848656A007BD3BE /* GenreListViewController.m */; };
+		D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D093D5121848656A007BD3BE /* GenreListViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,6 +196,9 @@
 		04C00E581810194A001839A8 /* TrackListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TrackListViewController.xib; path = ../TrackListViewController.xib; sourceTree = "<group>"; };
 		04C00E5B181019F7001839A8 /* example.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = example.mp3; sourceTree = "<group>"; };
 		04C00E5D18101AA3001839A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		D093D5101848656A007BD3BE /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
+		D093D5111848656A007BD3BE /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
+		D093D5121848656A007BD3BE /* GenreListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenreListViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -294,6 +299,9 @@
 				042851D41810145D008CBA33 /* ViewController.m */,
 				042851D61810145D008CBA33 /* Images.xcassets */,
 				042851C51810145D008CBA33 /* Supporting Files */,
+				D093D5101848656A007BD3BE /* GenreListViewController.h */,
+				D093D5111848656A007BD3BE /* GenreListViewController.m */,
+				D093D5121848656A007BD3BE /* GenreListViewController.xib */,
 			);
 			path = ShufflePlayer;
 			sourceTree = "<group>";
@@ -548,6 +556,7 @@
 				04A021261815A6C00002B91B /* button_next.png in Resources */,
 				04A021291815A6C00002B91B /* button_stop.png in Resources */,
 				042851C91810145D008CBA33 /* InfoPlist.strings in Resources */,
+				D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */,
 				042851D21810145D008CBA33 /* Main.storyboard in Resources */,
 				04A021281815A6C00002B91B /* button_prev.png in Resources */,
 				04A0211D18159BC00002B91B /* no_image.png in Resources */,
@@ -571,6 +580,7 @@
 			files = (
 				04C00E591810194A001839A8 /* TrackListViewController.m in Sources */,
 				042851D51810145D008CBA33 /* ViewController.m in Sources */,
+				D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */,
 				042851CF1810145D008CBA33 /* AppDelegate.m in Sources */,
 				042851CB1810145D008CBA33 /* main.m in Sources */,
 			);

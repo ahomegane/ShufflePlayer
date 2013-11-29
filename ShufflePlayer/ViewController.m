@@ -35,23 +35,49 @@
     UIImageView *artworkImageView;
     UIImageView *waveformImageView;
     UIImageView *waveformSequenceView;
+    UIButton *playButton;
     UIButton *titleButton;
     UIImage *playImage;
     UIImage *stopImage;
+    
+    GenreListViewController *genreListVC;
+    NSArray *genreList;
 }
 @end
 
 @implementation ViewController
 
-//なぜかsynthesizeにしないとエラー
-//AVAudioPlayer *player;ではだめ
 @synthesize player;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
+    genreList = [[NSArray alloc] initWithObjects:@"hiphop", @"electronica", @"breakbeats", @"house", @"techno", @"pops", nil];
+    
     [self setElement];
+    [self changeGenre: genreList];
+    
+    sequenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(playSequence) userInfo:nil repeats:YES];
+
+}
+
+- (void)changeGenre:(NSArray *)genres
+{
+    NSString *resourceURL = @"https://api.soundcloud.com/tracks.json";
+    //    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+    //                            @"cef5e6d3c083503120892b041572abff", @"client_id",
+    //                            @"ahomegane", @"q",
+    //                            @"hiphop", @"genres",
+    //                            @"japan", @"tags",
+    //                            @"public,streamable", @"filter",
+    //                            nil];
+    NSString *genreString = [genres componentsJoinedByString:@","];
+    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                            @"cef5e6d3c083503120892b041572abff", @"client_id",
+                            genreString, @"genres",
+                            @"public,streamable", @"filter",
+                            nil];
     
     SCRequestResponseHandler handler;
     handler = ^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -66,25 +92,16 @@
             trackIndex = 0;
             track = [tracks objectAtIndex:trackIndex];
             [self setMusic];
+            [self playMusic:playButton];
         }
     };
     
-    NSString *resourceURL = @"https://api.soundcloud.com/tracks.json";
     [SCRequest performMethod:SCRequestMethodGET
                   onResource:[NSURL URLWithString:resourceURL]
-             usingParameters: [NSDictionary dictionaryWithObjectsAndKeys:
-                               @"cef5e6d3c083503120892b041572abff", @"client_id",
-//                               @"ahomegane", @"q",
-                               @"hiphop", @"genres",
-                               @"japan", @"tags",
-                               @"public,streamable", @"filter",
-                               nil]
+             usingParameters: params
                  withAccount:nil
       sendingProgressHandler:nil
              responseHandler:handler];
-    
-    sequenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(playSequence) userInfo:nil repeats:YES];
-
 }
 
 - (id)filterTracks:(NSMutableArray *)_tracks
@@ -99,6 +116,15 @@
         }
     }
     return _tracks;
+}
+
+- (void)selectGenre:(NSArray *)_genreList
+{
+    if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
+    [playButton setImage:stopImage forState:UIControlStateNormal];
+    [player stop];
+    [self changeGenre:_genreList];
+    [genreListVC dismissViewControllerAnimated:YES completion: nil];
 }
 
 - (void)setElement
@@ -123,7 +149,7 @@
     [self.view addSubview:titleButton];
     
     playImage = [UIImage imageNamed:@"button_play.png"];
-    UIButton *playButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    playButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     playButton.frame = CGRectMake(139,430,41,48);
     [playButton setImage:playImage forState:UIControlStateNormal];
     [self.view addSubview:playButton];
@@ -201,21 +227,21 @@
     }
 }
 
--(void)playMusic:(UIButton *)playButton
+-(void)playMusic:(UIButton *)_playButton
 {
     
-    if (playButton && player.playing) {
+    if (_playButton && player.playing) {
         if (playImage == nil) playImage = [UIImage imageNamed:@"button_play.png"];
-        [playButton setImage:playImage forState:UIControlStateNormal];
+        [_playButton setImage:playImage forState:UIControlStateNormal];
         [player pause];
         isPause = true;
         return;
     }
         
     if (stopImage == nil) stopImage = [UIImage imageNamed:@"button_stop.png"];
-    [playButton setImage:stopImage forState:UIControlStateNormal];
+    [_playButton setImage:stopImage forState:UIControlStateNormal];
 
-    if (playButton && isPause) {
+    if (_playButton && isPause) {
         [player play];
         isPause = false;
         return;
@@ -247,7 +273,7 @@
                  [player prepareToPlay];
                  player.currentTime = 0;
                  [player play];
-                 [player setDelegate:self];
+                 player.delegate = self;
              }];
     
 }
@@ -333,6 +359,17 @@
     [super viewWillDisappear:animated];
     //ファーストレスポンダ解除
     [self resignFirstResponder];
+}
+
+- (IBAction) openGenreList:(id) sender
+{
+    genreListVC = [[GenreListViewController alloc]
+                   initWithNibName:@"GenreListViewController"
+                   bundle:nil];
+    genreListVC.genreData = genreList;
+    genreListVC.delegate = self;
+    [self presentViewController:genreListVC
+                       animated:YES completion:nil];
 }
 
 - (IBAction) getTracks:(id) sender
