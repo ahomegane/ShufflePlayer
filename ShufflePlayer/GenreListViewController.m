@@ -16,6 +16,7 @@
 @implementation GenreListViewController
 
 @synthesize genreData;
+@synthesize delegate;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
