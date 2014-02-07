@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import "GenreListViewController.h"
 
-@interface ViewController : UIViewController <GenreListViewControllerDelegate, AVAudioPlayerDelegate>
+@interface ViewController : UIViewController<GenreListViewControllerDelegate, AVAudioSessionDelegate>
 
--(void)selectGenre:(NSArray *)genreList;
+- (void)selectGenre:(NSArray*)genreList;
 
 @end

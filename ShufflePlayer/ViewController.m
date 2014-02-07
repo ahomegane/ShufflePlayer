@@ -6,24 +6,19 @@
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
 
-//ローディング
 // Class分け
-// アカウント保存
-// 再生の表示
-
-// AVAudioPlayer
-// http://lab.dolice.net/blog/2013/07/14/objc-av-audio-player/
-// http://blog.volv.jp/memo/2011/06/avaudioplayer.html
-//バックグラウンド再生でほかのアプリで音楽が再生されて戻ってきたとき
-
 #import "SCUI.h"
 #import "ViewController.h"
 #import "TrackListViewController.h"
 
 @interface ViewController () {
-  AVAudioPlayer* _player;
 
-  SCAccount* _scaccount;
+  BOOL _isInterruptionBeginInPlayFlag;
+
+  AVPlayer* _player;
+  AVPlayerItem* _playerItem;
+
+  SCAccount* _scAccount;
 
   NSMutableArray* _tracks;
   int _trackIndex;
@@ -39,19 +34,51 @@
 
   GenreListViewController* _genreListVC;
   NSArray* _genreList;
+
+  // ローディング
+  UIView* _loadingView;
+  UIActivityIndicatorView* _indicator;
 }
 @end
 
 @implementation ViewController
 
+NSString* const _SC_CLIENT_ID = @"cef5e6d3c083503120892b041572abff";
+NSString* const _ARTWORK_IMAGE_SIZE = @"t500x500";
+NSString* const _SC_TRACK_REQUEST_URL =
+    @"https://api.soundcloud.com/tracks.json";
+NSString* const _SC_LIKE_URL = @"https://api.soundcloud.com/me/favorites/";
+
 - (void)viewDidLoad {
   [super viewDidLoad];
+  
+//  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
 
+  // sequence timer
   [NSTimer scheduledTimerWithTimeInterval:0.1
                                    target:self
                                  selector:@selector(playSequence)
                                  userInfo:nil
                                   repeats:YES];
+
+  // バックグラウンド再生
+  AVAudioSession* audioSession = [AVAudioSession sharedInstance];
+  [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+  [audioSession setActive:YES error:nil];
+
+  // 音楽再生の割り込み
+  NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+  [center addObserver:self
+             selector:@selector(sessionDidInterrupt:)
+                 name:AVAudioSessionInterruptionNotification
+               object:nil];
+  [center addObserver:self
+             selector:@selector(sessionRouteDidChange:)
+                 name:AVAudioSessionRouteChangeNotification
+               object:nil];
+
+  // ロック画面用 remoteControlEventsを受け取り開始
+  [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 
   _genreList = [[NSArray alloc] initWithObjects:@"hiphop",
                                                 @"electronica",
@@ -64,7 +91,7 @@
                                                 nil];
 
   [self initElement];
-  [self changeGenre:_genreList withFlagForcePlay:false];
+  [self changeGenre:_genreList withFlagForcePlay:NO];
 }
 
 - (void)initElement {
@@ -114,25 +141,72 @@
   [nextButton addTarget:self
                  action:@selector(touchNextButton:)
        forControlEvents:UIControlEventTouchUpInside];
+
+  UIButton* genreButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  genreButton.frame = CGRectMake(20, 520, 52, 30);
+  [self.view addSubview:genreButton];
+  [genreButton setTitle:@"Genre" forState:UIControlStateNormal];
+  [genreButton addTarget:self
+                  action:@selector(touchGenreButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+
+  UIButton* likeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  likeButton.frame = CGRectMake(20, 30, 50, 30);
+  [self.view addSubview:likeButton];
+  [likeButton setTitle:@"Like" forState:UIControlStateNormal];
+  [likeButton addTarget:self
+                 action:@selector(touchLikeButton:)
+       forControlEvents:UIControlEventTouchUpInside];
+
+  // loading
+  _loadingView = [[UIView alloc] initWithFrame:self.view.bounds];
+  _loadingView.backgroundColor = [UIColor whiteColor];
+  //  _loadingView.alpha = 0.5f;
+
+  _indicator = [[UIActivityIndicatorView alloc]
+      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+  _indicator.activityIndicatorViewStyle =
+      UIActivityIndicatorViewStyleWhiteLarge;
+  _indicator.color = [UIColor blackColor];
+  [_indicator setCenter:CGPointMake(_loadingView.bounds.size.width / 2,
+                                    _loadingView.bounds.size.height / 2)];
+  [_loadingView addSubview:_indicator];
+  [self.view addSubview:_loadingView];
+
+  // genreListViewControler
+  _genreListVC = [[GenreListViewController alloc]
+      initWithNibName:@"GenreListViewController"
+               bundle:nil];
+  _genreListVC.genreData = _genreList;
+  _genreListVC.delegate = self;
 }
 
-- (void)changeGenre:(NSArray*)genres withFlagForcePlay:(bool)isForcePlay {
-  NSString* resourceURL = @"https://api.soundcloud.com/tracks.json";
+- (void)beginLoading {
+  _loadingView.hidden = NO;
+  [_indicator startAnimating];
+}
+
+- (void)endLoading {
+  [_indicator stopAnimating];
+  _loadingView.hidden = YES;
+}
+
+- (void)changeGenre:(NSArray*)genres withFlagForcePlay:(BOOL)isForcePlay {
+  [self beginLoading];
+
   //    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
   //                            @"cef5e6d3c083503120892b041572abff",
   // @"client_id",
   //                            @"ahomegane", @"q",
   //                            @"hiphop", @"genres",
   //                            @"japan", @"tags",
-  //                            @"public,streamable", @"filter",
+  //                            @"public,streamable", @"filter",//効かない
   //                            nil];
   NSDictionary* params = [NSDictionary
-      dictionaryWithObjectsAndKeys:@"cef5e6d3c083503120892b041572abff",
+      dictionaryWithObjectsAndKeys:_SC_CLIENT_ID,
                                    @"client_id",
                                    [genres componentsJoinedByString:@","],
                                    @"genres",
-                                   @"public,streamable",
-                                   @"filter",
                                    nil];
 
   SCRequestResponseHandler handler =
@@ -149,10 +223,11 @@
       [self changeTrack:[_tracks objectAtIndex:_trackIndex]
           withFlagForcePlay:isForcePlay];
     }
+    [self endLoading];
   };
 
   [SCRequest performMethod:SCRequestMethodGET
-                  onResource:[NSURL URLWithString:resourceURL]
+                  onResource:[NSURL URLWithString:_SC_TRACK_REQUEST_URL]
              usingParameters:params
                  withAccount:nil
       sendingProgressHandler:nil
@@ -161,13 +236,17 @@
 
 - (NSMutableArray*)filterTracks:(NSMutableArray*)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSDictionary* _track = [tracks objectAtIndex:i];
+    NSDictionary* track = [tracks objectAtIndex:i];
     //        int favorite = [[_track objectForKey:@"favoritings_count"]
     // intValue];
     //        int contentSize = [[_track objectForKey:@"original_content_size"]
     // intValue] /  1000000;
-    NSString* streamURL = [_track objectForKey:@"stream_url"];
-    if (streamURL == nil) {  // contentSize > 7 || favorite < 3
+    BOOL streamable = [[track objectForKey:@"streamable"] boolValue];
+    NSString* format = [track objectForKey:@"original_format"];
+    NSString* sharing = [track objectForKey:@"sharing"];
+    if (!streamable || [format isEqualToString:@"wav"] ||
+        ![sharing isEqualToString:@"public"]) {  // contentSize > 7 || favorite
+                                                 // < 3
       [tracks removeObjectAtIndex:i];
       i--;
     }
@@ -184,18 +263,24 @@
   return tracks;
 }
 
-- (void)selectGenre:(NSArray*)genreList {
-  [self changeGenre:genreList withFlagForcePlay:true];
-  [_genreListVC dismissViewControllerAnimated:YES completion:nil];
-}
-
 - (void)renderTrackInfo:(NSDictionary*)track {
+
   NSString* artworkUrl = [track objectForKey:@"artwork_url"];
-  NSLog(@"%@", artworkUrl);
   UIImage* artworkImage;
   if (![artworkUrl isEqual:[NSNull null]]) {
+    NSRegularExpression* regexp = [NSRegularExpression
+        regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
+                             options:0
+                               error:nil];
+    NSString* artworkUrlLarge = [regexp
+        stringByReplacingMatchesInString:artworkUrl
+                                 options:0
+                                   range:NSMakeRange(0, artworkUrl.length)
+                            withTemplate:[NSString stringWithFormat:
+                                                       @"$1-%@.$2",
+                                                       _ARTWORK_IMAGE_SIZE]];
     NSData* artworkData =
-        [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
+        [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
     artworkImage = [[UIImage alloc] initWithData:artworkData];
   } else {
     artworkImage = [UIImage
@@ -217,9 +302,21 @@
                    action:@selector(openUrl)
          forControlEvents:UIControlEventTouchUpInside];
 
+  // waveform初期化
   CGRect rect = _waveformSequenceView.frame;
   _waveformSequenceView.frame =
       CGRectMake(rect.origin.x, rect.origin.y, 0, rect.size.height);
+
+  // ロック画面に渡す
+  MPMediaItemArtwork* artwork =
+      [[MPMediaItemArtwork alloc] initWithImage:_artworkImageView.image];
+  NSDictionary* songInfo =
+      [NSDictionary dictionaryWithObjectsAndKeys:artwork,
+                                                 MPMediaItemPropertyArtwork,
+                                                 title,
+                                                 MPMediaItemPropertyTitle,
+                                                 nil];
+  [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
 }
 
 - (void)openUrl {
@@ -230,38 +327,46 @@
 }
 
 - (void)changeTrack:(NSDictionary*)newTrack
-    withFlagForcePlay:(bool)isForcePlay {
+    withFlagForcePlay:(BOOL)isForcePlay {
   // updateAudioData で _player が更新される前の状態を保存
-  bool isPlaying = _player.playing;
+  BOOL isPlaying = [_player rate] != 0.0 ? YES : NO;
   if (isForcePlay) {
     isPlaying = YES;
   }
 
   [self renderTrackInfo:newTrack];
 
-  if (_scaccount == nil) {
-    [self login: nil widthLoginedCallback:^()
-    {
-      _scaccount = [self getAccount];
-      [self updateAudioData: newTrack withLoadedCallback:^()
-      {
-        if (isPlaying) {
-          [self playStateToPlay];
-        } else {
-          [self playStateToStop];
-        }
-      }];
-    }];
-  } else {
-    [self updateAudioData: newTrack withLoadedCallback:^()
-    {
-      if (isPlaying) {
-        [self playStateToPlay];
-      } else {
-        [self playStateToStop];
-      }
-    }];
-  }
+  //  if (_scAccount == nil) {
+  //    [self login: nil widthLoginedCallback:^()
+  //    {
+  //      _scAccount = [self getScAccount];
+  //      [self updateAudioData: newTrack withLoadedCallback:^()
+  //      {
+  //        if (isPlaying) {
+  //          [self playStateToPlay];
+  //        } else {
+  //          [self playStateToStop];
+  //        }
+  //      }];
+  //    }];
+  //  } else {
+  //    [self updateAudioData: newTrack withLoadedCallback:^()
+  //    {
+  //      if (isPlaying) {
+  //        [self playStateToPlay];
+  //      } else {
+  //        [self playStateToStop];
+  //      }
+  //    }];
+  //  }
+  [self updateAudioData: newTrack withLoadedCallback:^()
+   {
+    if (isPlaying) {
+      [self playStateToPlay];
+    } else {
+      [self playStateToStop];
+    }
+  }];
 }
 
 - (void)playStateToPlay {
@@ -269,6 +374,7 @@
     return;
   [_playButton setImage:_stopImage forState:UIControlStateNormal];
   [_player play];
+  _isInterruptionBeginInPlayFlag = YES;
 }
 
 - (void)playStateToStop {
@@ -276,9 +382,10 @@
     return;
   [_playButton setImage:_playImage forState:UIControlStateNormal];
   [_player pause];
+  _isInterruptionBeginInPlayFlag = NO;
 }
 
-- (void)prevTrack:(bool)isFrocePlay {
+- (void)prevTrack:(BOOL)isFrocePlay {
   if (_trackIndex == 0)
     return;
   _trackIndex--;
@@ -286,7 +393,7 @@
       withFlagForcePlay:isFrocePlay];
 }
 
-- (void)nextTrack:(bool)isFrocePlay {
+- (void)nextTrack:(BOOL)isFrocePlay {
   if (_trackIndex == [_tracks count] - 1)
     return;
   _trackIndex++;
@@ -296,74 +403,236 @@
 
 - (void)updateAudioData:(NSDictionary*)newTrack
      withLoadedCallback:(void (^)())callback {
-  [SCRequest performMethod:SCRequestMethodGET
-                onResource:[NSURL URLWithString: [newTrack objectForKey:@"stream_url"]]
-           usingParameters:nil
-               withAccount:_scaccount
-    sendingProgressHandler:nil
-           responseHandler:^(NSURLResponse *response, NSData *data, NSError *error)
-  {
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
 
-    NSError* playerError;
-    _player = [[AVAudioPlayer alloc] initWithData:data error:&playerError];
-    _player.delegate = self;
+  NSString* streamUrl =
+      [NSString stringWithFormat:@"%@?client_id=%@",
+                                 [newTrack objectForKey:@"stream_url"],
+                                 _SC_CLIENT_ID];
 
-    //バックグラウンド再生
-    AVAudioSession* audioSession = [AVAudioSession sharedInstance];
-    NSError* sessionError = nil;
-    [audioSession setCategory:AVAudioSessionCategoryPlayback
-                        error:&sessionError];
-    [audioSession setActive:YES error:&sessionError];
+  NSLog(@"%@", streamUrl);
+  _playerItem =
+      [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:streamUrl]];
+  NSString* ItemStatusContext;
+  [_playerItem addObserver:self
+                forKeyPath:@"status"
+                   options:0
+                   context:&ItemStatusContext];
+  [[NSNotificationCenter defaultCenter]
+      addObserver:self
+         selector:@selector(playerItemDidReachEnd:)
+             name:AVPlayerItemDidPlayToEndTimeNotification
+           object:_playerItem];
 
-    [_player prepareToPlay];
-    _player.currentTime = 0;
+  _player = [AVPlayer playerWithPlayerItem:_playerItem];
 
-    if (callback != nil)
-      callback();
-  }];
-}
-
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer*)player
-                       successfully:(BOOL)flag {
-  // Music completed
-  if (flag) {
-    [self nextTrack:true];
+  if (callback != nil) {
+    callback();
   }
 }
 
+- (void)observeValueForKeyPath:(NSString*)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary*)change
+                       context:(void*)context {
+  NSLog(@"%@", NSStringFromSelector(_cmd));
+  if (object == _playerItem && [keyPath isEqualToString:@"status"]) {
+
+    if (_playerItem.status == AVPlayerStatusReadyToPlay) {
+      NSLog(@"AVPlayerStatusReadyToPlay");
+    } else if (_playerItem.status == AVPlayerStatusFailed) {
+      NSLog(@"AVPlayerStatusFailed");
+    } else if (_playerItem.status == AVPlayerStatusUnknown) {
+      NSLog(@"AVPlayerStatusUnknown");
+    } else if (_playerItem.status == AVPlayerItemStatusReadyToPlay) {
+      NSLog(@"AVPlayerItemStatusReadyToPlay");
+    } else if (_playerItem.status == AVPlayerItemStatusFailed) {
+      NSLog(@"AVPlayerItemStatusFailed");
+    } else if (_playerItem.status == AVPlayerItemStatusUnknown) {
+      NSLog(@"AVPlayerItemStatusUnknown");
+    } else if (_playerItem.status == AVPlayerActionAtItemEndAdvance) {
+      NSLog(@"AVPlayerActionAtItemEndAdvance");
+    } else if (_playerItem.status == AVPlayerActionAtItemEndNone) {
+      NSLog(@"AVPlayerActionAtItemEndNone");
+    } else if (_playerItem.status == AVPlayerActionAtItemEndPause) {
+      NSLog(@"AVPlayerActionAtItemEndPause");
+    }
+
+    if (context == AVPlayerItemDidPlayToEndTimeNotification) {
+      NSLog(@"AVPlayerItemDidPlayToEndTimeNotification");
+    } else if (context == AVPlayerItemFailedToPlayToEndTimeErrorKey) {
+      NSLog(@"AVPlayerItemFailedToPlayToEndTimeErrorKey");
+    } else if (context == AVPlayerItemFailedToPlayToEndTimeNotification) {
+      NSLog(@"AVPlayerItemFailedToPlayToEndTimeNotification");
+    } else if (context == AVPlayerItemNewAccessLogEntryNotification) {
+      NSLog(@"AVPlayerItemNewAccessLogEntryNotification");
+    } else if (context == AVPlayerItemNewErrorLogEntryNotification) {
+      NSLog(@"AVPlayerItemNewErrorLogEntryNotification");
+    } else if (context == AVPlayerItemPlaybackStalledNotification) {
+      NSLog(@"AVPlayerItemPlaybackStalledNotification");
+    } else if (context == AVPlayerItemTimeJumpedNotification) {
+      NSLog(@"AVPlayerItemTimeJumpedNotification");
+    }
+  }
+}
+
+- (void)playerItemDidReachEnd:(NSNotification*)notification {
+  // Music completed
+  [self nextTrack:YES];
+}
+
 - (void)touchPlayButton:(id)sender {
-  if (_player.playing) {  // stop
+  if ([_player rate] != 0.0) {  // stop
     [self playStateToStop];
-    return;
   } else {  // play
     [self playStateToPlay];
   }
 }
 
 - (void)touchPrevButton:(id)sender {
-  [self prevTrack:_player.playing];
+  BOOL isPlay = [_player rate] != 0.0 ? YES : NO;
   [self playStateToStop];
+  [self prevTrack:isPlay];
 }
 
 - (void)touchNextButton:(id)sender {
-  [self nextTrack:_player.playing];
+  BOOL isPlay = [_player rate] != 0.0 ? YES : NO;
   [self playStateToStop];
+  [self nextTrack:isPlay];
 }
 
-- (id)getAccount {
-  SCAccount* account = [SCSoundCloud account];
-  if (account == nil) {
-    UIAlertView* alert =
-        [[UIAlertView alloc] initWithTitle:@"Not Logged In"
-                                   message:@"You must login first"
-                                  delegate:nil
-                         cancelButtonTitle:@"OK"
-                         otherButtonTitles:nil];
-    [alert show];
-    return nil;
+- (void)touchGenreButton:(id)sender {
+  [self playStateToStop];
+  [self presentViewController:_genreListVC animated:YES completion:nil];
+}
+
+- (void)selectGenre:(NSArray*)genreList {
+  [self changeGenre:genreList withFlagForcePlay:YES];
+  [_genreListVC dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)touchLikeButton:(id)sender {
+
+  NSDictionary* currentTrack = [_tracks objectAtIndex:_trackIndex];
+  NSString* resourcetURL =
+      [NSString stringWithFormat:
+                    @"%@%@", _SC_LIKE_URL, [currentTrack objectForKey:@"id"]];
+
+  SCRequestResponseHandler handler =
+      ^(NSURLResponse * response, NSData * data, NSError * error) {
+    if (SC_CANCELED(error)) {
+      NSLog(@"Canceled!");
+    } else if (error) {
+      NSLog(@"Error: %@", [error localizedDescription]);
+    } else {
+      NSLog(@"Liked track: %@", [currentTrack objectForKey:@"id"]);
+    }
+  };
+
+  [self getScAccount: ^(SCAccount * scAccount) {
+    _scAccount = scAccount;
+    [SCRequest performMethod:SCRequestMethodPUT
+                  onResource:[NSURL URLWithString:resourcetURL]
+             usingParameters:nil
+                 withAccount:_scAccount
+      sendingProgressHandler:nil
+             responseHandler:handler];
+  }];
+}
+
+// ロック画面からのイベントを受け取る
+- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent {
+  if (receivedEvent.type == UIEventTypeRemoteControl) {
+
+    switch (receivedEvent.subtype) {
+
+      case UIEventSubtypeRemoteControlPlay:
+      case UIEventSubtypeRemoteControlPause:
+      case UIEventSubtypeRemoteControlTogglePlayPause:
+        [self touchPlayButton:nil];
+        break;
+
+      case UIEventSubtypeRemoteControlNextTrack:
+        [self touchNextButton:nil];
+        break;
+
+      case UIEventSubtypeRemoteControlPreviousTrack:
+        [self touchPrevButton:nil];
+        break;
+
+      default:
+        break;
+    }
   }
-  return account;
+}
+
+// remoteControlReceivedWithEventのため、firstResponderに設定
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  [self becomeFirstResponder];
+}
+
+// 音楽再生の割り込み
+- (void)sessionDidInterrupt:(NSNotification*)notification {
+  switch ([notification.userInfo[AVAudioSessionInterruptionTypeKey] intValue]) {
+    case AVAudioSessionInterruptionTypeEnded:  // 電話 割り込みend
+      NSLog(_isInterruptionBeginInPlayFlag ? @"YES" : @"NO");
+      if (_isInterruptionBeginInPlayFlag) {
+        [self playStateToPlay];
+      } else {
+        [self playStateToStop];
+      }
+      break;
+    case AVAudioSessionInterruptionTypeBegan:  // 電話/ipod 割り込みstart
+    default:
+      [_playButton setImage:_playImage forState:UIControlStateNormal];
+      break;
+  }
+}
+// イヤホンジャック抜いたとき
+- (void)sessionRouteDidChange:(NSNotification*)notification {
+  NSLog(@"%@", NSStringFromSelector(_cmd));
+  [_playButton setImage:_playImage forState:UIControlStateNormal];
+}
+
+- (void)getScAccount:(void (^)())callback {
+  SCAccount* scAccount;
+  
+  if (_scAccount == nil) {
+    
+    scAccount = [self restoreScAccount];
+    
+    if (scAccount == nil) {
+      [self login: nil widthLoginedCallback:^() {
+        
+        SCAccount* scAccount = [SCSoundCloud account];
+        
+        if (scAccount == nil) {
+          UIAlertView* alert =
+          [[UIAlertView alloc] initWithTitle:@"Not Logged In"
+                                     message:@"You must login"
+                                    delegate:nil
+                           cancelButtonTitle:@"OK"
+                           otherButtonTitles:nil];
+          [alert show];
+        } else {
+          [self saveScAccount:scAccount];
+        }
+        if (callback != nil)
+          callback(scAccount);
+      }];
+
+    } else {
+      NSLog(@"restore");
+      if (callback != nil)
+        callback(scAccount);
+    }
+    
+  } else {
+    scAccount = _scAccount;
+
+    if (callback != nil)
+      callback(scAccount);
+  }
 }
 
 - (IBAction)login:(id)sender widthLoginedCallback:(void (^)())callback {
@@ -391,48 +660,32 @@
   }];
 }
 
+-(BOOL)saveScAccount: (SCAccount*) scAccount {
+  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  [defaults setObject:data forKey:@"scAccount"];
+  BOOL isSuccess = [defaults synchronize];
+  return isSuccess;
+}
+
+-(SCAccount*)restoreScAccount {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSData *data = [defaults dataForKey:@"scAccount"];
+  SCAccount* scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  return scAccount;
+}
+
 - (void)playSequence {
-  if (_player.playing) {
-    //    NSLog(@"%@", [NSString stringWithFormat:@"%f", _player.currentTime]);
+  if ([_player rate] != 0.0) {
+    float currentTime = CMTimeGetSeconds(_player.currentTime);
+    NSLog(@"%f", currentTime);
+    float duration = CMTimeGetSeconds(_player.currentItem.asset.duration);
     CGRect rect = _waveformSequenceView.frame;
-    _waveformSequenceView.frame =
-        CGRectMake(rect.origin.x,
-                   rect.origin.y,
-                   260 * _player.currentTime / _player.duration,
-                   rect.size.height);
+    _waveformSequenceView.frame = CGRectMake(rect.origin.x,
+                                             rect.origin.y,
+                                             260 * currentTime / duration,
+                                             rect.size.height);
   }
-}
-
-// RemoteControlDelegate
-// http://blog.valeur3.com/?p=663
-- (void)remoteControlReceivedWithEvent:(UIEvent*)event {
-  NSLog(@"receive remote control events");
-}
-// FirstResponderDelegate
-- (BOOL)canBecomeFirstResponder {
-  return YES;
-}
-- (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
-
-  //ファーストレスポンダ登録
-  [self becomeFirstResponder];
-}
-- (void)viewWillDisappear:(BOOL)animated {
-  [super viewWillDisappear:animated];
-  //ファーストレスポンダ解除
-  [self resignFirstResponder];
-}
-
-- (IBAction)openGenreList:(id)sender {
-  [self playStateToStop];
-
-  _genreListVC = [[GenreListViewController alloc]
-      initWithNibName:@"GenreListViewController"
-               bundle:nil];
-  _genreListVC.genreData = _genreList;
-  _genreListVC.delegate = self;
-  [self presentViewController:_genreListVC animated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {

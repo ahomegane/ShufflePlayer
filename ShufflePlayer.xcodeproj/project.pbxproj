@@ -44,6 +44,9 @@
 		04C00E5E18101AA3001839A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C00E5D18101AA3001839A8 /* AVFoundation.framework */; };
 		D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D093D5111848656A007BD3BE /* GenreListViewController.m */; };
 		D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D093D5121848656A007BD3BE /* GenreListViewController.xib */; };
+		D098312218A33F2E00A6BEC8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D098312118A33F2E00A6BEC8 /* CoreMedia.framework */; };
+		D098312718A33F3D00A6BEC8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */; };
+		D098312A18A4AC1800A6BEC8 /* SCAccount+Coding.m in Sources */ = {isa = PBXBuildFile; fileRef = D098312918A4AC1800A6BEC8 /* SCAccount+Coding.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -199,6 +202,11 @@
 		D093D5101848656A007BD3BE /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
 		D093D5111848656A007BD3BE /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
 		D093D5121848656A007BD3BE /* GenreListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenreListViewController.xib; sourceTree = "<group>"; };
+		D098312118A33F2E00A6BEC8 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		D098312818A4AC1800A6BEC8 /* SCAccount+Coding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SCAccount+Coding.h"; sourceTree = "<group>"; };
+		D098312918A4AC1800A6BEC8 /* SCAccount+Coding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SCAccount+Coding.m"; sourceTree = "<group>"; };
+		D0AD116E18A3332F00D72BA6 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +214,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D098312718A33F3D00A6BEC8 /* MediaPlayer.framework in Frameworks */,
+				D098312218A33F2E00A6BEC8 /* CoreMedia.framework in Frameworks */,
 				04C00E5E18101AA3001839A8 /* AVFoundation.framework in Frameworks */,
 				04285237181015D3008CBA33 /* Security.framework in Frameworks */,
 				04285235181015CA008CBA33 /* QuartzCore.framework in Frameworks */,
@@ -265,6 +275,9 @@
 		042851BD1810145D008CBA33 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D098312118A33F2E00A6BEC8 /* CoreMedia.framework */,
+				D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */,
+				D0AD116E18A3332F00D72BA6 /* CoreAudio.framework */,
 				04C00E5D18101AA3001839A8 /* AVFoundation.framework */,
 				04285236181015D3008CBA33 /* Security.framework */,
 				04285234181015CA008CBA33 /* QuartzCore.framework */,
@@ -284,6 +297,8 @@
 			isa = PBXGroup;
 			children = (
 				04A021221815A6C00002B91B /* button_next.png */,
+				D098312818A4AC1800A6BEC8 /* SCAccount+Coding.h */,
+				D098312918A4AC1800A6BEC8 /* SCAccount+Coding.m */,
 				04A021231815A6C00002B91B /* button_play.png */,
 				04A021241815A6C00002B91B /* button_prev.png */,
 				04A021251815A6C00002B91B /* button_stop.png */,
@@ -581,6 +596,7 @@
 				04C00E591810194A001839A8 /* TrackListViewController.m in Sources */,
 				042851D51810145D008CBA33 /* ViewController.m in Sources */,
 				D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */,
+				D098312A18A4AC1800A6BEC8 /* SCAccount+Coding.m in Sources */,
 				042851CF1810145D008CBA33 /* AppDelegate.m in Sources */,
 				042851CB1810145D008CBA33 /* main.m in Sources */,
 			);
