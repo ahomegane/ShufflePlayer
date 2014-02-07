@@ -8,11 +8,24 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import <MediaPlayer/MediaPlayer.h>
+#import "MusicManager.h"
+#import "AccountManager.h"
 #import "GenreListViewController.h"
 
-@interface ViewController : UIViewController<GenreListViewControllerDelegate, AVAudioSessionDelegate>
+@interface ViewController : UIViewController <MusicManagerDelegate, GenreListViewControllerDelegate,AccountManagerDelegate, AVAudioSessionDelegate>
 
-- (void)selectGenre:(NSArray*)genreList;
+// delegate MusicManager
+- (void)changeGenreBefore;
+- (void)changeGenreComplete;
+- (void)changeTrackBefore:(NSDictionary *)newTrack withplayingBeforeChangeTrackFlag:(BOOL)isPlaying;
+- (void)changeTrackComplete:(NSDictionary *)newTrack withplayingBeforeChangeTrackFlag:(BOOL)isPlaying;
+- (void)playSequenceOnPlaying:(float)currentTime
+            withTrackDuration:(float)duration;
+
+// delegate AccountManager
+- (void)showModal:(id)view;
+
+// delegate GenreListViewController
+- (void)selectGenre:(NSArray *)genreList;
 
 @end

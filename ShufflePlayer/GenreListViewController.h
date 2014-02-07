@@ -10,16 +10,15 @@
 
 @protocol GenreListViewControllerDelegate
 
--(void)selectGenre:(NSArray *)genreList;
+- (void)selectGenre:(NSArray *)genreList;
 
 @end
 
-@interface GenreListViewController : UITableViewController
-{
-     id <GenreListViewControllerDelegate> delegate;
+@interface GenreListViewController : UITableViewController {
+  id<GenreListViewControllerDelegate> delegate;
 }
 
-@property(retain, nonatomic)id <GenreListViewControllerDelegate> delegate;
+@property(retain, nonatomic) id<GenreListViewControllerDelegate> delegate;
 @property(nonatomic, strong) NSArray *genreData;
 
 @end
