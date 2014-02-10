@@ -8,6 +8,7 @@
 #import "ViewController.h"
 #import "SCUI.h"
 #import "Constants.h"
+#import "UIButton+Helper.h"
 
 @interface ViewController () {
 
@@ -16,8 +17,6 @@
   GenreListViewController *_genreListVC;
   
   BOOL _isInterruptionBeginInPlayFlag;
-
-  NSString *_permalinkUrl;
 
   UIImageView *_artworkImageView;
   UIImageView *_waveformImageView;
@@ -95,6 +94,9 @@
   _titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
   _titleButton.frame = CGRectMake(30, 380, 260, 20);
   [self.view addSubview:_titleButton];
+  [_titleButton addTarget:self
+                   action:@selector(touchTitleButton:)
+         forControlEvents:UIControlEventTouchUpInside];
 
   _playImage = [UIImage imageNamed:@"button_play.png"];
   _stopImage = [UIImage imageNamed:@"button_stop.png"];
@@ -200,12 +202,10 @@
   _waveformImageView.image = waveformImage;
 
   NSString *title = [track objectForKey:@"title"];
-  _permalinkUrl = [track objectForKey:@"permalink_url"];
+  NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
   [_titleButton setTitle:title forState:UIControlStateNormal];
-  [_titleButton addTarget:self
-                   action:@selector(openUrl)
-         forControlEvents:UIControlEventTouchUpInside];
-
+  [_titleButton setStringTag:permalinkUrl];
+  
   // waveform初期化
   CGRect rect = _waveformSequenceView.frame;
   _waveformSequenceView.frame =
@@ -220,13 +220,6 @@
   [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
 }
 
-- (void)openUrl {
-  if (!_permalinkUrl)
-    return;
-  NSURL *url = [NSURL URLWithString:_permalinkUrl];
-  [[UIApplication sharedApplication] openURL:url];
-}
-
 - (void)playStateToPlay {
   if ([_musicManager play]) {
     [_playButton setImage:_stopImage forState:UIControlStateNormal];
@@ -239,6 +232,11 @@
     [_playButton setImage:_playImage forState:UIControlStateNormal];
     _isInterruptionBeginInPlayFlag = NO;
   }
+}
+
+- (void)openUrlOnSafari: (NSString *)permalinkUrl {
+  NSURL *url = [NSURL URLWithString:permalinkUrl];
+  [[UIApplication sharedApplication] openURL:url];
 }
 
 - (void)touchPlayButton:(id)sender {
@@ -278,6 +276,13 @@
       NSLog(@"Liked track: %@", [currentTrack objectForKey:@"id"]);
     }
   }];
+}
+
+- (void)touchTitleButton:(id)sender {
+  UIButton* button = sender;
+  NSString* permalinkUrl = [button getStringTag];
+  NSLog(@"%@", permalinkUrl);
+  [self openUrlOnSafari: permalinkUrl];
 }
 
 - (void)didReceiveMemoryWarning {

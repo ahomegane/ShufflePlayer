@@ -40,6 +40,7 @@
 		04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E4F1810164C001839A8 /* SoundCloud.bundle */; };
 		04C00E5C181019F7001839A8 /* example.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E5B181019F7001839A8 /* example.mp3 */; };
 		04C00E5E18101AA3001839A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C00E5D18101AA3001839A8 /* AVFoundation.framework */; };
+		D0417E5218A91D6300E0B295 /* UIButton+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = D0417E5118A91D6300E0B295 /* UIButton+Helper.m */; };
 		D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D093D5111848656A007BD3BE /* GenreListViewController.m */; };
 		D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D093D5121848656A007BD3BE /* GenreListViewController.xib */; };
 		D098312218A33F2E00A6BEC8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D098312118A33F2E00A6BEC8 /* CoreMedia.framework */; };
@@ -197,6 +198,8 @@
 		04C00E4F1810164C001839A8 /* SoundCloud.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SoundCloud.bundle; sourceTree = "<group>"; };
 		04C00E5B181019F7001839A8 /* example.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = example.mp3; sourceTree = "<group>"; };
 		04C00E5D18101AA3001839A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		D0417E5018A91D6300E0B295 /* UIButton+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Helper.h"; sourceTree = "<group>"; };
+		D0417E5118A91D6300E0B295 /* UIButton+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Helper.m"; sourceTree = "<group>"; };
 		D093D5101848656A007BD3BE /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
 		D093D5111848656A007BD3BE /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
 		D093D5121848656A007BD3BE /* GenreListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenreListViewController.xib; sourceTree = "<group>"; };
@@ -381,9 +384,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D0417E5318A91E3800E0B295 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				D0417E5018A91D6300E0B295 /* UIButton+Helper.h */,
+				D0417E5118A91D6300E0B295 /* UIButton+Helper.m */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
 		D098313A18A4BA9A00A6BEC8 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				D0417E5318A91E3800E0B295 /* Helper */,
 				D098313C18A4BB5900A6BEC8 /* SoundCloudAPIAdditions */,
 				042851CD1810145D008CBA33 /* AppDelegate.h */,
 				042851CE1810145D008CBA33 /* AppDelegate.m */,
@@ -630,6 +643,7 @@
 				D098313918A4BA8100A6BEC8 /* MusicManager.m in Sources */,
 				D098313618A4B59400A6BEC8 /* Constants.m in Sources */,
 				042851CB1810145D008CBA33 /* main.m in Sources */,
+				D0417E5218A91D6300E0B295 /* UIButton+Helper.m in Sources */,
 				D098313F18A4C09200A6BEC8 /* AccountManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
