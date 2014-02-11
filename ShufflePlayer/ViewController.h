@@ -23,7 +23,7 @@
             withTrackDuration:(float)duration;
 
 // delegate AccountManager
-- (void)showModal:(id)view;
+- (void)showSubView:(id)view;
 
 // delegate GenreListViewController
 - (void)selectGenre:(NSArray *)genreList;

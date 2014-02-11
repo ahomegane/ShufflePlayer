@@ -10,7 +10,7 @@
 
 @protocol AccountManagerDelegate
 
-- (void)showModal:(id)view;
+- (void)showSubView:(id)view;
 
 @end
 

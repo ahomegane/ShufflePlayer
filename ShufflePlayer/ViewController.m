@@ -261,6 +261,7 @@
 
 - (void)touchGenreButton:(id)sender {
   [self playStateToStop];
+  _genreListVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
   [self presentViewController:_genreListVC animated:YES completion:nil];
 }
 
@@ -376,7 +377,7 @@
 }
 
 //////////////////// delegate AccountManager
--(void)showModal:(id)view {
+-(void)showSubView:(id)view {
   [self presentViewController:view
                               animated:YES
                             completion:nil];
@@ -386,6 +387,7 @@
 
 - (void)selectGenre:(NSArray *)genreList {
   [_musicManager changeGenre:genreList withFlagForcePlay:YES];
+  _genreListVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
   [_genreListVC dismissViewControllerAnimated:YES completion:nil];
 }
 

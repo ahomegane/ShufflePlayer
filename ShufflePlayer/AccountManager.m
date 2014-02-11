@@ -88,7 +88,7 @@
     loginViewController =
         [SCLoginViewController loginViewControllerWithPreparedURL:preparedURL
                                                 completionHandler:handler];
-    [self.delegate showModal:loginViewController];
+    [self.delegate showSubView:loginViewController];
   }];
 }
 

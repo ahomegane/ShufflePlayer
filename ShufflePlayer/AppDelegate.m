@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import "SCUI.h"
-
 #import "Constants.h"
 
 @implementation AppDelegate
