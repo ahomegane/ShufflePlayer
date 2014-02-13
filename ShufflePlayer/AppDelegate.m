@@ -29,9 +29,7 @@
   // 自動ロック／スリープの禁止
   [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
   
-  UILocalNotification * notification
-  = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
-  NSDictionary *userInfo = notification.userInfo;
+  NSDictionary *userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
 
   if (userInfo != nil) {
     if ([[userInfo objectForKey:@"id"] isEqualToString:@"alarm"]) {
