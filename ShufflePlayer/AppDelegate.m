@@ -12,6 +12,8 @@
 
 @implementation AppDelegate
 
+@synthesize viewController;
+
 + (void)initialize {
   [SCSoundCloud setClientID:SC_CLIENT_ID
                      secret:SC_CLIENT_SECRET
@@ -21,6 +23,22 @@
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
+  
+  NSLog(@"didFinishLaunchingWithOptions");
+  
+  // 自動ロック／スリープの禁止
+  [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+  
+  UILocalNotification * notification
+  = [launchOptions objectForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"];
+  NSDictionary *userInfo = notification.userInfo;
+
+  if (userInfo != nil) {
+    if ([[userInfo objectForKey:@"id"] isEqualToString:@"alarm"]) {
+      self.viewController.lunchAlarmFlag = YES;
+    }
+  }
+  
   return YES;
 }
 
@@ -55,6 +73,22 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if
   // appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+  NSDictionary * userInfo = notification.userInfo;
+  UIApplicationState state = [application applicationState];
+  if (userInfo != nil) {
+    if ([[userInfo objectForKey:@"id"] isEqualToString:@"alarm"]) {
+      if (state == UIApplicationStateInactive) NSLog(@"UIApplicationStateInactive");
+      if (state == UIApplicationStateActive) NSLog(@"UIApplicationStateActive");
+      if (state == UIApplicationStateInactive) {
+        NSLog(@"UIApplicationStateInactive");
+        [self.viewController.alarmVC overrideSelectedTime:[NSDate date]];
+      }
+    }
+  }
 }
 
 @end

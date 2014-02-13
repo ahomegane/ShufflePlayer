@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AccountManager.h"
 
 @interface TrackScrollView : UIScrollView
 
-- (id)initWithFrame:(CGRect)frame withAccountManagerInstance:accountManager;
+- (id)initWithFrame:(CGRect)frame withAccountManagerInstance:(AccountManager*) accountManager;
 - (void)initElement;
 - (void)setTrackInfo:(NSDictionary *)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;

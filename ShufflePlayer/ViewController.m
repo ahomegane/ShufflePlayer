@@ -6,6 +6,7 @@
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
 #import "ViewController.h"
+#import "AppDelegate.h"
 #import "Constants.h"
 #import "UIButton+Helper.h"
 #import "STDeferred.h"
@@ -20,8 +21,6 @@
   TrackScrollView *_prevTrackScrollView;
   TrackScrollView *_currentTrackScrollView;
   TrackScrollView *_nextTrackScrollView;
-
-  AlarmViewController *_alarmVC;
 
   int _trackScrollViewIndex;
   int _tracksCount;
@@ -43,12 +42,17 @@
 
 @implementation ViewController
 
-@synthesize accountManager, musicManager;
+@synthesize accountManager, musicManager, alarmVC, lunchAlarmFlag;
 
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  
+  NSLog(@"ViewDidLoad");
+  
+  AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+  appDelegate.viewController = self;
 
   // MusicManager
   self.musicManager = [[MusicManager alloc] init];
@@ -65,9 +69,9 @@
   _genreListVC.genreData = self.musicManager.genreList;
   _genreListVC.delegate = self;
 
-  _alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController"
-                                                   bundle:nil];
-  _alarmVC.delegate = self;
+  self.alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController"
+                                                       bundle:nil withMusicManagerInstance: self.musicManager];
+  self.alarmVC.delegate = self;
 
   // バックグラウンド再生
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -93,7 +97,7 @@
 
   // すべてのジェンルでリクエスト
   [self.musicManager changeGenre:self.musicManager.genreList
-               withForcePlayFlag:NO
+               withForcePlayFlag:self.lunchAlarmFlag ? YES : NO
                     withInitFlag:YES];
 }
 
@@ -375,8 +379,8 @@
 }
 
 - (void)touchMoreButton:(id)sender {
-  _alarmVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-  [self presentViewController:_alarmVC animated:YES completion:nil];
+  self.alarmVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+  [self presentViewController:self.alarmVC animated:YES completion:nil];
 }
 
 - (void)beginOpening {
@@ -559,8 +563,8 @@
 }
 
 - (void)hideAlarmView {
-  _alarmVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-  [_alarmVC dismissViewControllerAnimated:YES completion:nil];
+  self.alarmVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+  [self.alarmVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

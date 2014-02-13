@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MusicManager.h"
 
 @protocol AlarmViewControllerDelegate
 
@@ -19,6 +20,9 @@
   id<AlarmViewControllerDelegate> delegate;
 }
 
+- (id)initWithNibName:(NSString *)nibNameOrNil
+               bundle:(NSBundle *)nibBundleOrNil withMusicManagerInstance: (MusicManager*) musicManager;
+- (void)overrideSelectedTime:(NSDate*)date;
 @property NSDate *selectedTime;
 @property(retain, nonatomic) id<AlarmViewControllerDelegate> delegate;
 

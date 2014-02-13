@@ -24,8 +24,7 @@
 - (id)init {
   self = [super init];
   if (self) {
-    //    [[NSUserDefaults standardUserDefaults]
-    // removeObjectForKey:@"scAccount"];
+    // [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
   }
   return self;
 }

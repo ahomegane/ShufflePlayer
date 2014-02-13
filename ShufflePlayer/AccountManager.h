@@ -18,7 +18,6 @@
   id<AccountManagerDelegate> delegate;
 }
 
-- (void)getScAccount:(void (^)())callback;
 - (void)sendLike:(NSString *)trackId
     withCompleteCallback:(void (^)(NSError *error))callback;
 @property(retain, nonatomic) id<AccountManagerDelegate> delegate;

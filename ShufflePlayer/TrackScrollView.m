@@ -10,7 +10,6 @@
 #import "SCUI.h"
 #import "Constants.h"
 #import "UIButton+Helper.h"
-#import "AccountManager.h"
 
 @interface TrackScrollView () {
 
@@ -30,11 +29,12 @@
 
 #pragma mark - Initialize
 
-- (id)initWithFrame:(CGRect)frame withAccountManagerInstance:accountManager {
+- (id)initWithFrame:(CGRect)frame withAccountManagerInstance: (AccountManager*) accountManager {
   self = [super initWithFrame:frame];
   if (self) {
+    // Initialization code    
     [self initElement];
-    // Initialization code
+    _accountManager = accountManager;
   }
   return self;
 }
