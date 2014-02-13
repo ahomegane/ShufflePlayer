@@ -11,7 +11,7 @@
 
 @implementation UIButton (Helper)
 
-static NSString *const STRING_TAG_KEY = @"StringTagKey";
+static NSString * STRING_TAG_KEY = @"StringTagKey";
 
 - (NSString *)getStringTag{
   return objc_getAssociatedObject(self, CFBridgingRetain(STRING_TAG_KEY));

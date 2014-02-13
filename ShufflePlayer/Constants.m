@@ -18,4 +18,6 @@ NSString *const SC_LIKE_URL = @"https://api.soundcloud.com/me/favorites/";
 
 NSString *const ARTWORK_IMAGE_SIZE = @"t500x500";
 
-NSString *const GENRE_LIST[] = {@"hiphop", @"electronica", @"breakbeats", @"house",@"techno", @"pop", @"rock", @"japanese"};
+NSString *const GENRE_LIST[] = { @"hiphop", @"electronica", @"breakbeats",
+                                 @"house",  @"techno",      @"pop",
+                                 @"rock",   @"japanese" };

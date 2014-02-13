@@ -6,26 +6,35 @@
 //  Copyright (c) 2013年 ahomegane. All rights reserved.
 //
 #import "ViewController.h"
-#import "SCUI.h"
 #import "Constants.h"
 #import "UIButton+Helper.h"
+#import "STDeferred.h"
+
+// oauth invalid_grant おそらくアカウントオブジェクトの有効期間
 
 @interface ViewController () {
 
-  MusicManager *_musicManager;
-  AccountManager *_accountManager;
   GenreListViewController *_genreListVC;
+
+  UIScrollView *_baseScrollView;
+  TrackScrollView *_prevTrackScrollView;
+  TrackScrollView *_currentTrackScrollView;
+  TrackScrollView *_nextTrackScrollView;
   
+  AlarmViewController* _alarmVC;
+
+  int _trackScrollViewIndex;
+  int _tracksCount;
+
   BOOL _isInterruptionBeginInPlayFlag;
 
-  UIImageView *_artworkImageView;
-  UIImageView *_waveformImageView;
-  UIImageView *_waveformSequenceView;
-  UIButton *_titleButton;
   UIButton *_playButton;
   UIImage *_playImage;
   UIImage *_stopImage;
 
+  // オープニング
+  UIView *_openingView;
+  
   // ローディング
   UIView *_loadingView;
   UIActivityIndicatorView *_indicator;
@@ -34,9 +43,31 @@
 
 @implementation ViewController
 
+@synthesize accountManager, musicManager;
+
+#pragma mark - UIViewController
+
 - (void)viewDidLoad {
   [super viewDidLoad];
-
+  
+  // MusicManager
+  self.musicManager = [[MusicManager alloc] init];
+  self.musicManager.delegate = self;
+  
+  // AccountManager
+  self.accountManager = [[AccountManager alloc] init];
+  self.accountManager.delegate = self;
+  
+  // GenreListViewControler
+  _genreListVC = [[GenreListViewController alloc]
+                  initWithNibName:@"GenreListViewController"
+                  bundle:nil];
+  _genreListVC.genreData = self.musicManager.genreList;
+  _genreListVC.delegate = self;
+  
+  _alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController" bundle:nil];
+  _alarmVC.delegate = self;
+  
   // バックグラウンド再生
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
   [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
@@ -56,47 +87,67 @@
   // ロック画面用 remoteControlEventsを受け取り開始
   [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
   
-  // MusicManager
-  _musicManager = [[MusicManager alloc] init];
-  _musicManager.delegate = self;
-  
-  // AccountManager
-  _accountManager = [[AccountManager alloc] init];
-  _accountManager.delegate = self;
-  
-  // GenreListViewControler
-  _genreListVC = [[GenreListViewController alloc]
-                  initWithNibName:@"GenreListViewController"
-                  bundle:nil];
-  _genreListVC.genreData = _musicManager.genreList;
-  _genreListVC.delegate = self;
-  
+  // エレメント初期化
   [self initElement];
-  [_musicManager changeGenre:_musicManager.genreList withFlagForcePlay:NO];
+  
+  // すべてのジェンルでリクエスト
+  [self.musicManager changeGenre:self.musicManager.genreList withForcePlayFlag:NO withInitFlag:YES];
 }
 
+- (void)didReceiveMemoryWarning {
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark - View Element
+
 - (void)initElement {
-  _artworkImageView = [[UIImageView alloc] init];
-  _artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
-  _artworkImageView.frame = CGRectMake(30, 70, 260, 260);
-  [self.view addSubview:_artworkImageView];
 
-  _waveformSequenceView = [[UIImageView alloc] init];
-  _waveformSequenceView.frame = CGRectMake(30, 330, 0, 41);
-  _waveformSequenceView.backgroundColor = [UIColor lightGrayColor];
-  [self.view addSubview:_waveformSequenceView];
+  _baseScrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
+  _baseScrollView.pagingEnabled = YES;
+  _baseScrollView.showsHorizontalScrollIndicator = NO;
+  _baseScrollView.showsVerticalScrollIndicator = NO;
+  _baseScrollView.scrollsToTop = NO;
+  _baseScrollView.delegate = self;
+  [self.view addSubview:_baseScrollView];
 
-  _waveformImageView = [[UIImageView alloc] init];
-  _waveformImageView.contentMode = UIViewContentModeScaleAspectFit;
-  _waveformImageView.frame = CGRectMake(30, 330, 260, 41);
-  [self.view addSubview:_waveformImageView];
+  // initialize TrackScrollViews
+  _trackScrollViewIndex = 0;
 
-  _titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  _titleButton.frame = CGRectMake(30, 380, 260, 20);
-  [self.view addSubview:_titleButton];
-  [_titleButton addTarget:self
-                   action:@selector(touchTitleButton:)
-         forControlEvents:UIControlEventTouchUpInside];
+  CGRect trackScrollViewFrame = CGRectZero;
+  trackScrollViewFrame.size = _baseScrollView.frame.size;
+  trackScrollViewFrame.origin.x =
+      (_trackScrollViewIndex - 1) * trackScrollViewFrame.size.width;
+
+  for (int i = 0; i < 3; i++) {
+    TrackScrollView *trackScrollView =
+        [[TrackScrollView alloc] initWithFrame:trackScrollViewFrame
+                    withAccountManagerInstance:self.accountManager];
+    trackScrollView.minimumZoomScale = 1.0;
+    trackScrollView.maximumZoomScale = 1.0;
+    trackScrollView.showsHorizontalScrollIndicator = NO;
+    trackScrollView.showsVerticalScrollIndicator = NO;
+
+    [_baseScrollView addSubview:trackScrollView];
+
+    switch (i) {
+    case 0:
+      _prevTrackScrollView = trackScrollView;
+//      _prevTrackScrollView.backgroundColor = [UIColor blueColor];
+      break;
+    case 1:
+      _currentTrackScrollView = trackScrollView;
+//      _currentTrackScrollView.backgroundColor = [UIColor redColor];
+      break;
+    case 2:
+      _nextTrackScrollView = trackScrollView;
+//      _nextTrackScrollView.backgroundColor = [UIColor yellowColor];
+      break;
+    }
+
+    trackScrollViewFrame.origin.x += trackScrollViewFrame.size.width;
+  }
 
   _playImage = [UIImage imageNamed:@"button_play.png"];
   _stopImage = [UIImage imageNamed:@"button_stop.png"];
@@ -128,21 +179,21 @@
 
   UIButton *genreButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
   genreButton.frame = CGRectMake(20, 520, 52, 30);
-  [self.view addSubview:genreButton];
   [genreButton setTitle:@"Genre" forState:UIControlStateNormal];
+  [self.view addSubview:genreButton];
   [genreButton addTarget:self
                   action:@selector(touchGenreButton:)
         forControlEvents:UIControlEventTouchUpInside];
 
-  UIButton *likeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  likeButton.frame = CGRectMake(20, 30, 50, 30);
-  [self.view addSubview:likeButton];
-  [likeButton setTitle:@"Like" forState:UIControlStateNormal];
-  [likeButton addTarget:self
-                 action:@selector(touchLikeButton:)
-       forControlEvents:UIControlEventTouchUpInside];
-
-  // loading
+  UIButton *moreButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  moreButton.frame = CGRectMake(250, 520, 52, 30);
+  [moreButton setTitle:@"more" forState:UIControlStateNormal];
+  [self.view addSubview:moreButton];
+  [moreButton addTarget:self
+                  action:@selector(touchMoreButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+  
+  // ローディング
   _loadingView = [[UIView alloc] initWithFrame:self.view.bounds];
   _loadingView.backgroundColor = [UIColor whiteColor];
   //  _loadingView.alpha = 0.5f;
@@ -152,11 +203,184 @@
   _indicator.activityIndicatorViewStyle =
       UIActivityIndicatorViewStyleWhiteLarge;
   _indicator.color = [UIColor blackColor];
-  [_indicator setCenter:CGPointMake(_loadingView.bounds.size.width / 2,
-                                    _loadingView.bounds.size.height / 2)];
+  _indicator.center = _loadingView.center;
+  
   [_loadingView addSubview:_indicator];
   [self.view addSubview:_loadingView];
+  
+  _loadingView.hidden = YES;
+  
+  // オープニング
+  _openingView = [[UIView alloc] initWithFrame:self.view.bounds];
+  _openingView.backgroundColor = [UIColor whiteColor];
+  UIImageView * _logoImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"button_next.png"]];
+  _logoImageView.center = _openingView.center;
+  [_openingView addSubview:_logoImageView];
+  [self.view addSubview:_openingView];
+  
+}
 
+- (void)resetScrollView {
+  CGPoint point = _baseScrollView.contentOffset;
+  point.x = 0;
+  _baseScrollView.contentOffset = point;
+  
+  _trackScrollViewIndex = 0;
+
+  CGRect frame = _prevTrackScrollView.frame;
+  frame.origin.x = (_trackScrollViewIndex - 1) * frame.size.width;
+  for (int i = 0; i < 3; i++) {
+
+    switch (i) {
+    case 0:
+      _prevTrackScrollView.frame = frame;
+      break;
+    case 1:
+      _currentTrackScrollView.frame = frame;
+      break;
+    case 2:
+      _nextTrackScrollView.frame = frame;
+      break;
+    }
+
+    frame.origin.x += frame.size.width;
+  }
+
+  CGSize contentSize =
+      CGSizeMake(_currentTrackScrollView.frame.size.width * _tracksCount,
+                 _currentTrackScrollView.frame.size.height);
+  _baseScrollView.contentSize = contentSize;
+}
+
+- (void)changeAllTrackInfo {
+  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
+  [_prevTrackScrollView setTrackInfo:prevTrack];
+  
+  NSDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
+  [_currentTrackScrollView setTrackInfo:currentTrack];
+  
+  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
+  [_nextTrackScrollView setTrackInfo:nextTrack];
+  
+  [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
+                             title:_currentTrackScrollView.title];
+}
+
+- (void)changePrevTrackInfo {
+  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
+  [_prevTrackScrollView setTrackInfo:prevTrack];
+  
+  [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
+                             title:_currentTrackScrollView.title];
+}
+
+- (void)changeNextTrackInfo {
+  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
+  [_nextTrackScrollView setTrackInfo:nextTrack];
+  
+  [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
+                             title:_currentTrackScrollView.title];
+}
+
+#pragma mark Event Listener
+
+- (void)playStateToPlay {
+  if ([self.musicManager play]) {
+    [_playButton setImage:_stopImage forState:UIControlStateNormal];
+    _isInterruptionBeginInPlayFlag = YES;
+  }
+}
+
+- (void)playStateToStop {
+  if ([self.musicManager pause]) {
+    [_playButton setImage:_playImage forState:UIControlStateNormal];
+    _isInterruptionBeginInPlayFlag = NO;
+  }
+}
+
+- (void)touchPlayButton:(id)sender {
+  if (self.musicManager.playing) {
+    [self playStateToStop];
+  } else {
+    [self playStateToPlay];
+  }
+}
+
+- (void)scrollPrev {
+  // viewの入れ替え
+  TrackScrollView *tmpView = _currentTrackScrollView;
+  
+  _currentTrackScrollView = _prevTrackScrollView;
+  _prevTrackScrollView = _nextTrackScrollView;
+  _nextTrackScrollView = tmpView;
+  
+  CGRect frame = _currentTrackScrollView.frame;
+  frame.origin.x -= frame.size.width;
+  _prevTrackScrollView.frame = frame;
+  
+  BOOL isPlay = self.musicManager.playing;
+  [self playStateToStop];
+  [self.musicManager prevTrack:isPlay];
+  
+  [self changePrevTrackInfo];
+}
+
+- (void)scrollNext {
+  // viewの入れ替え
+  TrackScrollView *tmpView = _currentTrackScrollView;
+  
+  _currentTrackScrollView = _nextTrackScrollView;
+  _nextTrackScrollView = _prevTrackScrollView;
+  _prevTrackScrollView = tmpView;
+  
+  CGRect frame = _currentTrackScrollView.frame;
+  frame.origin.x += frame.size.width;
+  _nextTrackScrollView.frame = frame;
+  
+  BOOL isPlay = self.musicManager.playing;
+  [self playStateToStop];
+  [self.musicManager nextTrack:isPlay];
+  
+  [self changeNextTrackInfo];
+}
+
+- (void)touchPrevButton:(id)sender {
+  if (_trackScrollViewIndex == 0) return;
+  
+  CGPoint point = _baseScrollView.contentOffset;
+  point.x -= _baseScrollView.bounds.size.width;
+  _baseScrollView.contentOffset = point;
+  
+  _trackScrollViewIndex -= 1;
+  [self scrollPrev];
+}
+
+- (void)touchNextButton:(id)sender {
+  if (_trackScrollViewIndex == _tracksCount - 1) return;
+  
+  CGPoint point = _baseScrollView.contentOffset;
+  point.x += _baseScrollView.bounds.size.width;
+  _baseScrollView.contentOffset = point;
+  
+  _trackScrollViewIndex += 1;
+  [self scrollNext];
+}
+
+- (void)touchGenreButton:(id)sender {
+  [self presentViewController:_genreListVC animated:YES completion:nil];
+}
+
+- (void)touchMoreButton:(id)sender {
+  _alarmVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+  [self presentViewController:_alarmVC animated:YES completion:nil];
+}
+
+- (void)beginOpening {
+  _openingView.hidden = NO;
+}
+
+- (void)endOpening {
+  _openingView.hidden = YES;
 }
 
 - (void)beginLoading {
@@ -169,127 +393,7 @@
   _loadingView.hidden = YES;
 }
 
-- (void)renderTrackInfo:(NSDictionary *)track {
-
-  NSString *artworkUrl = [track objectForKey:@"artwork_url"];
-  UIImage *artworkImage;
-  if (![artworkUrl isEqual:[NSNull null]]) {
-    NSRegularExpression *regexp = [NSRegularExpression
-        regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
-                             options:0
-                               error:nil];
-    NSString *artworkUrlLarge = [regexp
-        stringByReplacingMatchesInString:artworkUrl
-                                 options:0
-                                   range:NSMakeRange(0, artworkUrl.length)
-                            withTemplate:
-                                [NSString stringWithFormat:@"$1-%@.$2",
-                                                           ARTWORK_IMAGE_SIZE]];
-    NSData *artworkData =
-        [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
-    artworkImage = [[UIImage alloc] initWithData:artworkData];
-  } else {
-    artworkImage = [UIImage
-        imageWithContentsOfFile:
-            [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"]];
-  }
-  _artworkImageView.image = artworkImage;
-
-  NSString *waveformUrl = [track objectForKey:@"waveform_url"];
-  NSData *waveformData =
-      [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
-  UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
-  _waveformImageView.image = waveformImage;
-
-  NSString *title = [track objectForKey:@"title"];
-  NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
-  [_titleButton setTitle:title forState:UIControlStateNormal];
-  [_titleButton setStringTag:permalinkUrl];
-  
-  // waveform初期化
-  CGRect rect = _waveformSequenceView.frame;
-  _waveformSequenceView.frame =
-      CGRectMake(rect.origin.x, rect.origin.y, 0, rect.size.height);
-
-  // ロック画面に渡す
-  MPMediaItemArtwork *artwork =
-      [[MPMediaItemArtwork alloc] initWithImage:_artworkImageView.image];
-  NSDictionary *songInfo = [NSDictionary
-      dictionaryWithObjectsAndKeys:artwork, MPMediaItemPropertyArtwork, title,
-                                   MPMediaItemPropertyTitle, nil];
-  [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
-}
-
-- (void)playStateToPlay {
-  if ([_musicManager play]) {
-    [_playButton setImage:_stopImage forState:UIControlStateNormal];
-    _isInterruptionBeginInPlayFlag = YES;
-  }
-}
-
-- (void)playStateToStop {
-  if ([_musicManager pause]) {
-    [_playButton setImage:_playImage forState:UIControlStateNormal];
-    _isInterruptionBeginInPlayFlag = NO;
-  }
-}
-
-- (void)openUrlOnSafari: (NSString *)permalinkUrl {
-  NSURL *url = [NSURL URLWithString:permalinkUrl];
-  [[UIApplication sharedApplication] openURL:url];
-}
-
-- (void)touchPlayButton:(id)sender {
-  if (_musicManager.playing) {
-    [self playStateToStop];
-  } else {
-    [self playStateToPlay];
-  }
-}
-
-- (void)touchPrevButton:(id)sender {
-  BOOL isPlay = _musicManager.playing;
-  [self playStateToStop];
-  [_musicManager prevTrack:isPlay];
-}
-
-- (void)touchNextButton:(id)sender {
-  BOOL isPlay = _musicManager.playing;
-  [self playStateToStop];
-  [_musicManager nextTrack:isPlay];
-}
-
-- (void)touchGenreButton:(id)sender {
-  [self playStateToStop];
-  _genreListVC.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-  [self presentViewController:_genreListVC animated:YES completion:nil];
-}
-
-- (void)touchLikeButton:(id)sender {
-  NSDictionary *currentTrack = [_musicManager fetchCurrentTrack];
-
-  [_accountManager sendLike:currentTrack withCompleteCallback:^(NSError * error){
-    if (SC_CANCELED(error)) {
-      NSLog(@"Canceled!");
-    } else if (error) {
-      NSLog(@"Error: %@", [error localizedDescription]);
-    } else {
-      NSLog(@"Liked track: %@", [currentTrack objectForKey:@"id"]);
-    }
-  }];
-}
-
-- (void)touchTitleButton:(id)sender {
-  UIButton* button = sender;
-  NSString* permalinkUrl = [button getStringTag];
-  NSLog(@"%@", permalinkUrl);
-  [self openUrlOnSafari: permalinkUrl];
-}
-
-- (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
-}
+#pragma mark RemoteEvent Control
 
 // ロック画面からのイベントを受け取る
 - (void)remoteControlReceivedWithEvent:(UIEvent *)receivedEvent {
@@ -346,21 +450,73 @@
   [_playButton setImage:_playImage forState:UIControlStateNormal];
 }
 
-//////////////////// delegate MusicManager
+// ロック画面の音楽情報を更新
+- (void)setSongInfoToDefaultCenter:(UIImage *)artworkImage
+                             title:(NSString *)title {
+  MPMediaItemArtwork *artwork =
+      [[MPMediaItemArtwork alloc] initWithImage:artworkImage];
+  NSDictionary *songInfo = [NSDictionary
+      dictionaryWithObjectsAndKeys:artwork, MPMediaItemPropertyArtwork, title,
+                                   MPMediaItemPropertyTitle, nil];
+  [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
+}
 
-- (void)changeGenreBefore {
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+  NSLog(@"****** scrollViewDidEndDecelerating");
+  
+  CGFloat position = scrollView.contentOffset.x / scrollView.bounds.size.width;
+  CGFloat delta = position - (CGFloat)_trackScrollViewIndex;
+  
+  if (fabs(delta) >= 1.0f) {
+    
+    if (delta > 0) {
+      // the current page moved to right
+      _trackScrollViewIndex += 1;
+      [self scrollNext];
+      
+    } else {
+      // the current page moved to left
+      _trackScrollViewIndex -= 1;
+      [self scrollPrev];
+    }
+  }
+}
+
+#pragma mark - MusicManagerDelegate
+
+- (void)changeGenreBefore:(BOOL)isInit {
+  if (isInit) {
+    [self beginOpening];
+  } else {
+    [self beginLoading];
+  }
+}
+
+- (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit {
+  // update
+  _tracksCount = tracksCount;
+
+  [self changeAllTrackInfo];
+  [self resetScrollView];
+  if (isInit) {
+    [self endOpening];
+  } else {
+    [self endLoading];
+  }
+}
+
+- (void)getAudioDataBefore {
   [self beginLoading];
 }
 
-- (void)changeGenreComplete {
+- (void)getAudioDataReadyToPlay {
   [self endLoading];
 }
 
-- (void)changeTrackBefore:(NSDictionary *)newTrack withplayingBeforeChangeTrackFlag:(BOOL)isPlaying {
-  [self renderTrackInfo:newTrack];
-}
-
-- (void)changeTrackComplete:(NSDictionary *)newTrack withplayingBeforeChangeTrackFlag:(BOOL)isPlaying {
+- (void)didChangeTrack:(NSDictionary *)newTrack
+    withPlayingBeforeChangeFlag:(BOOL)isPlaying {
   if (isPlaying) {
     [self playStateToPlay];
   } else {
@@ -370,25 +526,34 @@
 
 - (void)playSequenceOnPlaying:(float)currentTime
             withTrackDuration:(float)duration {
-  CGRect rect = _waveformSequenceView.frame;
-  _waveformSequenceView.frame =
-  CGRectMake(rect.origin.x, rect.origin.y, 260 * currentTime / duration,
-             rect.size.height);
+  [_currentTrackScrollView updateWaveform:currentTime
+                        withTrackDuration:duration];
 }
 
-//////////////////// delegate AccountManager
--(void)showSubView:(id)view {
-  [self presentViewController:view
-                              animated:YES
-                            completion:nil];
+#pragma mark - AccountManagerDelegate
+
+- (void)showAccountView:(id)view {
+  [self presentViewController:view animated:YES completion:nil];
 }
 
-//////////////////// delegate GenreListViewController
+#pragma mark - GenreListViewControllerDelegate
 
 - (void)selectGenre:(NSArray *)genreList {
-  [_musicManager changeGenre:genreList withFlagForcePlay:YES];
-  _genreListVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+  [self.musicManager changeGenre:genreList withForcePlayFlag:NO withInitFlag:NO];
+
   [_genreListVC dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - AlarmViewControllerDelegate
+
+
+- (void)playAlarm {
+  [self.musicManager changeGenre:self.musicManager.genreList withForcePlayFlag:YES withInitFlag:NO];
+}
+
+- (void)hideAlarmView {
+  _alarmVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+  [_alarmVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

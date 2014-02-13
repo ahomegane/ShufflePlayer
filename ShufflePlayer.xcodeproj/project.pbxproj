@@ -32,6 +32,7 @@
 		04285233181015B9008CBA33 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285231181015B9008CBA33 /* CoreText.framework */; };
 		04285235181015CA008CBA33 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285234181015CA008CBA33 /* QuartzCore.framework */; };
 		04285237181015D3008CBA33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04285236181015D3008CBA33 /* Security.framework */; };
+		048E531118AA21AA0029DE86 /* TrackScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 048E531018AA21AA0029DE86 /* TrackScrollView.m */; };
 		04A0211D18159BC00002B91B /* no_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A0211C18159BC00002B91B /* no_image.png */; };
 		04A021261815A6C00002B91B /* button_next.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021221815A6C00002B91B /* button_next.png */; };
 		04A021271815A6C00002B91B /* button_play.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021231815A6C00002B91B /* button_play.png */; };
@@ -43,6 +44,9 @@
 		D0417E5218A91D6300E0B295 /* UIButton+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = D0417E5118A91D6300E0B295 /* UIButton+Helper.m */; };
 		D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D093D5111848656A007BD3BE /* GenreListViewController.m */; };
 		D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D093D5121848656A007BD3BE /* GenreListViewController.xib */; };
+		D097304618AC7EA700DE1700 /* AlarmViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D097304418AC7EA700DE1700 /* AlarmViewController.m */; };
+		D097304718AC7EA700DE1700 /* AlarmViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D097304518AC7EA700DE1700 /* AlarmViewController.xib */; };
+		D097304B18ACA70700DE1700 /* STDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = D097304A18ACA70700DE1700 /* STDeferred.m */; };
 		D098312218A33F2E00A6BEC8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D098312118A33F2E00A6BEC8 /* CoreMedia.framework */; };
 		D098312718A33F3D00A6BEC8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */; };
 		D098312A18A4AC1800A6BEC8 /* SCAccount+Coding.m in Sources */ = {isa = PBXBuildFile; fileRef = D098312918A4AC1800A6BEC8 /* SCAccount+Coding.m */; };
@@ -190,6 +194,8 @@
 		04285231181015B9008CBA33 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		04285234181015CA008CBA33 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		04285236181015D3008CBA33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		048E530F18AA21AA0029DE86 /* TrackScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackScrollView.h; sourceTree = "<group>"; };
+		048E531018AA21AA0029DE86 /* TrackScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackScrollView.m; sourceTree = "<group>"; };
 		04A0211C18159BC00002B91B /* no_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = no_image.png; sourceTree = "<group>"; };
 		04A021221815A6C00002B91B /* button_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_next.png; sourceTree = "<group>"; };
 		04A021231815A6C00002B91B /* button_play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_play.png; sourceTree = "<group>"; };
@@ -203,6 +209,12 @@
 		D093D5101848656A007BD3BE /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
 		D093D5111848656A007BD3BE /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
 		D093D5121848656A007BD3BE /* GenreListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenreListViewController.xib; sourceTree = "<group>"; };
+		D097304318AC7EA700DE1700 /* AlarmViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlarmViewController.h; sourceTree = "<group>"; };
+		D097304418AC7EA700DE1700 /* AlarmViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlarmViewController.m; sourceTree = "<group>"; };
+		D097304518AC7EA700DE1700 /* AlarmViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlarmViewController.xib; sourceTree = "<group>"; };
+		D097304818ACA70700DE1700 /* STDeferred-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "STDeferred-Prefix.pch"; sourceTree = "<group>"; };
+		D097304918ACA70700DE1700 /* STDeferred.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDeferred.h; sourceTree = "<group>"; };
+		D097304A18ACA70700DE1700 /* STDeferred.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDeferred.m; sourceTree = "<group>"; };
 		D098312118A33F2E00A6BEC8 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		D098312818A4AC1800A6BEC8 /* SCAccount+Coding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SCAccount+Coding.h"; sourceTree = "<group>"; };
 		D098312918A4AC1800A6BEC8 /* SCAccount+Coding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SCAccount+Coding.m"; sourceTree = "<group>"; };
@@ -387,6 +399,9 @@
 		D0417E5318A91E3800E0B295 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				D097304818ACA70700DE1700 /* STDeferred-Prefix.pch */,
+				D097304918ACA70700DE1700 /* STDeferred.h */,
+				D097304A18ACA70700DE1700 /* STDeferred.m */,
 				D0417E5018A91D6300E0B295 /* UIButton+Helper.h */,
 				D0417E5118A91D6300E0B295 /* UIButton+Helper.m */,
 			);
@@ -402,6 +417,8 @@
 				042851CE1810145D008CBA33 /* AppDelegate.m */,
 				042851D31810145D008CBA33 /* ViewController.h */,
 				042851D41810145D008CBA33 /* ViewController.m */,
+				048E530F18AA21AA0029DE86 /* TrackScrollView.h */,
+				048E531018AA21AA0029DE86 /* TrackScrollView.m */,
 				D098313718A4BA8100A6BEC8 /* MusicManager.h */,
 				D098313818A4BA8100A6BEC8 /* MusicManager.m */,
 				D093D5101848656A007BD3BE /* GenreListViewController.h */,
@@ -411,6 +428,9 @@
 				D098313518A4B59400A6BEC8 /* Constants.m */,
 				D098313D18A4C09200A6BEC8 /* AccountManager.h */,
 				D098313E18A4C09200A6BEC8 /* AccountManager.m */,
+				D097304318AC7EA700DE1700 /* AlarmViewController.h */,
+				D097304418AC7EA700DE1700 /* AlarmViewController.m */,
+				D097304518AC7EA700DE1700 /* AlarmViewController.xib */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -607,6 +627,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D097304718AC7EA700DE1700 /* AlarmViewController.xib in Resources */,
 				04A021271815A6C00002B91B /* button_play.png in Resources */,
 				042851D71810145D008CBA33 /* Images.xcassets in Resources */,
 				04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */,
@@ -636,7 +657,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D097304618AC7EA700DE1700 /* AlarmViewController.m in Sources */,
 				042851D51810145D008CBA33 /* ViewController.m in Sources */,
+				048E531118AA21AA0029DE86 /* TrackScrollView.m in Sources */,
+				D097304B18ACA70700DE1700 /* STDeferred.m in Sources */,
 				D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */,
 				D098312A18A4AC1800A6BEC8 /* SCAccount+Coding.m in Sources */,
 				042851CF1810145D008CBA33 /* AppDelegate.m in Sources */,

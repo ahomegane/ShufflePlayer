@@ -16,7 +16,9 @@
   AVPlayerItem *_playerItem;
 
   int _trackIndex;
-  NSMutableArray* _tracks;
+  NSMutableArray *_tracks;
+  
+  NSTimer* _sequenceTimer;
 }
 @end
 
@@ -24,44 +26,41 @@
 
 @synthesize delegate, genreList, playing;
 
+#pragma mark - Initialize
+
 - (id)init {
   self = [super init];
   if (self) {
-    
-    // sequence timer
-    [NSTimer scheduledTimerWithTimeInterval:0.1
-                                     target:self
-                                   selector:@selector(playSequence)
-                                   userInfo:nil
-                                    repeats:YES];
-    
     // genreList
-    NSMutableArray* tmp = [[NSMutableArray alloc] init];
+    NSMutableArray *tmp = [[NSMutableArray alloc] init];
     int i = 0;
     while (GENRE_LIST[i] != nil) {
       [tmp addObject:GENRE_LIST[i]];
       i++;
     }
     self.genreList = [tmp copy];
-  
   }
   return self;
 }
 
-- (NSDictionary *)fetchCurrentTrack {
-  return [_tracks objectAtIndex:_trackIndex];
-}
+#pragma mark - Instance Method
 
-- (BOOL) play {
-  if (_player == nil)
-    return NO;
-  [_player play];
+- (BOOL)play {
+  if (_player == nil) {
+    [self getAudioData:[self fetchCurrentTrack] withLoadedCallback:^()
+     {
+      [self setPlaySequence];
+      [_player play];
+     }];
+  } else {
+    [self setPlaySequence];
+    [_player play];
+  }
   return YES;
 }
 
-- (BOOL) pause {
-  if (_player == nil)
-    return NO;
+- (BOOL)pause {
+  [self clearPlaySequence];
   [_player pause];
   return YES;
 }
@@ -70,8 +69,24 @@
   return _player.rate != 0.0 ? YES : NO;
 }
 
-- (void)changeGenre:(NSArray *)genres withFlagForcePlay:(BOOL)isForcePlay {
-  [self.delegate changeGenreBefore];
+- (NSDictionary *)fetchCurrentTrack {
+  return [_tracks objectAtIndex:_trackIndex];
+}
+
+- (NSDictionary *)fetchPrevTrack {
+  if (_trackIndex - 1 < 0)
+    return nil;
+  return [_tracks objectAtIndex:_trackIndex - 1];
+}
+
+- (NSDictionary *)fetchNextTrack {
+  if (_trackIndex + 1 > [_tracks count] - 1)
+    return nil;
+  return [_tracks objectAtIndex:_trackIndex + 1];
+}
+
+- (void)changeGenre:(NSArray *)genres withForcePlayFlag:(BOOL)isForcePlay withInitFlag:(BOOL)isInit {
+  [self.delegate changeGenreBefore:isInit];
 
   //    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
   //                            @"cef5e6d3c083503120892b041572abff",
@@ -97,11 +112,9 @@
       _tracks = [(NSArray *)jsonResponse mutableCopy];
       _tracks = [self randomSortTracks:[self filterTracks:_tracks]];
       _trackIndex = 0;
-      [self changeTrack:[self fetchCurrentTrack]
-          withFlagForcePlay:isForcePlay];
+      [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
     }
-
-    [self.delegate changeGenreComplete];
+    [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit];
   };
 
   [SCRequest performMethod:SCRequestMethodGET
@@ -112,17 +125,23 @@
              responseHandler:handler];
 }
 
-- (NSMutableArray*)filterTracks:(NSMutableArray*)tracks {
+#pragma mark - Private Method
+
+#pragma mark Init Tracks JSON
+
+- (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSDictionary* track = [tracks objectAtIndex:i];
+    NSDictionary *track = [tracks objectAtIndex:i];
     //        int favorite = [[_track objectForKey:@"favoritings_count"]
     // intValue];
     //        int contentSize = [[_track objectForKey:@"original_content_size"]
     // intValue] /  1000000;
     BOOL streamable = [[track objectForKey:@"streamable"] boolValue];
-    NSString* format = [track objectForKey:@"original_format"];
-    NSString* sharing = [track objectForKey:@"sharing"];
-    if (!streamable || [format isEqualToString:@"wav"] || ![sharing isEqualToString:@"public"]) {  // contentSize > 7 || favorite < 3
+    NSString *format = [track objectForKey:@"original_format"];
+    NSString *sharing = [track objectForKey:@"sharing"];
+    if (!streamable || [format isEqualToString:@"wav"] ||
+        ![sharing isEqualToString:@"public"]) { // contentSize > 7 || favorite <
+                                                // 3
       [tracks removeObjectAtIndex:i];
       i--;
     }
@@ -130,7 +149,7 @@
   return tracks;
 }
 
-- (NSMutableArray*)randomSortTracks:(NSMutableArray*)tracks {
+- (NSMutableArray *)randomSortTracks:(NSMutableArray *)tracks {
   int count = [tracks count];
   for (int i = count - 1; i > 0; i--) {
     int randomNum = arc4random() % i;
@@ -140,40 +159,40 @@
 }
 
 - (void)changeTrack:(NSDictionary *)newTrack
-    withFlagForcePlay:(BOOL)isForcePlay {
+  withFlagForcePlay:(BOOL)isForcePlay {
+  
+  NSLog(@"%@",[newTrack objectForKey:@"original_format"]);
+
   // updateAudioData で _player が更新される前の状態を保存
   BOOL isPlaying = self.playing;
   if (isForcePlay) {
     isPlaying = YES;
   }
-
-  [self.delegate changeTrackBefore:newTrack withplayingBeforeChangeTrackFlag:isPlaying];
-
-  [self updateAudioData:newTrack withLoadedCallback:^()
-   {
-    [self.delegate changeTrackComplete:newTrack withplayingBeforeChangeTrackFlag:isPlaying];
-  }];
+  _player = nil;
+  [self.delegate didChangeTrack:newTrack
+         withPlayingBeforeChangeFlag:isPlaying];
 }
 
 - (void)prevTrack:(BOOL)isFrocePlay {
   if (_trackIndex == 0)
     return;
   _trackIndex--;
-  [self changeTrack:[self fetchCurrentTrack]
-      withFlagForcePlay:isFrocePlay];
+  [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isFrocePlay];
 }
 
 - (void)nextTrack:(BOOL)isFrocePlay {
   if (_trackIndex == [_tracks count] - 1)
     return;
   _trackIndex++;
-  [self changeTrack:[self fetchCurrentTrack]
-      withFlagForcePlay:isFrocePlay];
+  [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isFrocePlay];
 }
 
-- (void)updateAudioData:(NSDictionary *)newTrack
-     withLoadedCallback:(void (^)())callback {
+#pragma mark MusicPlayer Instance
 
+- (void)getAudioData:(NSDictionary *)newTrack
+     withLoadedCallback:(void (^)())callback {
+  [self.delegate getAudioDataBefore];
+  
   NSString *streamUrl = [NSString
       stringWithFormat:@"%@?client_id=%@",
                        [newTrack objectForKey:@"stream_url"], SC_CLIENT_ID];
@@ -208,6 +227,7 @@
 
     if (_playerItem.status == AVPlayerStatusReadyToPlay) {
       NSLog(@"AVPlayerStatusReadyToPlay");
+      [self.delegate getAudioDataReadyToPlay];
     } else if (_playerItem.status == AVPlayerStatusFailed) {
       NSLog(@"AVPlayerStatusFailed");
     } else if (_playerItem.status == AVPlayerStatusUnknown) {
@@ -248,13 +268,30 @@
   [self nextTrack:YES];
 }
 
+#pragma mark Play Sequence
+
 - (void)playSequence {
   if (self.playing) {
     float currentTime = CMTimeGetSeconds(_player.currentTime);
     float duration = CMTimeGetSeconds(_player.currentItem.asset.duration);
 
-    [self.delegate playSequenceOnPlaying:currentTime withTrackDuration:duration];
+    [self.delegate playSequenceOnPlaying:currentTime
+                       withTrackDuration:duration];
   }
+}
+
+- (void)setPlaySequence {
+  _sequenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
+                                                    target:self
+                                                  selector:@selector(playSequence)
+                                                  userInfo:nil
+                                                   repeats:YES];
+  
+}
+
+- (void)clearPlaySequence {
+  [_sequenceTimer invalidate];
+  _sequenceTimer = nil;
 }
 
 @end

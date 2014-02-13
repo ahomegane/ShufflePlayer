@@ -19,13 +19,18 @@
 
 @synthesize delegate;
 
-- (id)init{
+#pragma mark - Initialize
+
+- (id)init {
   self = [super init];
   if (self) {
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
+    //    [[NSUserDefaults standardUserDefaults]
+    // removeObjectForKey:@"scAccount"];
   }
   return self;
 }
+
+#pragma mark - Instance Method
 
 - (void)getScAccount:(void (^)())callback {
   SCAccount *scAccount;
@@ -69,6 +74,31 @@
   }
 }
 
+
+- (void)sendLike:(NSString *)trackId
+withCompleteCallback:(void (^)(NSError *error))callback {
+  NSString *resourcetURL =
+  [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
+  
+  SCRequestResponseHandler handler =
+  ^(NSURLResponse * response, NSData * data, NSError * error) {
+    if (callback != nil)
+      callback(error);
+  };
+  
+  [self getScAccount: ^(SCAccount * scAccount) {
+    _scAccount = scAccount;
+    [SCRequest performMethod:SCRequestMethodPUT
+                  onResource:[NSURL URLWithString:resourcetURL]
+             usingParameters:nil
+                 withAccount:_scAccount
+      sendingProgressHandler:nil
+             responseHandler:handler];
+  }];
+}
+
+#pragma mark - Private Method
+
 - (void)login:(id)sender withLoginedCallback:(void (^)())callback {
   SCLoginViewControllerCompletionHandler handler = ^(NSError * error) {
     if (SC_CANCELED(error)) {
@@ -88,9 +118,11 @@
     loginViewController =
         [SCLoginViewController loginViewControllerWithPreparedURL:preparedURL
                                                 completionHandler:handler];
-    [self.delegate showSubView:loginViewController];
+    [self.delegate showAccountView:loginViewController];
   }];
 }
+
+#pragma mark - UserDefault Control
 
 - (BOOL)saveScAccount:(SCAccount *)scAccount {
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
@@ -108,26 +140,6 @@
   }
   SCAccount *scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
   return scAccount;
-}
-
-- (void)sendLike:(NSDictionary *)track withCompleteCallback:(void (^)(NSError * error))callback {
-  NSString *resourcetURL = [NSString
-                            stringWithFormat:@"%@%@", SC_LIKE_URL, [track objectForKey:@"id"]];
-  
-  SCRequestResponseHandler handler =
-  ^(NSURLResponse * response, NSData * data, NSError * error) {
-    if (callback) callback(error);
-  };
-  
-  [self getScAccount: ^(SCAccount * scAccount) {
-    _scAccount = scAccount;
-    [SCRequest performMethod:SCRequestMethodPUT
-                  onResource:[NSURL URLWithString:resourcetURL]
-             usingParameters:nil
-                 withAccount:_scAccount
-      sendingProgressHandler:nil
-             responseHandler:handler];
-  }];
 }
 
 @end

@@ -10,7 +10,7 @@
 
 @protocol AccountManagerDelegate
 
-- (void)showSubView:(id)view;
+- (void)showAccountView:(id)view;
 
 @end
 
@@ -19,7 +19,8 @@
 }
 
 - (void)getScAccount:(void (^)())callback;
-- (void)sendLike: (NSDictionary *)track withCompleteCallback:(void (^)(NSError * error))callback;
+- (void)sendLike:(NSString *)trackId
+    withCompleteCallback:(void (^)(NSError *error))callback;
 @property(retain, nonatomic) id<AccountManagerDelegate> delegate;
 
 @end
