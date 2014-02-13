@@ -32,7 +32,9 @@
 - (NSDictionary *)fetchNextTrack;
 - (BOOL)play;
 - (BOOL)pause;
-- (void)changeGenre:(NSArray *)genres withForcePlayFlag:(BOOL)isForcePlay withInitFlag: (BOOL)isInit;
+- (void)changeGenre:(NSArray *)genres
+    withForcePlayFlag:(BOOL)isForcePlay
+         withInitFlag:(BOOL)isInit;
 - (void)prevTrack:(BOOL)isFrocePlay;
 - (void)nextTrack:(BOOL)isFrocePlay;
 @property(retain, nonatomic) id<MusicManagerDelegate> delegate;

@@ -19,7 +19,7 @@
   id<AlarmViewControllerDelegate> delegate;
 }
 
-@property NSDate* selectedTime;
+@property NSDate *selectedTime;
 @property(retain, nonatomic) id<AlarmViewControllerDelegate> delegate;
 
 @end

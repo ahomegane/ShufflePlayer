@@ -17,8 +17,8 @@
 
   int _trackIndex;
   NSMutableArray *_tracks;
-  
-  NSTimer* _sequenceTimer;
+
+  NSTimer *_sequenceTimer;
 }
 @end
 
@@ -51,7 +51,7 @@
      {
       [self setPlaySequence];
       [_player play];
-     }];
+    }];
   } else {
     [self setPlaySequence];
     [_player play];
@@ -85,7 +85,9 @@
   return [_tracks objectAtIndex:_trackIndex + 1];
 }
 
-- (void)changeGenre:(NSArray *)genres withForcePlayFlag:(BOOL)isForcePlay withInitFlag:(BOOL)isInit {
+- (void)changeGenre:(NSArray *)genres
+    withForcePlayFlag:(BOOL)isForcePlay
+         withInitFlag:(BOOL)isInit {
   [self.delegate changeGenreBefore:isInit];
 
   //    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -159,9 +161,9 @@
 }
 
 - (void)changeTrack:(NSDictionary *)newTrack
-  withFlagForcePlay:(BOOL)isForcePlay {
-  
-  NSLog(@"%@",[newTrack objectForKey:@"original_format"]);
+    withFlagForcePlay:(BOOL)isForcePlay {
+
+  NSLog(@"%@", [newTrack objectForKey:@"original_format"]);
 
   // updateAudioData で _player が更新される前の状態を保存
   BOOL isPlaying = self.playing;
@@ -169,8 +171,7 @@
     isPlaying = YES;
   }
   _player = nil;
-  [self.delegate didChangeTrack:newTrack
-         withPlayingBeforeChangeFlag:isPlaying];
+  [self.delegate didChangeTrack:newTrack withPlayingBeforeChangeFlag:isPlaying];
 }
 
 - (void)prevTrack:(BOOL)isFrocePlay {
@@ -190,9 +191,9 @@
 #pragma mark MusicPlayer Instance
 
 - (void)getAudioData:(NSDictionary *)newTrack
-     withLoadedCallback:(void (^)())callback {
+    withLoadedCallback:(void (^)())callback {
   [self.delegate getAudioDataBefore];
-  
+
   NSString *streamUrl = [NSString
       stringWithFormat:@"%@?client_id=%@",
                        [newTrack objectForKey:@"stream_url"], SC_CLIENT_ID];
@@ -281,12 +282,12 @@
 }
 
 - (void)setPlaySequence {
-  _sequenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.1
-                                                    target:self
-                                                  selector:@selector(playSequence)
-                                                  userInfo:nil
-                                                   repeats:YES];
-  
+  _sequenceTimer =
+      [NSTimer scheduledTimerWithTimeInterval:0.1
+                                       target:self
+                                     selector:@selector(playSequence)
+                                     userInfo:nil
+                                      repeats:YES];
 }
 
 - (void)clearPlaySequence {

@@ -20,8 +20,8 @@
   TrackScrollView *_prevTrackScrollView;
   TrackScrollView *_currentTrackScrollView;
   TrackScrollView *_nextTrackScrollView;
-  
-  AlarmViewController* _alarmVC;
+
+  AlarmViewController *_alarmVC;
 
   int _trackScrollViewIndex;
   int _tracksCount;
@@ -34,7 +34,7 @@
 
   // オープニング
   UIView *_openingView;
-  
+
   // ローディング
   UIView *_loadingView;
   UIActivityIndicatorView *_indicator;
@@ -49,30 +49,31 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  
+
   // MusicManager
   self.musicManager = [[MusicManager alloc] init];
   self.musicManager.delegate = self;
-  
+
   // AccountManager
   self.accountManager = [[AccountManager alloc] init];
   self.accountManager.delegate = self;
-  
+
   // GenreListViewControler
   _genreListVC = [[GenreListViewController alloc]
-                  initWithNibName:@"GenreListViewController"
-                  bundle:nil];
+      initWithNibName:@"GenreListViewController"
+               bundle:nil];
   _genreListVC.genreData = self.musicManager.genreList;
   _genreListVC.delegate = self;
-  
-  _alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController" bundle:nil];
+
+  _alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController"
+                                                   bundle:nil];
   _alarmVC.delegate = self;
-  
+
   // バックグラウンド再生
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
   [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
   [audioSession setActive:YES error:nil];
-  
+
   // 音楽再生の割り込み
   NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
   [center addObserver:self
@@ -83,22 +84,23 @@
              selector:@selector(sessionRouteDidChange:)
                  name:AVAudioSessionRouteChangeNotification
                object:nil];
-  
+
   // ロック画面用 remoteControlEventsを受け取り開始
   [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-  
+
   // エレメント初期化
   [self initElement];
-  
+
   // すべてのジェンルでリクエスト
-  [self.musicManager changeGenre:self.musicManager.genreList withForcePlayFlag:NO withInitFlag:YES];
+  [self.musicManager changeGenre:self.musicManager.genreList
+               withForcePlayFlag:NO
+                    withInitFlag:YES];
 }
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
 
 #pragma mark - View Element
 
@@ -134,15 +136,15 @@
     switch (i) {
     case 0:
       _prevTrackScrollView = trackScrollView;
-//      _prevTrackScrollView.backgroundColor = [UIColor blueColor];
+      //      _prevTrackScrollView.backgroundColor = [UIColor blueColor];
       break;
     case 1:
       _currentTrackScrollView = trackScrollView;
-//      _currentTrackScrollView.backgroundColor = [UIColor redColor];
+      //      _currentTrackScrollView.backgroundColor = [UIColor redColor];
       break;
     case 2:
       _nextTrackScrollView = trackScrollView;
-//      _nextTrackScrollView.backgroundColor = [UIColor yellowColor];
+      //      _nextTrackScrollView.backgroundColor = [UIColor yellowColor];
       break;
     }
 
@@ -190,9 +192,9 @@
   [moreButton setTitle:@"more" forState:UIControlStateNormal];
   [self.view addSubview:moreButton];
   [moreButton addTarget:self
-                  action:@selector(touchMoreButton:)
-        forControlEvents:UIControlEventTouchUpInside];
-  
+                 action:@selector(touchMoreButton:)
+       forControlEvents:UIControlEventTouchUpInside];
+
   // ローディング
   _loadingView = [[UIView alloc] initWithFrame:self.view.bounds];
   _loadingView.backgroundColor = [UIColor whiteColor];
@@ -204,27 +206,27 @@
       UIActivityIndicatorViewStyleWhiteLarge;
   _indicator.color = [UIColor blackColor];
   _indicator.center = _loadingView.center;
-  
+
   [_loadingView addSubview:_indicator];
   [self.view addSubview:_loadingView];
-  
+
   _loadingView.hidden = YES;
-  
+
   // オープニング
   _openingView = [[UIView alloc] initWithFrame:self.view.bounds];
   _openingView.backgroundColor = [UIColor whiteColor];
-  UIImageView * _logoImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"button_next.png"]];
+  UIImageView *_logoImageView = [[UIImageView alloc]
+      initWithImage:[UIImage imageNamed:@"button_next.png"]];
   _logoImageView.center = _openingView.center;
   [_openingView addSubview:_logoImageView];
   [self.view addSubview:_openingView];
-  
 }
 
 - (void)resetScrollView {
   CGPoint point = _baseScrollView.contentOffset;
   point.x = 0;
   _baseScrollView.contentOffset = point;
-  
+
   _trackScrollViewIndex = 0;
 
   CGRect frame = _prevTrackScrollView.frame;
@@ -255,13 +257,13 @@
 - (void)changeAllTrackInfo {
   NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
-  
+
   NSDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
   [_currentTrackScrollView setTrackInfo:currentTrack];
-  
+
   NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
-  
+
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
 }
@@ -269,7 +271,7 @@
 - (void)changePrevTrackInfo {
   NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
-  
+
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
 }
@@ -277,7 +279,7 @@
 - (void)changeNextTrackInfo {
   NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
-  
+
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
 }
@@ -309,59 +311,61 @@
 - (void)scrollPrev {
   // viewの入れ替え
   TrackScrollView *tmpView = _currentTrackScrollView;
-  
+
   _currentTrackScrollView = _prevTrackScrollView;
   _prevTrackScrollView = _nextTrackScrollView;
   _nextTrackScrollView = tmpView;
-  
+
   CGRect frame = _currentTrackScrollView.frame;
   frame.origin.x -= frame.size.width;
   _prevTrackScrollView.frame = frame;
-  
+
   BOOL isPlay = self.musicManager.playing;
   [self playStateToStop];
   [self.musicManager prevTrack:isPlay];
-  
+
   [self changePrevTrackInfo];
 }
 
 - (void)scrollNext {
   // viewの入れ替え
   TrackScrollView *tmpView = _currentTrackScrollView;
-  
+
   _currentTrackScrollView = _nextTrackScrollView;
   _nextTrackScrollView = _prevTrackScrollView;
   _prevTrackScrollView = tmpView;
-  
+
   CGRect frame = _currentTrackScrollView.frame;
   frame.origin.x += frame.size.width;
   _nextTrackScrollView.frame = frame;
-  
+
   BOOL isPlay = self.musicManager.playing;
   [self playStateToStop];
   [self.musicManager nextTrack:isPlay];
-  
+
   [self changeNextTrackInfo];
 }
 
 - (void)touchPrevButton:(id)sender {
-  if (_trackScrollViewIndex == 0) return;
-  
+  if (_trackScrollViewIndex == 0)
+    return;
+
   CGPoint point = _baseScrollView.contentOffset;
   point.x -= _baseScrollView.bounds.size.width;
   _baseScrollView.contentOffset = point;
-  
+
   _trackScrollViewIndex -= 1;
   [self scrollPrev];
 }
 
 - (void)touchNextButton:(id)sender {
-  if (_trackScrollViewIndex == _tracksCount - 1) return;
-  
+  if (_trackScrollViewIndex == _tracksCount - 1)
+    return;
+
   CGPoint point = _baseScrollView.contentOffset;
   point.x += _baseScrollView.bounds.size.width;
   _baseScrollView.contentOffset = point;
-  
+
   _trackScrollViewIndex += 1;
   [self scrollNext];
 }
@@ -465,17 +469,17 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
   NSLog(@"****** scrollViewDidEndDecelerating");
-  
+
   CGFloat position = scrollView.contentOffset.x / scrollView.bounds.size.width;
   CGFloat delta = position - (CGFloat)_trackScrollViewIndex;
-  
+
   if (fabs(delta) >= 1.0f) {
-    
+
     if (delta > 0) {
       // the current page moved to right
       _trackScrollViewIndex += 1;
       [self scrollNext];
-      
+
     } else {
       // the current page moved to left
       _trackScrollViewIndex -= 1;
@@ -539,16 +543,19 @@
 #pragma mark - GenreListViewControllerDelegate
 
 - (void)selectGenre:(NSArray *)genreList {
-  [self.musicManager changeGenre:genreList withForcePlayFlag:NO withInitFlag:NO];
+  [self.musicManager changeGenre:genreList
+               withForcePlayFlag:NO
+                    withInitFlag:NO];
 
   [_genreListVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - AlarmViewControllerDelegate
 
-
 - (void)playAlarm {
-  [self.musicManager changeGenre:self.musicManager.genreList withForcePlayFlag:YES withInitFlag:NO];
+  [self.musicManager changeGenre:self.musicManager.genreList
+               withForcePlayFlag:YES
+                    withInitFlag:NO];
 }
 
 - (void)hideAlarmView {

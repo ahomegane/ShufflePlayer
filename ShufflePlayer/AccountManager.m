@@ -74,26 +74,25 @@
   }
 }
 
-
 - (void)sendLike:(NSString *)trackId
-withCompleteCallback:(void (^)(NSError *error))callback {
+    withCompleteCallback:(void (^)(NSError *error))callback {
   NSString *resourcetURL =
-  [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
-  
+      [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
+
   SCRequestResponseHandler handler =
-  ^(NSURLResponse * response, NSData * data, NSError * error) {
+      ^(NSURLResponse * response, NSData * data, NSError * error) {
     if (callback != nil)
       callback(error);
   };
-  
+
   [self getScAccount: ^(SCAccount * scAccount) {
     _scAccount = scAccount;
     [SCRequest performMethod:SCRequestMethodPUT
-                  onResource:[NSURL URLWithString:resourcetURL]
-             usingParameters:nil
-                 withAccount:_scAccount
-      sendingProgressHandler:nil
-             responseHandler:handler];
+                    onResource:[NSURL URLWithString:resourcetURL]
+               usingParameters:nil
+                   withAccount:_scAccount
+        sendingProgressHandler:nil
+               responseHandler:handler];
   }];
 }
 
