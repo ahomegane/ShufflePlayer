@@ -164,7 +164,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		042851BB1810145D008CBA33 /* ShufflePlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShufflePlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		042851BB1810145D008CBA33 /* NewTracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewTracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		042851BE1810145D008CBA33 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		042851C01810145D008CBA33 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		042851C21810145D008CBA33 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -285,7 +285,7 @@
 		042851BC1810145D008CBA33 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				042851BB1810145D008CBA33 /* ShufflePlayer.app */,
+				042851BB1810145D008CBA33 /* NewTracks.app */,
 				042851DC1810145D008CBA33 /* ShufflePlayerTests.xctest */,
 			);
 			name = Products;
@@ -480,7 +480,7 @@
 			);
 			name = ShufflePlayer;
 			productName = ShufflePlayer;
-			productReference = 042851BB1810145D008CBA33 /* ShufflePlayer.app */;
+			productReference = 042851BB1810145D008CBA33 /* NewTracks.app */;
 			productType = "com.apple.product-type.application";
 		};
 		042851DB1810145D008CBA33 /* ShufflePlayerTests */ = {
@@ -833,7 +833,7 @@
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NewTracks;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -856,7 +856,7 @@
 					"-all_load",
 					"-ObjC",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = NewTracks;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
