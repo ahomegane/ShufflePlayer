@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "042851BA1810145D008CBA33"
-               BuildableName = "ShufflePlayer.app"
+               BuildableName = "NewTracks.app"
                BlueprintName = "ShufflePlayer"
                ReferencedContainer = "container:ShufflePlayer.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "042851BA1810145D008CBA33"
-            BuildableName = "ShufflePlayer.app"
+            BuildableName = "NewTracks.app"
             BlueprintName = "ShufflePlayer"
             ReferencedContainer = "container:ShufflePlayer.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "042851BA1810145D008CBA33"
-            BuildableName = "ShufflePlayer.app"
+            BuildableName = "NewTracks.app"
             BlueprintName = "ShufflePlayer"
             ReferencedContainer = "container:ShufflePlayer.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "042851BA1810145D008CBA33"
-            BuildableName = "ShufflePlayer.app"
+            BuildableName = "NewTracks.app"
             BlueprintName = "ShufflePlayer"
             ReferencedContainer = "container:ShufflePlayer.xcodeproj">
          </BuildableReference>

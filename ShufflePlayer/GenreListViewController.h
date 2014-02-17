@@ -2,8 +2,8 @@
 //  GenreListViewController.h
 //  ShufflePlayer
 //
-//  Created by k-watanabe on 2013/11/29.
-//  Copyright (c) 2013年 ahomegane. All rights reserved.
+//  Created by k-watanabe on 2014/02/17.
+//  Copyright (c) 2014年 ahomegane. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -11,14 +11,14 @@
 @protocol GenreListViewControllerDelegate
 
 - (void)selectGenre:(NSArray *)genreList;
+- (void)hideGenreView;
 
 @end
 
-@interface GenreListViewController : UITableViewController {
-  id<GenreListViewControllerDelegate> delegate;
-}
+@interface GenreListViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
+- (void)setBlurImage:(UIImage *)blurImage;
 @property(retain, nonatomic) id<GenreListViewControllerDelegate> delegate;
-@property(nonatomic, strong) NSArray *genreData;
+@property(nonatomic, retain) NSArray *genreData;
 
 @end

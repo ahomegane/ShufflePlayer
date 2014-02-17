@@ -38,14 +38,14 @@ NSString *const CLEAR_TEXT = @"-- : --";
     
     self.selectedTime = [self restoreSelectedTimeFromUserDefault];
     if (self.selectedTime != nil) [self startTimer];
-
+    
+    [self initElement];
   }
   return self;
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  [self initElement];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

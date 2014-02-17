@@ -23,9 +23,7 @@
 
 @end
 
-@interface MusicManager : NSObject {
-  id<MusicManagerDelegate> delegate;
-}
+@interface MusicManager : NSObject
 
 - (NSDictionary *)fetchCurrentTrack;
 - (NSDictionary *)fetchPrevTrack;

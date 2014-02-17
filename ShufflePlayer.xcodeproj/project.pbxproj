@@ -69,10 +69,7 @@
 		04E3EB5618B109F3007F1711 /* title_genre@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB4718B109F3007F1711 /* title_genre@2x.png */; };
 		04E3EB5718B109F3007F1711 /* waveform_loading@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB4818B109F3007F1711 /* waveform_loading@2x.png */; };
 		D0417E5218A91D6300E0B295 /* UIButton+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = D0417E5118A91D6300E0B295 /* UIButton+Helper.m */; };
-		D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D093D5111848656A007BD3BE /* GenreListViewController.m */; };
-		D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D093D5121848656A007BD3BE /* GenreListViewController.xib */; };
 		D097304618AC7EA700DE1700 /* AlarmViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D097304418AC7EA700DE1700 /* AlarmViewController.m */; };
-		D097304718AC7EA700DE1700 /* AlarmViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D097304518AC7EA700DE1700 /* AlarmViewController.xib */; };
 		D097304B18ACA70700DE1700 /* STDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = D097304A18ACA70700DE1700 /* STDeferred.m */; };
 		D098312218A33F2E00A6BEC8 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D098312118A33F2E00A6BEC8 /* CoreMedia.framework */; };
 		D098312718A33F3D00A6BEC8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */; };
@@ -80,6 +77,7 @@
 		D098313618A4B59400A6BEC8 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = D098313518A4B59400A6BEC8 /* Constants.m */; };
 		D098313918A4BA8100A6BEC8 /* MusicManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D098313818A4BA8100A6BEC8 /* MusicManager.m */; };
 		D098313F18A4C09200A6BEC8 /* AccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D098313E18A4C09200A6BEC8 /* AccountManager.m */; };
+		D0DA93F818B21E9F00877F56 /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DA93F718B21E9F00877F56 /* GenreListViewController.m */; };
 		D0E78B9318B1B7F400C8C4F5 /* UIImage+BlurredFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E78B9018B1B7F400C8C4F5 /* UIImage+BlurredFrame.m */; };
 		D0E78B9418B1B7F400C8C4F5 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E78B9218B1B7F400C8C4F5 /* UIImage+ImageEffects.m */; };
 /* End PBXBuildFile section */
@@ -262,12 +260,8 @@
 		04E3EB4818B109F3007F1711 /* waveform_loading@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "waveform_loading@2x.png"; sourceTree = "<group>"; };
 		D0417E5018A91D6300E0B295 /* UIButton+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Helper.h"; sourceTree = "<group>"; };
 		D0417E5118A91D6300E0B295 /* UIButton+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Helper.m"; sourceTree = "<group>"; };
-		D093D5101848656A007BD3BE /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
-		D093D5111848656A007BD3BE /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
-		D093D5121848656A007BD3BE /* GenreListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GenreListViewController.xib; sourceTree = "<group>"; };
 		D097304318AC7EA700DE1700 /* AlarmViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlarmViewController.h; sourceTree = "<group>"; };
 		D097304418AC7EA700DE1700 /* AlarmViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlarmViewController.m; sourceTree = "<group>"; };
-		D097304518AC7EA700DE1700 /* AlarmViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlarmViewController.xib; sourceTree = "<group>"; };
 		D097304818ACA70700DE1700 /* STDeferred-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "STDeferred-Prefix.pch"; sourceTree = "<group>"; };
 		D097304918ACA70700DE1700 /* STDeferred.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDeferred.h; sourceTree = "<group>"; };
 		D097304A18ACA70700DE1700 /* STDeferred.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDeferred.m; sourceTree = "<group>"; };
@@ -282,6 +276,8 @@
 		D098313E18A4C09200A6BEC8 /* AccountManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountManager.m; sourceTree = "<group>"; };
 		D0AD116E18A3332F00D72BA6 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		D0AD117418A3333F00D72BA6 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		D0DA93F618B21E9F00877F56 /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
+		D0DA93F718B21E9F00877F56 /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
 		D0E78B8F18B1B7F400C8C4F5 /* UIImage+BlurredFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+BlurredFrame.h"; sourceTree = "<group>"; };
 		D0E78B9018B1B7F400C8C4F5 /* UIImage+BlurredFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+BlurredFrame.m"; sourceTree = "<group>"; };
 		D0E78B9118B1B7F400C8C4F5 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
@@ -516,24 +512,22 @@
 			children = (
 				D0417E5318A91E3800E0B295 /* Helper */,
 				D098313C18A4BB5900A6BEC8 /* SoundCloudAPIAdditions */,
+				D098313418A4B59400A6BEC8 /* Constants.h */,
+				D098313518A4B59400A6BEC8 /* Constants.m */,
 				042851CD1810145D008CBA33 /* AppDelegate.h */,
 				042851CE1810145D008CBA33 /* AppDelegate.m */,
-				042851D31810145D008CBA33 /* ViewController.h */,
-				042851D41810145D008CBA33 /* ViewController.m */,
 				048E530F18AA21AA0029DE86 /* TrackScrollView.h */,
 				048E531018AA21AA0029DE86 /* TrackScrollView.m */,
 				D098313718A4BA8100A6BEC8 /* MusicManager.h */,
 				D098313818A4BA8100A6BEC8 /* MusicManager.m */,
-				D093D5101848656A007BD3BE /* GenreListViewController.h */,
-				D093D5111848656A007BD3BE /* GenreListViewController.m */,
-				D093D5121848656A007BD3BE /* GenreListViewController.xib */,
-				D098313418A4B59400A6BEC8 /* Constants.h */,
-				D098313518A4B59400A6BEC8 /* Constants.m */,
 				D098313D18A4C09200A6BEC8 /* AccountManager.h */,
 				D098313E18A4C09200A6BEC8 /* AccountManager.m */,
+				042851D31810145D008CBA33 /* ViewController.h */,
+				042851D41810145D008CBA33 /* ViewController.m */,
+				D0DA93F618B21E9F00877F56 /* GenreListViewController.h */,
+				D0DA93F718B21E9F00877F56 /* GenreListViewController.m */,
 				D097304318AC7EA700DE1700 /* AlarmViewController.h */,
 				D097304418AC7EA700DE1700 /* AlarmViewController.m */,
-				D097304518AC7EA700DE1700 /* AlarmViewController.xib */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -726,7 +720,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D097304718AC7EA700DE1700 /* AlarmViewController.xib in Resources */,
 				04E3EB2C18B109E3007F1711 /* artwork_sc_logo.png in Resources */,
 				04E3EB3418B109E3007F1711 /* opening_bg.png in Resources */,
 				04E3EB4B18B109F3007F1711 /* button_alarm@2x.png in Resources */,
@@ -754,7 +747,6 @@
 				042851C91810145D008CBA33 /* InfoPlist.strings in Resources */,
 				04E3EB4F18B109F3007F1711 /* button_like@2x.png in Resources */,
 				04E3EB2F18B109E3007F1711 /* button_genre.png in Resources */,
-				D093D5141848656A007BD3BE /* GenreListViewController.xib in Resources */,
 				042851D21810145D008CBA33 /* Main.storyboard in Resources */,
 				04E3EB3818B109E3007F1711 /* title_genre.png in Resources */,
 				04E3EB3718B109E3007F1711 /* title_alarm.png in Resources */,
@@ -783,13 +775,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0DA93F818B21E9F00877F56 /* GenreListViewController.m in Sources */,
 				D097304618AC7EA700DE1700 /* AlarmViewController.m in Sources */,
 				042851D51810145D008CBA33 /* ViewController.m in Sources */,
 				D0E78B9418B1B7F400C8C4F5 /* UIImage+ImageEffects.m in Sources */,
 				048E531118AA21AA0029DE86 /* TrackScrollView.m in Sources */,
 				D0E78B9318B1B7F400C8C4F5 /* UIImage+BlurredFrame.m in Sources */,
 				D097304B18ACA70700DE1700 /* STDeferred.m in Sources */,
-				D093D5131848656A007BD3BE /* GenreListViewController.m in Sources */,
 				D098312A18A4AC1800A6BEC8 /* SCAccount+Coding.m in Sources */,
 				042851CF1810145D008CBA33 /* AppDelegate.m in Sources */,
 				D098313918A4BA8100A6BEC8 /* MusicManager.m in Sources */,

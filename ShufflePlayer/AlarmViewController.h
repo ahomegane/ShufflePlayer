@@ -16,9 +16,7 @@
 
 @end
 
-@interface AlarmViewController : UIViewController {
-  id<AlarmViewControllerDelegate> delegate;
-}
+@interface AlarmViewController : UIViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil withMusicManagerInstance: (MusicManager*) musicManager;

@@ -68,12 +68,12 @@
 
   // GenreListViewControler
   self.genreListVC = [[GenreListViewController alloc]
-      initWithNibName:@"GenreListViewController"
+      initWithNibName:nil
                bundle:nil];
   self.genreListVC.genreData = self.musicManager.genreList;
   self.genreListVC.delegate = self;
 
-  self.alarmVC = [[AlarmViewController alloc] initWithNibName:@"AlarmViewController"
+  self.alarmVC = [[AlarmViewController alloc] initWithNibName:nil
                                                        bundle:nil withMusicManagerInstance: self.musicManager];
   self.alarmVC.delegate = self;
 
@@ -177,7 +177,7 @@
   UIImage *alarmImage = [UIImage imageNamed:@"button_alarm"];
   UIButton *alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [alarmButton setImage:alarmImage forState:UIControlStateNormal];
-  alarmButton.frame = CGRectMake(66, navigationArea.frame.size.height / 2 - alarmImage.size.height / 2, alarmImage.size.width, alarmImage.size.height);
+  alarmButton.frame = CGRectMake(74, navigationArea.frame.size.height / 2 - alarmImage.size.height / 2, alarmImage.size.width, alarmImage.size.height);
   [alarmButton addTarget:self
                   action:@selector(touchAlarmButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -399,18 +399,15 @@
 }
 
 - (void)touchGenreButton:(id)sender {
+  [self.genreListVC setBlurImage:[self blurImageFromView:self.view]];
   self.genreListVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
   [self presentViewController:self.genreListVC animated:YES completion:nil];
 }
 
 - (void)touchAlarmButton:(id)sender {
-  UIImage* blurImage = [self imageFromView:self.view];
-  CGRect frame = CGRectMake(0, 0, blurImage.size.width, blurImage.size.height);
-  blurImage = [blurImage applyLightEffectAtFrame:frame];
-  
+  [self.alarmVC setBlurImage:[self blurImageFromView:self.view]];
   self.alarmVC.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
   [self presentViewController:self.alarmVC animated:YES completion:nil];
-  [self.alarmVC setBlurImage:blurImage];
 }
 
 - (void)beginOpening {
@@ -581,6 +578,10 @@
                withForcePlayFlag:NO
                     withInitFlag:NO];
 
+  [self hideGenreView];
+}
+
+- (void)hideGenreView {
   [self.genreListVC dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -593,13 +594,12 @@
 }
 
 - (void)hideAlarmView {
-  self.view.layer.shouldRasterize = NO;
   [self.alarmVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Utility
 
-- (UIImage *)imageFromView:(UIView *)view {
+- (UIImage *)blurImageFromView:(UIView *)view {
   UIGraphicsBeginImageContextWithOptions(view.frame.size, YES, 0);
   CGContextRef context = UIGraphicsGetCurrentContext();
 
@@ -607,8 +607,11 @@
   [view.layer renderInContext:context];
   UIImage *renderedImage = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-
-  return renderedImage;
+  
+  CGRect frame = CGRectMake(0, 0, renderedImage.size.width, renderedImage.size.height);
+  UIImage * blurImage = [renderedImage applyLightEffectAtFrame:frame];
+  
+  return blurImage;
 }
 
 @end
