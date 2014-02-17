@@ -20,6 +20,9 @@
   UIImageView *_waveformSequenceView;
   UIButton *_titleButton;
   UIButton *_likeButton;
+  UIButton * _artworkScLogoButton;
+  UIImage* _likeImage;
+  UIImage* _likeImageOn;
 }
 @end
 
@@ -43,35 +46,55 @@
 
 - (void)initElement {
 
+  CGRect artworkFrame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.width);
+  
+  UIView * artworkArea = [[UIView alloc]initWithFrame:artworkFrame];
+  [self addSubview:artworkArea];
+  
   _artworkImageView = [[UIImageView alloc] init];
+  _artworkImageView.frame = artworkFrame;
   _artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
-  _artworkImageView.frame = CGRectMake(30, 70, 260, 260);
-  [self addSubview:_artworkImageView];
+  [artworkArea addSubview:_artworkImageView];
+  
+  UIImage * artworkScLogoImage = [UIImage imageNamed:@"artwork_sc_logo"];
+  _artworkScLogoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  _artworkScLogoButton.frame = CGRectMake(artworkFrame.size.width - 60, artworkFrame.size.height - 16, artworkScLogoImage.size.width, artworkScLogoImage.size.height);
+  [_artworkScLogoButton setImage:artworkScLogoImage forState:UIControlStateNormal];
+  [artworkArea addSubview:_artworkScLogoButton];
+  [_artworkScLogoButton addTarget:self
+                           action:@selector(touchTitleButton:)
+                 forControlEvents:UIControlEventTouchUpInside];
 
-  _waveformSequenceView = [[UIImageView alloc] init];
-  _waveformSequenceView.frame = CGRectMake(30, 330, 0, 41);
-  _waveformSequenceView.backgroundColor = [UIColor lightGrayColor];
+  CGRect waveformFrame = CGRectMake(0, self.frame.size.height - 50, self.frame.size.width, 50);
+  
+  _waveformSequenceView = [[UIImageView alloc] initWithFrame: waveformFrame];
+  _waveformSequenceView.backgroundColor = [UIColor colorWithRed:0.310 green:0.310 blue:0.310 alpha:1.0];
   [self addSubview:_waveformSequenceView];
 
-  _waveformImageView = [[UIImageView alloc] init];
+  _waveformImageView = [[UIImageView alloc] initWithFrame:waveformFrame];
   _waveformImageView.contentMode = UIViewContentModeScaleAspectFit;
-  _waveformImageView.frame = CGRectMake(30, 330, 260, 41);
   [self addSubview:_waveformImageView];
 
-  _titleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  _titleButton.frame = CGRectMake(30, 380, 260, 20);
+  _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  _titleButton.frame = CGRectMake(self.frame.size.width / 2 - 125, self.frame.size.height - 125, 250, 14);
+  _titleButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];//UltraLight
+  [_titleButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [self addSubview:_titleButton];
   [_titleButton addTarget:self
                    action:@selector(touchTitleButton:)
          forControlEvents:UIControlEventTouchUpInside];
 
-  _likeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  _likeButton.frame = CGRectMake(20, 30, 50, 30);
-  [self addSubview:_likeButton];
-  [_likeButton setTitle:@"Like" forState:UIControlStateNormal];
+  _likeImage = [UIImage imageNamed:@"button_like"];
+  _likeImageOn = [UIImage imageNamed:@"button_like_on"];
+  _likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [_likeButton setImage:_likeImage forState:UIControlStateNormal];
+  _likeButton.frame = CGRectMake(self.frame.size.width / 2 - _likeImage.size.width / 2, self.frame.size.height - 97, _likeImage.size.width, _likeImage.size.height);
   [_likeButton addTarget:self
                   action:@selector(touchLikeButton:)
         forControlEvents:UIControlEventTouchUpInside];
+  [self addSubview:_likeButton];
+  _likeButton.tag = 0;
+  
 }
 
 #pragma mark - Instance Method
@@ -102,9 +125,7 @@
         [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
     self.artworkImage = [[UIImage alloc] initWithData:artworkData];
   } else {
-    self.artworkImage = [UIImage
-        imageWithContentsOfFile:
-            [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"]];
+    self.artworkImage = [UIImage imageNamed:@"artwork_no_image"];
   }
   _artworkImageView.image = self.artworkImage;
 
@@ -116,8 +137,11 @@
 
   self.title = [track objectForKey:@"title"];
   NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
+
   [_titleButton setTitle:self.title forState:UIControlStateNormal];
   [_titleButton setStringTag:permalinkUrl];
+  
+  [_artworkScLogoButton setStringTag:permalinkUrl];
 
   NSString *trackId = [track objectForKey:@"id"];
   [_likeButton setStringTag:trackId];
@@ -141,7 +165,6 @@
 - (void)touchTitleButton:(id)sender {
   UIButton *button = sender;
   NSString *permalinkUrl = [button getStringTag];
-  NSLog(@"%@", permalinkUrl);
   [self openUrlOnSafari:permalinkUrl];
 }
 
@@ -153,15 +176,31 @@
 - (void)touchLikeButton:(id)sender {
   UIButton *button = sender;
   NSString *trackId = [button getStringTag];
-  [_accountManager sendLike:trackId withCompleteCallback:^(NSError * error){
-    if (SC_CANCELED(error)) {
-      NSLog(@"Canceled!");
-    } else if (error) {
-      NSLog(@"Error: %@", [error localizedDescription]);
-    } else {
-      NSLog(@"Liked track: %@", trackId);
-    }
-  }];
+  if (button.tag == 0) {// put
+    [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error){
+      if (SC_CANCELED(error)) {
+        NSLog(@"Canceled!");
+      } else if (error) {
+        NSLog(@"Error: %@", [error localizedDescription]);
+      } else {
+        NSLog(@"Liked track: %@", trackId);
+        [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
+        button.tag = 1;
+      }
+    }];
+  } else {// delete
+    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error){
+      if (SC_CANCELED(error)) {
+        NSLog(@"Canceled!");
+      } else if (error) {
+        NSLog(@"Error: %@", [error localizedDescription]);
+      } else {
+        NSLog(@"Like deleted track: %@", trackId);
+        [_likeButton setImage:_likeImage forState:UIControlStateNormal];
+        button.tag = 0;
+      }
+    }];
+  }
 }
 
 #pragma mark - UIScrollViewDelegate

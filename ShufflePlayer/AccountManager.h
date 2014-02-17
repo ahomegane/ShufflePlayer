@@ -19,7 +19,7 @@
 }
 
 - (void)sendLike:(NSString *)trackId
-    withCompleteCallback:(void (^)(NSError *error))callback;
+          method:(NSString*) method withCompleteCallback:(void (^)(NSError *error))callback;
 @property(retain, nonatomic) id<AccountManagerDelegate> delegate;
 
 @end

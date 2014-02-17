@@ -13,8 +13,10 @@
   NSTimer *_timer;
   
   UILabel *_selectedTimeLabel;
+  UILabel *_timeLabelMessage;
   UIDatePicker *_picker;
   NSDateFormatter *_formatter;
+  UIImageView * _blurImageView;
   
   MusicManager* _musicManager;
 }
@@ -34,8 +36,8 @@ NSString *const CLEAR_TEXT = @"-- : --";
   if (self) {
     _musicManager = musicManager;
     
-    self.selectedTime = [self restoreSelectedTime];
-    if (self.selectedTime != nil) [self setTimer];
+    self.selectedTime = [self restoreSelectedTimeFromUserDefault];
+    if (self.selectedTime != nil) [self startTimer];
 
   }
   return self;
@@ -60,6 +62,10 @@ NSString *const CLEAR_TEXT = @"-- : --";
 
 #pragma mark - Instance Method
 
+- (void)setBlurImage:(UIImage *)blurImage {
+  _blurImageView.image = blurImage;
+}
+
 - (void)overrideSelectedTime:(NSDate*)date {
   NSLog(@"overrideSelectedTime");
   self.selectedTime = date;
@@ -68,67 +74,129 @@ NSString *const CLEAR_TEXT = @"-- : --";
 #pragma mark - View Element
 
 - (void)initElement {
-  _picker = [[UIDatePicker alloc] init];
-  _picker.datePickerMode = UIDatePickerModeTime;
-  _picker.minuteInterval = 1;
-  CGRect frame = CGRectZero;
-  frame.origin.y = self.view.frame.origin.y +
-                   (self.view.frame.size.height - _picker.frame.size.height);
-  _picker.frame = frame;
-  [self.view addSubview:_picker];
 
-  UIButton *saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  saveButton.frame = CGRectMake(0, 0, 100, 20);
-  saveButton.center = CGPointMake(self.view.frame.size.width * 1 / 4, 300);
+  UIColor * bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+  UIColor * linkColor = [UIColor colorWithRed:0.3803921568627451 green:0.8 blue:0.8588235294117647 alpha:1.0];
+  UIColor * bgPickerView = [UIColor colorWithRed:0.624 green:0.624 blue:0.624 alpha:1];
+  
+  // ブラー処理用
+  _blurImageView = [[UIImageView alloc] initWithFrame:self.view.frame];
+  [self.view addSubview: _blurImageView];
+
+  //　背景
+  UIView * bgView = [[UIView alloc] initWithFrame:self.view.frame];
+  bgView.backgroundColor = bgColorAlpha;
+  [self.view addSubview:bgView];
+  
+  // タイトル
+  UIFont* titleFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:18];//UltraLight
+  
+  UIView *titleArea = [[UIView alloc]initWithFrame:CGRectMake(15, 40, 290, 24)];
+  [self.view addSubview:titleArea];
+
+  UIImage *iconImage = [UIImage imageNamed:@"title_alarm"];
+  UIImageView * iconImageView = [[UIImageView alloc]initWithImage:iconImage];
+  [titleArea addSubview:iconImageView];
+  
+  UILabel * title = [[UILabel alloc]initWithFrame:CGRectMake(32, 0, 230, titleArea.frame.size.height)];
+  title.font = titleFont;
+  title.textColor = [UIColor whiteColor];
+  title.text = @"Alarm Clock";
+  title.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+  [titleArea addSubview:title];
+  
+  UIImage *closeImage = [UIImage imageNamed:@"button_close"];
+  UIButton * closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [closeButton setImage:closeImage forState:UIControlStateNormal];
+  closeButton.frame = CGRectMake(titleArea.frame.size.width - closeImage.size.width, 2, closeImage.size.width, closeImage.size.height);
+  [closeButton addTarget:self
+                  action:@selector(touchCloseButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+  [titleArea addSubview:closeButton];
+  
+  // 時間表示
+  _selectedTimeLabel = [[UILabel alloc]
+                        initWithFrame:CGRectMake(0, 120, self.view.frame.size.width, 87.5)];
+  _selectedTimeLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLight" size:87.5];
+  _selectedTimeLabel.textColor = [UIColor whiteColor];
+  _selectedTimeLabel.textAlignment = NSTextAlignmentCenter;
+  [self.view addSubview:_selectedTimeLabel];
+  
+  _timeLabelMessage = [[UILabel alloc]
+                      initWithFrame:CGRectMake(0, 230, self.view.frame.size.width, 12)];
+  _timeLabelMessage.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12];
+  _timeLabelMessage.textColor = [UIColor whiteColor];
+  _timeLabelMessage.textAlignment = NSTextAlignmentCenter;
+  [self.view addSubview:_timeLabelMessage];
+  
+  [self updateTimeLabel:self.selectedTime];
+
+  // ボタン
+  CGRect frameButton = CGRectMake(0, 0, 50, 20);
+  CGPoint buttonCenter = CGPointMake(100, self.view.frame.size.height - 260);
+  UIFont * buttonFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:20];//UltraLight
+
+  UIButton *saveButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  saveButton.frame = frameButton;
+  saveButton.center = buttonCenter;
+  saveButton.titleLabel.font = buttonFont;
+  saveButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+  [saveButton setTitleColor:linkColor forState:UIControlStateNormal];
   [saveButton setTitle:@"Save" forState:UIControlStateNormal];
   [saveButton addTarget:self
                  action:@selector(touchSaveButton:)
        forControlEvents:UIControlEventTouchUpInside];
-  [self.view addSubview:saveButton];
 
   UIButton *clearButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  clearButton.frame = CGRectMake(0, 0, 100, 20);
-  clearButton.center = CGPointMake(self.view.frame.size.width * 3 / 4, 300);
+  clearButton.frame = frameButton;
+  buttonCenter.x = self.view.frame.size.width - buttonCenter.x;
+  clearButton.center = buttonCenter;
+  clearButton.titleLabel.font =  buttonFont;
+  clearButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+  [clearButton setTitleColor:linkColor forState:UIControlStateNormal];
   [clearButton setTitle:@"Clear" forState:UIControlStateNormal];
   [clearButton addTarget:self
                   action:@selector(touchClearButton:)
         forControlEvents:UIControlEventTouchUpInside];
+
+  [self.view addSubview:saveButton];
   [self.view addSubview:clearButton];
-
-  UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  closeButton.frame = CGRectMake(250, 20, 52, 30);
-  [closeButton setTitle:@"Close" forState:UIControlStateNormal];
-  [self.view addSubview:closeButton];
-  [closeButton addTarget:self
-                  action:@selector(touchCloseButton:)
-        forControlEvents:UIControlEventTouchUpInside];
-
-  _selectedTimeLabel = [[UILabel alloc]
-      initWithFrame:CGRectMake(0, 100, self.view.frame.size.width, 100)];
-  _selectedTimeLabel.center = CGPointMake(self.view.frame.size.width / 2, 150);
-
-  if (self.selectedTime != nil) {
-    _selectedTimeLabel.text = [self formatDate:self.selectedTime];
-  } else {
-    _selectedTimeLabel.text = CLEAR_TEXT;
-  }
-
-  _selectedTimeLabel.font = [UIFont systemFontOfSize:100];
-  _selectedTimeLabel.textAlignment = NSTextAlignmentCenter;
-  [self.view addSubview:_selectedTimeLabel];
+  
+  // picker
+  _picker = [[UIDatePicker alloc] init];
+  _picker.datePickerMode = UIDatePickerModeTime;
+  _picker.minuteInterval = 1;
+  
+  int margin = 0;
+  CGRect frame = _picker.frame;
+  frame.size.height += margin * 2;
+  frame.origin.y = self.view.frame.size.height - frame.size.height;
+  
+  UIView * pickerView = [[UIView alloc] initWithFrame:frame];
+  pickerView.backgroundColor = bgPickerView;
+  
+  frame = _picker.frame;
+  frame.origin.y = margin;
+  _picker.frame = frame;
+  
+  [pickerView addSubview:_picker];
+  [self.view addSubview:pickerView];
+  
 }
 
 #pragma mark Event Listener
 
 - (void)touchSaveButton:(id)sender {
   self.selectedTime = _picker.date;
-  _selectedTimeLabel.text = [self formatDate:self.selectedTime];
-  [self saveSelectedTime:self.selectedTime];
-  [self setTimer];
+  [self updateTimeLabel:self.selectedTime];
+  
+  [self saveSelectedTimeToUserDefault:self.selectedTime];
+  [self startTimer];
 }
 
 - (void)touchClearButton:(id)sender {
-  _selectedTimeLabel.text = CLEAR_TEXT;
+  [self updateTimeLabel:nil];
+  
   [self clearTimer];
 }
 
@@ -136,9 +204,20 @@ NSString *const CLEAR_TEXT = @"-- : --";
   [self.delegate hideAlarmView];
 }
 
+- (void)updateTimeLabel:(NSDate*) time {
+  if (time != nil) {
+    NSString* str = [self formatDate:time];
+    _selectedTimeLabel.text = str;
+    _timeLabelMessage.text = [NSString stringWithFormat:@"%@ に自動で再生を開始します", str];
+  } else {
+    _selectedTimeLabel.text = CLEAR_TEXT;
+    _timeLabelMessage.text = @"設定されていません";
+  }
+}
+
 #pragma mark - Timer
 
-- (void)setTimer {
+- (void)startTimer {
   [self clearTimer];
   
   _timer = [NSTimer scheduledTimerWithTimeInterval:1.0f
@@ -176,7 +255,7 @@ NSString *const CLEAR_TEXT = @"-- : --";
     
     // 設定が分刻みのため連続してlunchAlarmが呼ばてしまうのを防ぐため、61秒間はtimerを止める
     [STDeferred timeout:61.0f].then(^(id ret) {
-      [self setTimer];
+      [self startTimer];
     });
   }
 }
@@ -203,14 +282,14 @@ NSString *const CLEAR_TEXT = @"-- : --";
 
 #pragma mark - UserDefault Control
 
-- (BOOL)saveSelectedTime:(NSDate*)date {
+- (BOOL)saveSelectedTimeToUserDefault:(NSDate*)date {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults setObject:date forKey:@"alarmTime"];
   BOOL isSuccess = [defaults synchronize];
   return isSuccess;
 }
 
-- (NSDate *)restoreSelectedTime {
+- (NSDate *)restoreSelectedTimeFromUserDefault {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSDate *date = [defaults objectForKey:@"alarmTime"];
   return date;

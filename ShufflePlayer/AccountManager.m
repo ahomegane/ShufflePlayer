@@ -74,7 +74,7 @@
 }
 
 - (void)sendLike:(NSString *)trackId
-    withCompleteCallback:(void (^)(NSError *error))callback {
+          method:(NSString*) method withCompleteCallback:(void (^)(NSError *error))callback {
   NSString *resourcetURL =
       [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
 
@@ -83,10 +83,10 @@
     if (callback != nil)
       callback(error);
   };
-
+  
   [self getScAccount: ^(SCAccount * scAccount) {
     _scAccount = scAccount;
-    [SCRequest performMethod:SCRequestMethodPUT
+    [SCRequest performMethod:[method isEqualToString:@"delete"] ? SCRequestMethodDELETE : SCRequestMethodPUT
                     onResource:[NSURL URLWithString:resourcetURL]
                usingParameters:nil
                    withAccount:_scAccount
