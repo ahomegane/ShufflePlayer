@@ -15,9 +15,12 @@
 
   AccountManager *_accountManager;
 
+  UIView* _waveformArea;
   UIImageView *_artworkImageView;
   UIImageView *_waveformImageView;
   UIImageView *_waveformSequenceView;
+  UIImageView *_waveformLoadView;
+  CABasicAnimation *_waveformLoadAnimation;
   UIButton *_titleButton;
   UIButton *_likeButton;
   UIButton * _artworkScLogoButton;
@@ -46,6 +49,7 @@
 
 - (void)initElement {
 
+  // アートワーク
   CGRect artworkFrame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.width);
   
   UIView * artworkArea = [[UIView alloc]initWithFrame:artworkFrame];
@@ -58,25 +62,52 @@
   
   UIImage * artworkScLogoImage = [UIImage imageNamed:@"artwork_sc_logo"];
   _artworkScLogoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  _artworkScLogoButton.frame = CGRectMake(artworkFrame.size.width - 60, artworkFrame.size.height - 16, artworkScLogoImage.size.width, artworkScLogoImage.size.height);
+  _artworkScLogoButton.frame = CGRectMake(artworkFrame.size.width - 60, artworkFrame.size.height - 26, artworkScLogoImage.size.width, artworkScLogoImage.size.height);
   [_artworkScLogoButton setImage:artworkScLogoImage forState:UIControlStateNormal];
   [artworkArea addSubview:_artworkScLogoButton];
   [_artworkScLogoButton addTarget:self
                            action:@selector(touchTitleButton:)
                  forControlEvents:UIControlEventTouchUpInside];
 
+  // 波形
   CGRect waveformFrame = CGRectMake(0, self.frame.size.height - 50, self.frame.size.width, 50);
   
+  _waveformArea = [[UIView alloc]initWithFrame:waveformFrame];
+  [self addSubview:_waveformArea];
+  
+  waveformFrame.origin.y = 0;
+  
+  // 波形　進捗用
   _waveformSequenceView = [[UIImageView alloc] initWithFrame: waveformFrame];
   _waveformSequenceView.backgroundColor = [UIColor colorWithRed:0.310 green:0.310 blue:0.310 alpha:1.0];
-  [self addSubview:_waveformSequenceView];
+  [_waveformArea addSubview:_waveformSequenceView];
 
+  // 波形　ローディング用
+  waveformFrame.origin.x = -waveformFrame.size.width;
+  waveformFrame.size.width *= 2;
+  _waveformLoadView = [[UIImageView alloc]initWithFrame:waveformFrame];
+  _waveformLoadView.contentMode = UIViewContentModeScaleAspectFit;
+  _waveformLoadView.image = [UIImage imageNamed:@"waveform_loading"];
+  [_waveformArea addSubview:_waveformLoadView];
+  
+  // ローディングアニメーション
+  _waveformLoadAnimation = [CABasicAnimation animationWithKeyPath:@"position"];
+  _waveformLoadAnimation.duration = 10;
+  _waveformLoadAnimation.repeatCount = HUGE_VALF;
+  _waveformLoadAnimation.beginTime = CACurrentMediaTime();
+  _waveformLoadAnimation.fromValue = [NSValue valueWithCGPoint:CGPointMake(0, _waveformLoadView.center.y)]; // 絶対（中心座標）
+  _waveformLoadAnimation.byValue = [NSValue valueWithCGPoint:CGPointMake(waveformFrame.size.width / 2, 0)]; // 相対
+  
+  // 波形　画像セット用  
+  waveformFrame.origin.x = 0;
+  waveformFrame.size.width *= 0.5;
   _waveformImageView = [[UIImageView alloc] initWithFrame:waveformFrame];
   _waveformImageView.contentMode = UIViewContentModeScaleAspectFit;
-  [self addSubview:_waveformImageView];
-
+  [_waveformArea addSubview:_waveformImageView];
+  
+  // タイトル
   _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  _titleButton.frame = CGRectMake(self.frame.size.width / 2 - 125, self.frame.size.height - 125, 250, 14);
+  _titleButton.frame = CGRectMake(self.frame.size.width / 2 - 125, self.frame.size.height - 130, 250, 14);
   _titleButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];//UltraLight
   [_titleButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
   [self addSubview:_titleButton];
@@ -84,11 +115,12 @@
                    action:@selector(touchTitleButton:)
          forControlEvents:UIControlEventTouchUpInside];
 
+  // ライク
   _likeImage = [UIImage imageNamed:@"button_like"];
   _likeImageOn = [UIImage imageNamed:@"button_like_on"];
   _likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [_likeButton setImage:_likeImage forState:UIControlStateNormal];
-  _likeButton.frame = CGRectMake(self.frame.size.width / 2 - _likeImage.size.width / 2, self.frame.size.height - 97, _likeImage.size.width, _likeImage.size.height);
+  _likeButton.frame = CGRectMake(self.frame.size.width / 2 - _likeImage.size.width / 2, self.frame.size.height - 100, _likeImage.size.width, _likeImage.size.height);
   [_likeButton addTarget:self
                   action:@selector(touchLikeButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -108,6 +140,7 @@
     self.hidden = NO;
   }
 
+  // アートワーク
   NSString *artworkUrl = [track objectForKey:@"artwork_url"];
   if (![artworkUrl isEqual:[NSNull null]]) {
     NSRegularExpression *regexp = [NSRegularExpression
@@ -129,27 +162,34 @@
   }
   _artworkImageView.image = self.artworkImage;
 
-  NSString *waveformUrl = [track objectForKey:@"waveform_url"];
-  NSData *waveformData =
-      [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
-  UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
-  _waveformImageView.image = waveformImage;
-
+  // タイトルボタン
   self.title = [track objectForKey:@"title"];
   NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
 
   [_titleButton setTitle:self.title forState:UIControlStateNormal];
   [_titleButton setStringTag:permalinkUrl];
   
+  // サウンドクラウドロゴ
   [_artworkScLogoButton setStringTag:permalinkUrl];
 
+  // ライク
   NSString *trackId = [track objectForKey:@"id"];
   [_likeButton setStringTag:trackId];
+  [_likeButton setImage:_likeImage forState:UIControlStateNormal];
+  _likeButton.tag = 0;
 
-  // waveform初期化
+  // 波形
+  NSString *waveformUrl = [track objectForKey:@"waveform_url"];
+  NSData *waveformData =
+  [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
+  UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
+  _waveformImageView.image = waveformImage;
+
   CGRect rect = _waveformSequenceView.frame;
   _waveformSequenceView.frame =
       CGRectMake(rect.origin.x, rect.origin.y, 0, rect.size.height);
+  
+  _waveformLoadView.hidden = NO;
 }
 
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration {
@@ -157,6 +197,15 @@
   _waveformSequenceView.frame =
       CGRectMake(rect.origin.x, rect.origin.y, 260 * currentTime / duration,
                  rect.size.height);
+}
+
+- (void)audioDataBeginLoading {
+  [_waveformLoadView.layer addAnimation:_waveformLoadAnimation forKey:@"loading"];
+}
+
+- (void)audioDataEndLoading {
+  [_waveformLoadView.layer removeAnimationForKey:@"loading"];
+  _waveformLoadView.hidden = YES;
 }
 
 #pragma mark - Private Method
@@ -202,16 +251,5 @@
     }];
   }
 }
-
-#pragma mark - UIScrollViewDelegate
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
 
 @end

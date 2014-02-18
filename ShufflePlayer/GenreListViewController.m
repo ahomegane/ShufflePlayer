@@ -42,6 +42,10 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+  return UIStatusBarStyleLightContent;
+}
+
 #pragma mark - Instance Method
 
 - (void)setBlurImage:(UIImage *)blurImage {
@@ -82,7 +86,7 @@
   UIImage *closeImage = [UIImage imageNamed:@"button_close"];
   UIButton * closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [closeButton setImage:closeImage forState:UIControlStateNormal];
-  closeButton.frame = CGRectMake(titleArea.frame.size.width - closeImage.size.width, 2, closeImage.size.width, closeImage.size.height);
+  closeButton.frame = CGRectMake(titleArea.frame.size.width - closeImage.size.width, -3, closeImage.size.width, closeImage.size.height);
   [closeButton addTarget:self
                   action:@selector(touchCloseButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -96,6 +100,7 @@
   _tableView.separatorColor = [UIColor whiteColor];
   _tableView.backgroundColor = [UIColor clearColor];
 
+//　border
 //  CALayer *bottorTop = [CALayer layer];
 //  bottorTop.frame = CGRectMake(0, 0, _tableView.frame.size.width, 0.5f);
 //  bottorTop.backgroundColor = [UIColor whiteColor].CGColor;

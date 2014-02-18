@@ -15,6 +15,8 @@
 - (void)initElement;
 - (void)setTrackInfo:(NSDictionary *)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;
+- (void)audioDataBeginLoading;
+- (void)audioDataEndLoading;
 @property(retain, nonatomic) UIImage *artworkImage;
 @property(retain, nonatomic) NSString *title;
 

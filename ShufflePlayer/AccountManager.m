@@ -24,54 +24,12 @@
 - (id)init {
   self = [super init];
   if (self) {
-    // [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
+//    [self clearUserDefault];
   }
   return self;
 }
 
 #pragma mark - Instance Method
-
-- (void)getScAccount:(void (^)())callback {
-  SCAccount *scAccount;
-
-  if (_scAccount == nil) {
-
-    scAccount = [self restoreScAccount];
-
-    if (scAccount == nil) {
-      [self login: nil withLoginedCallback:^() {
-
-        SCAccount *scAccount = [SCSoundCloud account];
-
-        if (scAccount == nil) {
-          UIAlertView *alert =
-              [[UIAlertView alloc] initWithTitle:@"Not Logged In"
-                                         message:@"You must login"
-                                        delegate:nil
-                               cancelButtonTitle:@"OK"
-                               otherButtonTitles:nil];
-          [alert show];
-        } else {
-          [self saveScAccount:scAccount];
-          NSLog(@"scAccount save to UserDefaults");
-        }
-        if (callback != nil)
-          callback(scAccount);
-      }];
-
-    } else {
-      NSLog(@"scAccount restore from UserDefaults");
-      if (callback != nil)
-        callback(scAccount);
-    }
-
-  } else {
-    scAccount = _scAccount;
-
-    if (callback != nil)
-      callback(scAccount);
-  }
-}
 
 - (void)sendLike:(NSString *)trackId
           method:(NSString*) method withCompleteCallback:(void (^)(NSError *error))callback {
@@ -80,8 +38,24 @@
 
   SCRequestResponseHandler handler =
       ^(NSURLResponse * response, NSData * data, NSError * error) {
-    if (callback != nil)
-      callback(error);
+        if (SC_CANCELED(error)) {
+          
+        } else if (error) {
+          NSString* errorStr = [error localizedDescription];
+          
+          // 有効期限切れ?
+          if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
+            _scAccount = nil;
+            [self clearUserDefault];
+            
+            // 再帰処理
+            [self sendLike:trackId method:method withCompleteCallback:callback];
+          }
+          
+        }
+        
+        if (callback != nil)
+          callback(error);
   };
   
   [self getScAccount: ^(SCAccount * scAccount) {
@@ -97,12 +71,55 @@
 
 #pragma mark - Private Method
 
+
+- (void)getScAccount:(void (^)())callback {
+  SCAccount *scAccount;
+  
+  if (_scAccount == nil) {
+    
+    scAccount = [self restoreScAccount];
+    
+    if (scAccount == nil) {
+      [self login: nil withLoginedCallback:^() {
+        
+        SCAccount *scAccount = [SCSoundCloud account];
+        
+        if (scAccount == nil) {
+          UIAlertView *alert =
+          [[UIAlertView alloc] initWithTitle:@"Not Logged In"
+                                     message:@"You must login"
+                                    delegate:nil
+                           cancelButtonTitle:@"OK"
+                           otherButtonTitles:nil];
+          [alert show];
+        } else {
+          [self saveScAccount:scAccount];
+          NSLog(@"scAccount save to UserDefaults");
+        }
+        if (callback != nil)
+          callback(scAccount);
+      }];
+      
+    } else {
+      NSLog(@"scAccount restore from UserDefaults");
+      if (callback != nil)
+        callback(scAccount);
+    }
+    
+  } else {
+    scAccount = _scAccount;
+    
+    if (callback != nil)
+      callback(scAccount);
+  }
+}
+
 - (void)login:(id)sender withLoginedCallback:(void (^)())callback {
   SCLoginViewControllerCompletionHandler handler = ^(NSError * error) {
     if (SC_CANCELED(error)) {
       NSLog(@"Canceled!");
     } else if (error) {
-      NSLog(@"Error: %@", [error localizedDescription]);
+      NSLog(@"Error: %@", [error localizedDescription]);      
     } else {
       if (callback != nil)
         callback();
@@ -138,6 +155,10 @@
   }
   SCAccount *scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
   return scAccount;
+}
+
+- (void)clearUserDefault {
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
 }
 
 @end

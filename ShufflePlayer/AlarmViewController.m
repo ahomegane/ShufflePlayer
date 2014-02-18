@@ -60,6 +60,10 @@ NSString *const CLEAR_TEXT = @"-- : --";
   // Dispose of any resources that can be recreated.
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+  return UIStatusBarStyleLightContent;
+}
+
 #pragma mark - Instance Method
 
 - (void)setBlurImage:(UIImage *)blurImage {
@@ -108,7 +112,7 @@ NSString *const CLEAR_TEXT = @"-- : --";
   UIImage *closeImage = [UIImage imageNamed:@"button_close"];
   UIButton * closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [closeButton setImage:closeImage forState:UIControlStateNormal];
-  closeButton.frame = CGRectMake(titleArea.frame.size.width - closeImage.size.width, 2, closeImage.size.width, closeImage.size.height);
+  closeButton.frame = CGRectMake(titleArea.frame.size.width - closeImage.size.width, -3, closeImage.size.width, closeImage.size.height);
   [closeButton addTarget:self
                   action:@selector(touchCloseButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -208,7 +212,7 @@ NSString *const CLEAR_TEXT = @"-- : --";
   if (time != nil) {
     NSString* str = [self formatDate:time];
     _selectedTimeLabel.text = str;
-    _timeLabelMessage.text = [NSString stringWithFormat:@"%@ に自動で再生を開始します", str];
+    _timeLabelMessage.text = [NSString stringWithFormat:@"%@ に自動再生を開始します", str];
   } else {
     _selectedTimeLabel.text = CLEAR_TEXT;
     _timeLabelMessage.text = @"設定されていません";
@@ -243,7 +247,7 @@ NSString *const CLEAR_TEXT = @"-- : --";
   NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
   [formatter setDateFormat:@"HH:mm"];
   NSString *nowStr = [formatter stringFromDate:now];
-  NSLog(@"%@", nowStr);
+//  NSLog(@"%@", nowStr);
   
   NSString *selectedTimeStr = [formatter stringFromDate:self.selectedTime];
   if ([nowStr isEqualToString:selectedTimeStr]) {

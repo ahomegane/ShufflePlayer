@@ -8,8 +8,8 @@
 
 #import "Constants.h"
 
-NSString *const SC_CLIENT_ID = @"cef5e6d3c083503120892b041572abff";
-NSString *const SC_CLIENT_SECRET = @"65e92b9a3659531e926a96bae165cd82";
+NSString *const SC_CLIENT_ID = @"1dd3105d94a33bf1adb588e8cc0682a2";
+NSString *const SC_CLIENT_SECRET = @"47a0215578d653935513f7d5c98ef9f1";
 NSString *const SC_API_REDIRECT_URL = @"test://oauth";
 
 NSString *const SC_TRACK_REQUEST_URL =

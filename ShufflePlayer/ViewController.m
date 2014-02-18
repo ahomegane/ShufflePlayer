@@ -11,8 +11,8 @@
 #import "UIButton+Helper.h"
 #import "STDeferred.h"
 #import "UIImage+BlurredFrame.h"
-
-// oauth invalid_grant おそらくアカウントオブジェクトの有効期間
+#import "LoadIndicator.h"
+#import "OpeningView.h"
 
 @interface ViewController () {
 
@@ -30,15 +30,12 @@
   UIImage *_playImage;
   UIImage *_pauseImage;
 
-  UIColor * _bgColor;
-  UIColor * _bgImage;
-
   // オープニング
-  UIView *_openingView;
+  OpeningView *_openingView;
 
   // ローディング
   UIView *_loadingView;
-  UIActivityIndicatorView *_indicator;
+  LoadIndicator *_indicator;
 }
 @end
 
@@ -52,8 +49,6 @@
   [super viewDidLoad];
   
   NSLog(@"ViewDidLoad");
-  
-//  self.modalPresentationStyle = UIModalPresentationCurrentContext;
   
   AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
   appDelegate.viewController = self;
@@ -118,10 +113,11 @@
 
 - (void)initElement {
   
-  _bgColor = [UIColor colorWithRed:0.102 green:0.102 blue:0.102 alpha:1.0];
-  _bgImage = [UIColor colorWithPatternImage:[UIImage imageNamed:@"opening_bg"]];
+  UIColor *bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+  UIColor *bgImage = [UIColor colorWithPatternImage:[UIImage imageNamed:@"opening_bg"]];
   
-  self.view.backgroundColor = _bgImage;
+  // 背景指定
+  self.view.backgroundColor = bgImage;
   
   // scrollView配置
   _baseScrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
@@ -136,54 +132,53 @@
   _playImage = [UIImage imageNamed:@"button_play"];
   _pauseImage = [UIImage imageNamed:@"button_pause"];
 
-  UIView * navigationArea = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height - 206, self.view.frame.size.width, _playImage.size.height)];
-  [self.view addSubview:navigationArea];
+  CGRect navigationAreaFrame = CGRectMake(0, self.view.frame.size.height - 206, self.view.frame.size.width, _playImage.size.height);
   
   _playButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [_playButton setImage:_playImage forState:UIControlStateNormal];
-  _playButton.frame = CGRectMake(navigationArea.frame.size.width / 2 - _playImage.size.width / 2, 0, _playImage.size.width, _playImage.size.height);
+  _playButton.frame = CGRectMake(navigationAreaFrame.size.width / 2 - _playImage.size.width / 2, navigationAreaFrame.origin.y, _playImage.size.width, _playImage.size.height);
   [_playButton addTarget:self
                   action:@selector(touchPlayButton:)
         forControlEvents:UIControlEventTouchUpInside];
-  [navigationArea addSubview:_playButton];
+  [self.view addSubview:_playButton];
   
-  //  UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
-  //  UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  //  prevButton.frame = CGRectMake(190, navigationArea.frame.size.height / 2 - prevImage.size.height / 2, prevImage.size.width, prevImage.size.height);
-  //  [prevButton setImage:prevImage forState:UIControlStateNormal];
-  //  [navigationArea addSubview:prevButton];
-  //  [prevButton addTarget:self
-  //                 action:@selector(touchPrevButton:)
-  //       forControlEvents:UIControlEventTouchUpInside];
-  //
-  //  UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
-  //  UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  //  nextButton.frame = CGRectMake(250, navigationArea.frame.size.height / 2 - nextImage.size.height / 2, nextImage.size.width, nextImage.size.height);
-  //  [nextButton setImage:nextImage forState:UIControlStateNormal];
-  //  [navigationArea addSubview:nextButton];
-  //  [nextButton addTarget:self
-  //                 action:@selector(touchNextButton:)
-  //       forControlEvents:UIControlEventTouchUpInside];
+//  UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
+//  UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//  prevButton.frame = CGRectMake(200, navigationAreaFrame.origin.y + navigationAreaFrame.size.height / 2 - prevImage.size.height / 2, prevImage.size.width, prevImage.size.height);
+//  [prevButton setImage:prevImage forState:UIControlStateNormal];
+//  [self.view addSubview:prevButton];
+//  [prevButton addTarget:self
+//                 action:@selector(touchPrevButton:)
+//       forControlEvents:UIControlEventTouchUpInside];
+//
+//  UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
+//  UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//  nextButton.frame = CGRectMake(250, navigationAreaFrame.origin.y + navigationAreaFrame.size.height / 2 - nextImage.size.height / 2, nextImage.size.width, nextImage.size.height);
+//  [nextButton setImage:nextImage forState:UIControlStateNormal];
+//  [self.view addSubview:nextButton];
+//  [nextButton addTarget:self
+//                 action:@selector(touchNextButton:)
+//       forControlEvents:UIControlEventTouchUpInside];
   
   UIImage *genreImage = [UIImage imageNamed:@"button_genre"];
   UIButton *genreButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [genreButton setImage:genreImage forState:UIControlStateNormal];
-  genreButton.frame = CGRectMake(25, navigationArea.frame.size.height / 2 - genreImage.size.height / 2, genreImage.size.width, genreImage.size.height);
+  genreButton.frame = CGRectMake(25, navigationAreaFrame.origin.y + navigationAreaFrame.size.height / 2 - genreImage.size.height / 2, genreImage.size.width, genreImage.size.height);
   [genreButton addTarget:self
                   action:@selector(touchGenreButton:)
         forControlEvents:UIControlEventTouchUpInside];
-  [navigationArea addSubview:genreButton];
+  [self.view addSubview:genreButton];
   
   UIImage *alarmImage = [UIImage imageNamed:@"button_alarm"];
   UIButton *alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [alarmButton setImage:alarmImage forState:UIControlStateNormal];
-  alarmButton.frame = CGRectMake(74, navigationArea.frame.size.height / 2 - alarmImage.size.height / 2, alarmImage.size.width, alarmImage.size.height);
+  alarmButton.frame = CGRectMake(74, navigationAreaFrame.origin.y + navigationAreaFrame.size.height / 2 - alarmImage.size.height / 2, alarmImage.size.width, alarmImage.size.height);
   [alarmButton addTarget:self
                   action:@selector(touchAlarmButton:)
         forControlEvents:UIControlEventTouchUpInside];
-  [navigationArea addSubview:alarmButton];
+  [self.view addSubview:alarmButton];
 
-  // initialize TrackScrollViews
+  // TrackScrollView初期化
   _trackScrollViewIndex = 0;
 
   CGRect trackScrollViewFrame = CGRectZero;
@@ -222,13 +217,9 @@
 
   // ローディング
   _loadingView = [[UIView alloc] initWithFrame:self.view.bounds];
-  _loadingView.backgroundColor = _bgColor;
+  _loadingView.backgroundColor = bgColorAlpha;
 
-  _indicator = [[UIActivityIndicatorView alloc]
-      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-  _indicator.activityIndicatorViewStyle =
-      UIActivityIndicatorViewStyleWhiteLarge;
-  _indicator.color = [UIColor blackColor];
+  _indicator = [[LoadIndicator alloc] init];
   _indicator.center = _loadingView.center;
 
   [_loadingView addSubview:_indicator];
@@ -237,16 +228,9 @@
   _loadingView.hidden = YES;
 
   // オープニング
-  _openingView = [[UIView alloc] initWithFrame:self.view.bounds];
-  _openingView.backgroundColor = _bgImage;
-  UIImageView *logoImageView = [[UIImageView alloc]
-      initWithImage:[UIImage imageNamed:@"opening_logo"]];
-  logoImageView.frame = CGRectMake(_openingView.center.x - logoImageView.frame.size.width / 2, 154, logoImageView.frame.size.width, logoImageView.frame.size.height);
-  [_openingView addSubview:logoImageView];
-  UIImageView *openingScLogoImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"opening_sc_logo"]];
-  openingScLogoImageView.frame = CGRectMake(_openingView.center.x - openingScLogoImageView.frame.size.width / 2, _openingView.frame.size.height - 78, openingScLogoImageView.frame.size.width, openingScLogoImageView.frame.size.height);
-  [_openingView addSubview:openingScLogoImageView];
+  _openingView = [[OpeningView alloc] initWithFrame:self.view.bounds];
   [self.view addSubview:_openingView];
+  [self beginOpening];
 
 }
 
@@ -411,11 +395,11 @@
 }
 
 - (void)beginOpening {
-  _openingView.hidden = NO;
+  [_openingView fadeIn];
 }
 
 - (void)endOpening {
-  _openingView.hidden = YES;
+//  [_openingView fadeOut];
 }
 
 - (void)beginLoading {
@@ -522,9 +506,7 @@
 #pragma mark - MusicManagerDelegate
 
 - (void)changeGenreBefore:(BOOL)isInit {
-  if (isInit) {
-    [self beginOpening];
-  } else {
+  if (! isInit) {
     [self beginLoading];
   }
 }
@@ -543,11 +525,11 @@
 }
 
 - (void)getAudioDataBefore {
-  [self beginLoading];
+  [_currentTrackScrollView audioDataBeginLoading];
 }
 
 - (void)getAudioDataReadyToPlay {
-  [self endLoading];
+  [_currentTrackScrollView audioDataEndLoading];
 }
 
 - (void)didChangeTrack:(NSDictionary *)newTrack
