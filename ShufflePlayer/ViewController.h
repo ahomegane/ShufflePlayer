@@ -14,8 +14,12 @@
 #import "GenreListViewController.h"
 #import "AlarmViewController.h"
 
-@interface ViewController
-    : UIViewController <AVAudioSessionDelegate, UIScrollViewDelegate, MusicManagerDelegate, AccountManagerDelegate, GenreListViewControllerDelegate, AlarmViewControllerDelegate>
+@interface ViewController : UIViewController<AVAudioSessionDelegate,
+                                             UIScrollViewDelegate,
+                                             MusicManagerDelegate,
+                                             AccountManagerDelegate,
+                                             GenreListViewControllerDelegate,
+                                             AlarmViewControllerDelegate>
 
 @property(retain, nonatomic) MusicManager* musicManager;
 @property(retain, nonatomic) AccountManager* accountManager;

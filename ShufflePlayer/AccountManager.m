@@ -11,7 +11,7 @@
 #import "Constants.h"
 
 @interface AccountManager () {
-    SCAccount* _scAccount;
+  SCAccount* _scAccount;
 }
 @end
 
@@ -21,157 +21,147 @@
 
 #pragma mark - Initialize
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        //    [self clearUserDefault];
-    }
-    return self;
+- (id)init {
+  self = [super init];
+  if (self) {
+    //    [self clearUserDefault];
+  }
+  return self;
 }
 
 #pragma mark - Instance Method
 
 - (void)sendLike:(NSString*)trackId
                   method:(NSString*)method
-    withCompleteCallback:(void (^)(NSError* error))callback
-{
-    NSString* resourcetURL =
-        [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
+    withCompleteCallback:(void (^)(NSError* error))callback {
+  NSString* resourcetURL =
+      [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
 
-    SCRequestResponseHandler handler =
-        ^(NSURLResponse * response, NSData * data, NSError * error)
-    {
-        if (SC_CANCELED(error)) {
+  SCRequestResponseHandler handler =
+      ^(NSURLResponse * response, NSData * data, NSError * error) {
+    if (SC_CANCELED(error)) {
 
-        } else if (error) {
-            NSString* errorStr = [error localizedDescription];
+    } else if (error) {
+      NSString* errorStr = [error localizedDescription];
 
-            // 有効期限切れ?
-            if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
-                _scAccount = nil;
-                [self clearUserDefault];
+      // 有効期限切れ?
+      if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
+        _scAccount = nil;
+        [self clearUserDefault];
 
-                // 再帰処理
-                [self sendLike:trackId
-                                  method:method
-                    withCompleteCallback:callback];
-            }
-        }
+        // 再帰処理
+        [self sendLike:trackId method:method withCompleteCallback:callback];
+      }
+    }
 
-        if (callback != nil)
-            callback(error);
-    };
+    if (callback != nil)
+      callback(error);
+  };
 
   [self getScAccount: ^(SCAccount * scAccount)
   {
-      _scAccount = scAccount;
-      [SCRequest performMethod:[method isEqualToString:@"delete"] ? SCRequestMethodDELETE : SCRequestMethodPUT
-                      onResource:[NSURL URLWithString:resourcetURL]
-                 usingParameters:nil
-                     withAccount:_scAccount
-          sendingProgressHandler:nil
-                 responseHandler:handler];
+    _scAccount = scAccount;
+    [SCRequest performMethod:[method isEqualToString:@"delete"]
+                                     ? SCRequestMethodDELETE
+                                     : SCRequestMethodPUT
+                    onResource:[NSURL URLWithString:resourcetURL]
+               usingParameters:nil
+                   withAccount:_scAccount
+        sendingProgressHandler:nil
+               responseHandler:handler];
   }];
 }
 
 #pragma mark - Private Method
 
-- (void)getScAccount:(void (^)())callback
-{
-    SCAccount* scAccount;
+- (void)getScAccount:(void (^)())callback {
+  SCAccount* scAccount;
 
-    if (_scAccount == nil) {
+  if (_scAccount == nil) {
 
-        scAccount = [self restoreScAccount];
+    scAccount = [self restoreScAccount];
 
-        if (scAccount == nil) {
+    if (scAccount == nil) {
       [self login: nil withLoginedCallback:^()
       {
 
-          SCAccount* scAccount = [SCSoundCloud account];
+        SCAccount* scAccount = [SCSoundCloud account];
 
-          if (scAccount == nil) {
-              UIAlertView* alert =
-                  [[UIAlertView alloc] initWithTitle:@"Not Logged In"
-                                             message:@"You must login"
-                                            delegate:nil
-                                   cancelButtonTitle:@"OK"
-                                   otherButtonTitles:nil];
-              [alert show];
-          } else {
-              [self saveScAccount:scAccount];
-              NSLog(@"scAccount save to UserDefaults");
-          }
-          if (callback != nil)
-              callback(scAccount);
+        if (scAccount == nil) {
+          UIAlertView* alert =
+              [[UIAlertView alloc] initWithTitle:@"Not Logged In"
+                                         message:@"You must login"
+                                        delegate:nil
+                               cancelButtonTitle:@"OK"
+                               otherButtonTitles:nil];
+          [alert show];
+        } else {
+          [self saveScAccount:scAccount];
+          NSLog(@"scAccount save to UserDefaults");
+        }
+        if (callback != nil)
+          callback(scAccount);
       }];
 
-        } else {
-            NSLog(@"scAccount restore from UserDefaults");
-            if (callback != nil)
-                callback(scAccount);
-        }
-
     } else {
-        scAccount = _scAccount;
-
-        if (callback != nil)
-            callback(scAccount);
+      NSLog(@"scAccount restore from UserDefaults");
+      if (callback != nil)
+        callback(scAccount);
     }
+
+  } else {
+    scAccount = _scAccount;
+
+    if (callback != nil)
+      callback(scAccount);
+  }
 }
 
-- (void)login:(id)sender withLoginedCallback:(void (^)())callback
-{
-    SCLoginViewControllerCompletionHandler handler = ^(NSError * error)
-    {
-        if (SC_CANCELED(error)) {
-            NSLog(@"Canceled!");
-        } else if (error) {
-            NSLog(@"Error: %@", [error localizedDescription]);
-        } else {
-            if (callback != nil)
-                callback();
-        }
-    };
+- (void)login:(id)sender withLoginedCallback:(void (^)())callback {
+  SCLoginViewControllerCompletionHandler handler = ^(NSError * error) {
+    if (SC_CANCELED(error)) {
+      NSLog(@"Canceled!");
+    } else if (error) {
+      NSLog(@"Error: %@", [error localizedDescription]);
+    } else {
+      if (callback != nil)
+        callback();
+    }
+  };
 
   [SCSoundCloud requestAccessWithPreparedAuthorizationURLHandler:^(NSURL *preparedURL)
   {
-      SCLoginViewController* loginViewController;
+    SCLoginViewController* loginViewController;
 
-      loginViewController =
-          [SCLoginViewController loginViewControllerWithPreparedURL:preparedURL
-                                                  completionHandler:handler];
-      [self.delegate showAccountView:loginViewController];
+    loginViewController =
+        [SCLoginViewController loginViewControllerWithPreparedURL:preparedURL
+                                                completionHandler:handler];
+    [self.delegate showAccountView:loginViewController];
   }];
 }
 
 #pragma mark - UserDefault Control
 
-- (BOOL)saveScAccount:(SCAccount*)scAccount
-{
-    NSData* data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:data
-                 forKey:@"scAccount"];
-    BOOL isSuccess = [defaults synchronize];
-    return isSuccess;
+- (BOOL)saveScAccount:(SCAccount*)scAccount {
+  NSData* data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
+  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+  [defaults setObject:data forKey:@"scAccount"];
+  BOOL isSuccess = [defaults synchronize];
+  return isSuccess;
 }
 
-- (SCAccount*)restoreScAccount
-{
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    NSData* data = [defaults dataForKey:@"scAccount"];
-    if (data == nil) {
-        return nil;
-    }
-    SCAccount* scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    return scAccount;
+- (SCAccount*)restoreScAccount {
+  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+  NSData* data = [defaults dataForKey:@"scAccount"];
+  if (data == nil) {
+    return nil;
+  }
+  SCAccount* scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  return scAccount;
 }
 
-- (void)clearUserDefault
-{
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
+- (void)clearUserDefault {
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scAccount"];
 }
 
 @end

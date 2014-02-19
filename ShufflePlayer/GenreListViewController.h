@@ -15,7 +15,8 @@
 
 @end
 
-@interface GenreListViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface GenreListViewController
+    : UIViewController<UITableViewDataSource, UITableViewDelegate>
 
 - (void)setBlurImage:(UIImage*)blurImage;
 @property(retain, nonatomic) id<GenreListViewControllerDelegate> delegate;
