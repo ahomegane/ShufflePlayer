@@ -124,17 +124,17 @@
   return _player.rate != 0.0 ? YES : NO;
 }
 
-- (NSDictionary *)fetchCurrentTrack {
+- (NSMutableDictionary *)fetchCurrentTrack {
   return _tracks[_trackIndex];
 }
 
-- (NSDictionary *)fetchPrevTrack {
+- (NSMutableDictionary *)fetchPrevTrack {
   if (_trackIndex - 1 < 0)
     return nil;
   return _tracks[_trackIndex - 1];
 }
 
-- (NSDictionary *)fetchNextTrack {
+- (NSMutableDictionary *)fetchNextTrack {
   if (_trackIndex + 1 > [_tracks count] - 1)
     return nil;
   return _tracks[_trackIndex + 1];
@@ -180,13 +180,27 @@
              responseHandler:handler];
 }
 
+- (NSString *)replaceArtworkSize:(NSString*)defaultUrl withReplaceSize:(NSString*) replaceSize {
+  NSRegularExpression *regexp = [NSRegularExpression
+                                 regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
+                                 options:0
+                                 error:nil];
+  NSString *url = [regexp stringByReplacingMatchesInString:defaultUrl
+                               options:0
+                               range:NSMakeRange(0, defaultUrl.length)
+                               withTemplate:
+                               [NSString stringWithFormat:@"$1-%@.$2",
+                                replaceSize]];
+  return url;
+}
+
 #pragma mark - Private Method
 
 #pragma mark Init Tracks JSON
 
 - (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSMutableDictionary *track = tracks[i];
+    NSMutableDictionary *track = [tracks[i] mutableCopy];
     BOOL streamable = [track[@"streamable"] boolValue];
     NSString *format = track[@"original_format"];
     NSString *sharing = track[@"sharing"];
@@ -194,8 +208,9 @@
         ![sharing isEqualToString:@"public"]) {
       [tracks removeObjectAtIndex:i];
       i--;
+    } else {
+      tracks[i] = track;
     }
-    
   }
   return tracks;
 }
@@ -209,7 +224,7 @@
   return tracks;
 }
 
-- (void)changeTrack:(NSDictionary *)newTrack
+- (void)changeTrack:(NSMutableDictionary *)newTrack
     withFlagForcePlay:(BOOL)isForcePlay {
 
   NSLog(@"%@", newTrack[@"original_format"]);
@@ -239,7 +254,7 @@
 
 #pragma mark MusicPlayer Instance
 
-- (void)getAudioData:(NSDictionary *)newTrack
+- (void)getAudioData:(NSMutableDictionary *)newTrack
     withLoadedCallback:(void (^)())callback {
   [self.delegate getAudioDataBefore];
 

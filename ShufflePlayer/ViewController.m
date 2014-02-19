@@ -31,6 +31,7 @@
   UIButton *_playButton;
   UIImage *_playImage;
   UIImage *_pauseImage;
+  NSTimer *_timerUpdateCurrentViewArtwork;
   
   // オープニング
   OpeningView *_openingView;
@@ -324,31 +325,55 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 }
 
 - (void)changeAllTrackInfo {
-  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
+  NSMutableDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
 
-  NSDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
+  NSMutableDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
   [_currentTrackScrollView setTrackInfo:currentTrack];
 
-  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
+  NSMutableDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
 
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
+  
+  [self setTimerUpdateCurrentViewArtwork];
 }
 
 - (void)changePrevTrackInfo {
-  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
+  NSMutableDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
 
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
+
+  [self setTimerUpdateCurrentViewArtwork];
 }
 
 - (void)changeNextTrackInfo {
-  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
+  NSMutableDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
 
+  [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
+                             title:_currentTrackScrollView.title];
+
+  [self setTimerUpdateCurrentViewArtwork];
+}
+
+- (void)setTimerUpdateCurrentViewArtwork {
+  [_timerUpdateCurrentViewArtwork invalidate];
+  _timerUpdateCurrentViewArtwork = nil;
+  _timerUpdateCurrentViewArtwork = [NSTimer scheduledTimerWithTimeInterval:1.0f
+                                            target:self
+                                          selector:@selector(updateCurrentViewArtwork)
+                                          userInfo:nil
+                                           repeats:NO];
+}
+
+- (void)updateCurrentViewArtwork {
+  NSMutableDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
+  [_currentTrackScrollView updateArtworkImageToLarge:currentTrack];
+  
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
 }
@@ -611,7 +636,7 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
   [self nextTrack:YES];
 }
 
-- (void)didChangeTrack:(NSDictionary *)newTrack
+- (void)didChangeTrack:(NSMutableDictionary *)newTrack
     withPlayingBeforeChangeFlag:(BOOL)isPlaying {
   if (isPlaying) {
     [self playStateToPlay];
@@ -649,7 +674,12 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 #pragma mark - AlarmViewControllerDelegate
 
 - (void)playAlarm {
-  [self.musicManager changeGenre:@"All" withForcePlayFlag:YES withInitFlag:NO];
+  NSString *selectedGenre =
+  [self.musicManager restoreSelectedGenreFromUserDefault];
+  if (selectedGenre == nil) {
+    selectedGenre = @"All";
+  }
+  [self.musicManager changeGenre:selectedGenre withForcePlayFlag:YES withInitFlag:NO];
 }
 
 - (void)hideAlarmView {

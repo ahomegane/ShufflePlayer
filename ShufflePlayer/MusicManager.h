@@ -16,7 +16,7 @@
 - (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit error: (NSError *) error;
 - (void)getAudioDataBefore;
 - (void)getAudioDataReadyToPlay;
-- (void)didChangeTrack:(NSDictionary *)newTrack
+- (void)didChangeTrack:(NSMutableDictionary *)newTrack
     withPlayingBeforeChangeFlag:(BOOL)isPlaying;
 - (void)playSequenceOnPlaying:(float)currentTime
             withTrackDuration:(float)duration;
@@ -26,9 +26,9 @@
 
 @interface MusicManager : NSObject
 
-- (NSDictionary *)fetchCurrentTrack;
-- (NSDictionary *)fetchPrevTrack;
-- (NSDictionary *)fetchNextTrack;
+- (NSMutableDictionary *)fetchCurrentTrack;
+- (NSMutableDictionary *)fetchPrevTrack;
+- (NSMutableDictionary *)fetchNextTrack;
 - (BOOL)play;
 - (BOOL)pause;
 - (void)changeGenre:(NSString *)genreName
@@ -38,6 +38,7 @@
 - (void)nextTrack:(BOOL)isFrocePlay;
 - (void)seekWithRate:(float)rate;
 - (NSString *)restoreSelectedGenreFromUserDefault;
+- (NSString *)replaceArtworkSize:(NSString*)defaultUrl withReplaceSize:(NSString*) replaceSize;
 @property(retain, nonatomic) id<MusicManagerDelegate> delegate;
 @property(retain, nonatomic) NSDictionary *genres;
 @property(retain, nonatomic) NSArray *genreNameList;

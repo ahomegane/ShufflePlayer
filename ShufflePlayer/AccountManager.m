@@ -39,12 +39,9 @@
 
   SCRequestResponseHandler handler =
       ^(NSURLResponse * response, NSData * data, NSError * error) {
-    if (SC_CANCELED(error)) {
-
-    } else if (error) {
+    if (error) {
       NSString *errorStr = [error localizedDescription];
 
-      // 有効期限切れ?
       if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
         _scAccount = nil;
         [self clearUserDefault];
@@ -70,6 +67,35 @@
         sendingProgressHandler:nil
                responseHandler:handler];
   }];
+}
+
+- (void)getUserLiked {
+  NSString *resourcetURL = SC_LIKE_URL;
+  
+  SCRequestResponseHandler handler =
+  ^(NSURLResponse * response, NSData * data, NSError * error) {
+    NSError *jsonError = nil;
+    NSJSONSerialization *jsonResponse =
+    [NSJSONSerialization JSONObjectWithData:data
+                                    options:0
+                                      error:&jsonError];
+    if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
+      NSMutableArray* likes = [(NSArray *)jsonResponse mutableCopy];
+      NSLog(@"%@", likes);
+    }
+
+  };
+  
+  [self getScAccount: ^(SCAccount * scAccount)
+   {
+     _scAccount = scAccount;
+     [SCRequest performMethod:SCRequestMethodGET
+                   onResource:[NSURL URLWithString:resourcetURL]
+              usingParameters:nil
+                  withAccount:_scAccount
+       sendingProgressHandler:nil
+              responseHandler:handler];
+   }];
 }
 
 #pragma mark - Private Method

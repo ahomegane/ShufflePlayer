@@ -16,5 +16,4 @@ extern NSString *const SC_TRACK_REQUEST_URL;
 extern NSString *const SC_LIKE_URL;
 
 extern NSString *const ARTWORK_IMAGE_SIZE;
-
-extern NSString *const GENRE_LIST[];
+extern NSString *const ARTWORK_IMAGE_SIZE_SMALL;

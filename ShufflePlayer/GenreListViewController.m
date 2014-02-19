@@ -10,6 +10,8 @@
 
 @interface GenreListViewController () {
 
+  BOOL _isTableInitCompleteFlag;
+  
   UIImageView *_blurImageView;
   UITableView *_tableView;
   UIView *_backgroundView;
@@ -144,10 +146,9 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
          cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-  NSLog(@"call");
   static NSString *CellIdentifier = @"Cell";
   UITableViewCell *cell =
-      [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+  [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
   if (cell == nil) {
     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                   reuseIdentifier:CellIdentifier];
@@ -157,23 +158,29 @@
   cell.backgroundColor = [UIColor clearColor];
   cell.textLabel.textColor = [UIColor whiteColor];
   cell.textLabel.highlightedTextColor =
-      [UIColor colorWithRed:0.10196078431372549
-                      green:0.10196078431372549
-                       blue:0.10196078431372549
-                      alpha:1.0];
+  [UIColor colorWithRed:0.10196078431372549
+                  green:0.10196078431372549
+                   blue:0.10196078431372549
+                  alpha:1.0];
   cell.textLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:16];
   cell.selectedBackgroundView = _backgroundView;
-
-  if (indexPath.row == 0) {
-    CGRect frame = _checkImageView.frame;
-    _checkImageView.frame =
-        CGRectMake(cell.frame.size.width - frame.size.width - 15,
-                   cell.center.y - frame.size.height / 2, frame.size.width,
-                   frame.size.height);
+  
+  if (! _isTableInitCompleteFlag) {
+    if (indexPath.row == 0) {
+      CGRect frame = _checkImageView.frame;
+      _checkImageView.frame =
+      CGRectMake(cell.frame.size.width - frame.size.width - 15,
+                 cell.center.y - frame.size.height / 2, frame.size.width,
+                 frame.size.height);
+    }
+    
+    if (indexPath.row == self.selectedGenreIndex) {
+      [cell addSubview:_checkImageView];
+    }
   }
-
-  if (indexPath.row == self.selectedGenreIndex) {
-    [cell addSubview:_checkImageView];
+  
+  if (indexPath.row == [self.genreData count] - 1) {
+    _isTableInitCompleteFlag = YES;
   }
 
   return cell;
@@ -232,7 +239,8 @@
 - (void)tableView:(UITableView *)tableView
     didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
-
+  self.selectedGenreIndex = indexPath.row;
+  
   [_checkImageView removeFromSuperview];
 
   UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];

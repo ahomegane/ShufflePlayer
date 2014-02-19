@@ -17,3 +17,4 @@ NSString *const SC_TRACK_REQUEST_URL =
 NSString *const SC_LIKE_URL = @"https://api.soundcloud.com/me/favorites/";
 
 NSString *const ARTWORK_IMAGE_SIZE = @"t500x500";
+NSString *const ARTWORK_IMAGE_SIZE_SMALL = @"badge";

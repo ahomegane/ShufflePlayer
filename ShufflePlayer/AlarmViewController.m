@@ -272,7 +272,9 @@ NSString *const CLEAR_TEXT = @"-- : --";
     [self.delegate playAlarm];
 
     // 設定が分刻みのため連続してlunchAlarmが呼ばてしまうのを防ぐため、61秒間はtimerを止める
-    [STDeferred timeout:61.0f].then (^(id ret) { [self startTimer]; });
+    [STDeferred timeout:61.0f].then (^(id ret) {
+      [self startTimer];
+    });
   }
 }
 

@@ -25,6 +25,7 @@
   UIButton *_titleButton;
   UIButton *_likeButton;
   UIButton *_artworkScLogoButton;
+  UIImage *_artworkNoImage;
   UIImage *_likeImage;
   UIImage *_likeImageOn;
 }
@@ -76,6 +77,8 @@
   [_artworkScLogoButton addTarget:self
                            action:@selector(touchTitleButton:)
                  forControlEvents:UIControlEventTouchUpInside];
+  
+  _artworkNoImage = [UIImage imageNamed:@"artwork_no_image"];
 
   // 波形
   CGRect waveformFrame =
@@ -151,7 +154,7 @@
 
 #pragma mark - Instance Method
 
-- (void)setTrackInfo:(NSDictionary *)track {
+- (void)setTrackInfo:(NSMutableDictionary *)track {
 
   if (track == nil) {
     self.hidden = YES;
@@ -161,25 +164,18 @@
   }
 
   // アートワーク
-  NSString *artworkUrl = track[@"artwork_url"];
-  if (![artworkUrl isEqual:[NSNull null]]) {
-    NSRegularExpression *regexp = [NSRegularExpression
-        regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
-                             options:0
-                               error:nil];
-    NSString *artworkUrlLarge = [regexp
-        stringByReplacingMatchesInString:artworkUrl
-                                 options:0
-                                   range:NSMakeRange(0, artworkUrl.length)
-                            withTemplate:
-                                [NSString stringWithFormat:@"$1-%@.$2",
-                                                           ARTWORK_IMAGE_SIZE]];
-
-    NSData *artworkData =
-        [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
-    self.artworkImage = [[UIImage alloc] initWithData:artworkData];
+  if (track[@"_artworkImageLarge"]) {
+    self.artworkImage = track[@"_artworkImageLarge"];
   } else {
-    self.artworkImage = [UIImage imageNamed:@"artwork_no_image"];
+    NSString *artworkUrl = track[@"artwork_url"];
+    if (![artworkUrl isEqual:[NSNull null]]) {
+      artworkUrl = [_musicManager replaceArtworkSize:artworkUrl withReplaceSize:ARTWORK_IMAGE_SIZE_SMALL];
+      NSData *artworkData =
+      [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
+      self.artworkImage = [[UIImage alloc] initWithData:artworkData];
+    } else {
+      self.artworkImage = track[@"_artworkImageLarge"] = [_artworkNoImage copy];
+    }
   }
   _artworkImageView.image = self.artworkImage;
 
@@ -211,6 +207,19 @@
       CGRectMake(rect.origin.x, rect.origin.y, 0, rect.size.height);
 
   _waveformLoadView.hidden = NO;
+}
+
+- (void)updateArtworkImageToLarge:(NSMutableDictionary *)track {
+  // アートワーク
+  NSString *artworkUrl = track[@"artwork_url"];
+  if (track[@"_artworkImageLarge"] == nil && ![artworkUrl isEqual:[NSNull null]]) {
+    artworkUrl = [_musicManager replaceArtworkSize:artworkUrl withReplaceSize:ARTWORK_IMAGE_SIZE];
+    NSData *artworkData =
+    [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
+    self.artworkImage = track[@"_artworkImageLarge"] = [[UIImage alloc] initWithData:artworkData];
+    _artworkImageView.image = self.artworkImage;
+  }
+
 }
 
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration {
@@ -247,13 +256,14 @@
 
 - (void)touchLikeButton:(id)sender {
   UIButton *button = sender;
+  
+  [_accountManager getUserLiked];
+  
   NSString *trackId = [button getStringTag];
   if (button.tag == 0) { // put
     [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error)
     {
-      if (SC_CANCELED(error)) {
-        NSLog(@"Canceled!");
-      } else if (error) {
+      if (error) {
         NSLog(@"Error: %@", [error localizedDescription]);
       } else {
         NSLog(@"Liked track: %@", trackId);
@@ -264,9 +274,7 @@
   } else { // delete
     [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
     {
-      if (SC_CANCELED(error)) {
-        NSLog(@"Canceled!");
-      } else if (error) {
+      if (error) {
         NSLog(@"Error: %@", [error localizedDescription]);
       } else {
         NSLog(@"Like deleted track: %@", trackId);

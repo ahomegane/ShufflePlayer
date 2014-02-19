@@ -16,8 +16,9 @@
     withAccountManagerInstance:(AccountManager *)accountManager
       withMusicManagerInstance:(MusicManager *)musicManager;
 - (void)initElement;
-- (void)setTrackInfo:(NSDictionary *)track;
+- (void)setTrackInfo:(NSMutableDictionary *)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;
+- (void)updateArtworkImageToLarge:(NSMutableDictionary *)track;
 - (void)audioDataBeginLoading;
 - (void)audioDataEndLoading;
 @property(retain, nonatomic) UIImage *artworkImage;
