@@ -78,8 +78,8 @@
   animation.delegate = self;
   
   animation.duration = 800 / 1000;
-  animation.fromValue = [NSNumber numberWithFloat:0.0];
-  animation.toValue = [NSNumber numberWithFloat:1.0];
+  animation.fromValue = @0.0f;
+  animation.toValue = @1.0f;
   animation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionEaseOut];
   animation.removedOnCompletion = NO;
   animation.fillMode = kCAFillModeForwards;
@@ -96,8 +96,8 @@
   animation.duration = 800 / 1000;
   animation.repeatCount = 1;
   animation.beginTime = CACurrentMediaTime();
-  animation.fromValue = [NSNumber numberWithFloat:1.0];
-  animation.toValue = [NSNumber numberWithFloat:0.0];
+  animation.fromValue = @1.0f;
+  animation.toValue = @0.0f;
   animation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionEaseIn];
   animation.removedOnCompletion = NO;
   animation.fillMode = kCAFillModeForwards;

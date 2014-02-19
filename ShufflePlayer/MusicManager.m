@@ -120,10 +120,8 @@
   //                            @"japan", @"tags",
   //                            @"public,streamable", @"filter",//効かない
   //                            nil];
-  NSDictionary *params = [NSDictionary
-      dictionaryWithObjectsAndKeys:SC_CLIENT_ID, @"client_id",
-                                   [genres componentsJoinedByString:@","],
-                                   @"genres", nil];
+  NSDictionary *params = @{@"client_id": SC_CLIENT_ID,
+                                   @"genres": [genres componentsJoinedByString:@","]};
 
   SCRequestResponseHandler handler =
       ^(NSURLResponse * response, NSData * data, NSError * error) {
@@ -155,7 +153,7 @@
 
 - (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSDictionary *track = [tracks objectAtIndex:i];
+    NSDictionary *track = tracks[i];
     //        int favorite = [_track[@"favoritings_count"]
     // intValue];
     //        int contentSize = [_track[@"original_content_size"]

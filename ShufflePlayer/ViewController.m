@@ -487,9 +487,7 @@
                              title:(NSString *)title {
   MPMediaItemArtwork *artwork =
       [[MPMediaItemArtwork alloc] initWithImage:artworkImage];
-  NSDictionary *songInfo = [NSDictionary
-      dictionaryWithObjectsAndKeys:artwork, MPMediaItemPropertyArtwork, title,
-                                   MPMediaItemPropertyTitle, nil];
+  NSDictionary *songInfo = @{MPMediaItemPropertyArtwork: artwork, MPMediaItemPropertyTitle: title};
   [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
 }
 

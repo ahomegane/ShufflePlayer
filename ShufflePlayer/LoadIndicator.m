@@ -46,7 +46,7 @@
   animation.duration = 0.7;
   animation.repeatCount = HUGE_VALF;
   animation.beginTime = CACurrentMediaTime();
-  animation.fromValue = [NSNumber numberWithFloat:0.0]; // 開始時の角度
+  animation.fromValue = @0.0f; // 開始時の角度
   animation.toValue = [NSNumber numberWithFloat:2 * M_PI]; // 終了時の角度
 //  animation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionEaseIn];
   return animation;

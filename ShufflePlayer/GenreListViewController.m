@@ -211,7 +211,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
   UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
   NSLog(@"%@", cell.textLabel.text);
-  NSArray *tmp = [NSArray arrayWithObjects:cell.textLabel.text, nil];
+  NSArray *tmp = @[cell.textLabel.text];
   [self.delegate selectGenre:tmp];
 }
 

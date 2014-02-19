@@ -29,10 +29,10 @@
   // 自動ロック／スリープの禁止
   [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
   
-  NSDictionary *userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+  NSDictionary *userInfo = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
 
   if (userInfo != nil) {
-    if ([[userInfo objectForKey:@"id"] isEqualToString:@"alarm"]) {
+    if ([userInfo[@"id"] isEqualToString:@"alarm"]) {
       self.viewController.lunchAlarmFlag = YES;
     }
   }
@@ -78,7 +78,7 @@
   NSDictionary * userInfo = notification.userInfo;
   UIApplicationState state = [application applicationState];
   if (userInfo != nil) {
-    if ([[userInfo objectForKey:@"id"] isEqualToString:@"alarm"]) {
+    if ([userInfo[@"id"] isEqualToString:@"alarm"]) {
       if (state == UIApplicationStateInactive) NSLog(@"UIApplicationStateInactive");
       if (state == UIApplicationStateActive) NSLog(@"UIApplicationStateActive");
       if (state == UIApplicationStateInactive) {
