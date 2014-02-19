@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "STDeferred.h"
 
 @interface OpeningView : UIView
 
 - (void)fadeOut;
-- (void)fadeIn;
+- (STDeferred*)fadeIn;
 
 @end

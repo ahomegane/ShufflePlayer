@@ -8,12 +8,11 @@
 
 #import "OpeningView.h"
 #import "LoadIndicator.h"
-#import "STDeferred.h"
 
 @interface OpeningView() {
-  UIImageView *_blur;
   UIImageView *_logo;
   LoadIndicator* _indicator;
+  STDeferred *_deferred;
 }
 @end
 
@@ -25,46 +24,46 @@
 {
   self = [super initWithFrame:frame];
   if (self) {
-    
-    UIColor *bgImage = [UIColor colorWithPatternImage:[UIImage imageNamed:@"opening_bg"]];
-    self.backgroundColor = bgImage;
-    
-    UIImage * blurImage = [UIImage imageNamed:@"opening_logo_blur"];
-    UIImage * logoImage = [UIImage imageNamed:@"opening_logo"];
-    
-    CGRect logoFrame = CGRectMake(self.center.x - logoImage.size.width / 2, 154, logoImage.size.width, logoImage.size.height);
-    
-    _logo = [[UIImageView alloc] initWithImage:logoImage];
-    _logo.frame = logoFrame;
-    _logo.layer.opacity = 0;
-    [self addSubview:_logo];
-    
-    _blur = [[UIImageView alloc] initWithImage:blurImage];
-    _blur.frame = logoFrame;
-    _blur.layer.opacity = 0;
-    [self addSubview:_blur];
-    
-    UIImage * scLogoImage = [UIImage imageNamed:@"opening_sc_logo"];
-    UIButton *scLogoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [scLogoButton setImage:scLogoImage forState:UIControlStateNormal];
-    scLogoButton.frame = CGRectMake(self.center.x - scLogoImage.size.width / 2, self.frame.size.height - 78, scLogoImage.size.width, scLogoImage.size.height);
-    [scLogoButton addTarget:self
-                     action:@selector(touchScLogoButton:)
-           forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:scLogoButton];
-    
-    _indicator = [[LoadIndicator alloc] init];
-    _indicator.center = self.center;
-    [self addSubview:_indicator];
+    [self initElement];
+    _deferred = [STDeferred deferred];
+
   }
   return self;
 }
 
+- (void)initElement {
+  UIColor *bgImage = [UIColor colorWithPatternImage:[UIImage imageNamed:@"opening_bg"]];
+  self.backgroundColor = bgImage;
+  
+  UIImage * logoImage = [UIImage imageNamed:@"opening_logo"];
+  
+  CGRect logoFrame = CGRectMake(self.center.x - logoImage.size.width / 2, 154, logoImage.size.width, logoImage.size.height);
+  
+  _logo = [[UIImageView alloc] initWithImage:logoImage];
+  _logo.frame = logoFrame;
+  _logo.layer.opacity = 0;
+  [self addSubview:_logo];
+  
+  UIImage * scLogoImage = [UIImage imageNamed:@"opening_sc_logo"];
+  UIButton *scLogoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [scLogoButton setImage:scLogoImage forState:UIControlStateNormal];
+  scLogoButton.frame = CGRectMake(self.center.x - scLogoImage.size.width / 2, self.frame.size.height - 78, scLogoImage.size.width, scLogoImage.size.height);
+  [scLogoButton addTarget:self
+                   action:@selector(touchScLogoButton:)
+         forControlEvents:UIControlEventTouchUpInside];
+  [self addSubview:scLogoButton];
+  
+  _indicator = [[LoadIndicator alloc] init];
+  _indicator.center = self.center;
+  [self addSubview:_indicator];
+}
+
 #pragma mark - Instance Method
 
-- (void)fadeIn {
+- (STDeferred*)fadeIn {
   [self fadeInLogo];
   [_indicator startAnimating];
+  return _deferred;
 }
 
 #pragma mark - Private Method
@@ -78,7 +77,7 @@
   CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
   animation.delegate = self;
   
-  animation.duration = 600 / 1000;
+  animation.duration = 800 / 1000;
   animation.fromValue = [NSNumber numberWithFloat:0.0];
   animation.toValue = [NSNumber numberWithFloat:1.0];
   animation.timingFunction = [CAMediaTimingFunction functionWithName: kCAMediaTimingFunctionEaseOut];
@@ -89,6 +88,8 @@
 }
 
 - (void)fadeOut {
+  [_indicator stopAnimating];
+  
   CABasicAnimation* animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
   animation.delegate = self;
   
@@ -101,7 +102,6 @@
   animation.removedOnCompletion = NO;
   animation.fillMode = kCAFillModeForwards;
   
-  [_indicator stopAnimating];
   [self.layer addAnimation:animation forKey:@"fadeOut"];
 }
 
@@ -111,11 +111,12 @@
 {
   if (animation == [_logo.layer animationForKey:@"fadeIn"]) {
     [STDeferred timeout:2000 / 1000].then(^(id ret) {
-      [self fadeOut];
+      [_deferred resolve:nil];
     });
   }
   if (animation == [self.layer animationForKey:@"fadeOut"]) {
     self.hidden = YES;
+    [_logo.layer removeAllAnimations];
     [self.layer removeAnimationForKey:@"fadeOut"];
   }
 }

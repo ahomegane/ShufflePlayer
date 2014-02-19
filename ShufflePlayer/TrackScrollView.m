@@ -14,6 +14,7 @@
 @interface TrackScrollView () {
 
   AccountManager *_accountManager;
+  MusicManager *_musicManager;
 
   UIView* _waveformArea;
   UIImageView *_artworkImageView;
@@ -35,12 +36,13 @@
 
 #pragma mark - Initialize
 
-- (id)initWithFrame:(CGRect)frame withAccountManagerInstance: (AccountManager*) accountManager {
+- (id)initWithFrame:(CGRect)frame withAccountManagerInstance: (AccountManager*) accountManager withMusicManagerInstance: (MusicManager*) musicManager {
   self = [super initWithFrame:frame];
   if (self) {
     // Initialization code    
     [self initElement];
     _accountManager = accountManager;
+    _musicManager = musicManager;
   }
   return self;
 }
@@ -73,6 +75,7 @@
   CGRect waveformFrame = CGRectMake(0, self.frame.size.height - 50, self.frame.size.width, 50);
   
   _waveformArea = [[UIView alloc]initWithFrame:waveformFrame];
+  _waveformArea.tag = 1;
   [self addSubview:_waveformArea];
   
   waveformFrame.origin.y = 0;
@@ -83,7 +86,7 @@
   [_waveformArea addSubview:_waveformSequenceView];
 
   // 波形　ローディング用
-  waveformFrame.origin.x = -waveformFrame.size.width;
+  waveformFrame.origin.x = -1 * waveformFrame.size.width;
   waveformFrame.size.width *= 2;
   _waveformLoadView = [[UIImageView alloc]initWithFrame:waveformFrame];
   _waveformLoadView.contentMode = UIViewContentModeScaleAspectFit;
@@ -141,7 +144,7 @@
   }
 
   // アートワーク
-  NSString *artworkUrl = [track objectForKey:@"artwork_url"];
+  NSString *artworkUrl = track[@"artwork_url"];
   if (![artworkUrl isEqual:[NSNull null]]) {
     NSRegularExpression *regexp = [NSRegularExpression
         regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
@@ -154,17 +157,18 @@
                             withTemplate:
                                 [NSString stringWithFormat:@"$1-%@.$2",
                                                            ARTWORK_IMAGE_SIZE]];
-    NSData *artworkData =
-        [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
-    self.artworkImage = [[UIImage alloc] initWithData:artworkData];
+    
+      NSData *artworkData =
+      [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
+      self.artworkImage = [[UIImage alloc] initWithData:artworkData];
   } else {
     self.artworkImage = [UIImage imageNamed:@"artwork_no_image"];
   }
   _artworkImageView.image = self.artworkImage;
 
   // タイトルボタン
-  self.title = [track objectForKey:@"title"];
-  NSString *permalinkUrl = [track objectForKey:@"permalink_url"];
+  self.title = track[@"title"];
+  NSString *permalinkUrl = track[@"permalink_url"];
 
   [_titleButton setTitle:self.title forState:UIControlStateNormal];
   [_titleButton setStringTag:permalinkUrl];
@@ -173,13 +177,13 @@
   [_artworkScLogoButton setStringTag:permalinkUrl];
 
   // ライク
-  NSString *trackId = [track objectForKey:@"id"];
+  NSString *trackId = track[@"id"];
   [_likeButton setStringTag:trackId];
   [_likeButton setImage:_likeImage forState:UIControlStateNormal];
   _likeButton.tag = 0;
 
   // 波形
-  NSString *waveformUrl = [track objectForKey:@"waveform_url"];
+  NSString *waveformUrl = track[@"waveform_url"];
   NSData *waveformData =
   [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
   UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
@@ -195,7 +199,7 @@
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration {
   CGRect rect = _waveformSequenceView.frame;
   _waveformSequenceView.frame =
-      CGRectMake(rect.origin.x, rect.origin.y, 260 * currentTime / duration,
+      CGRectMake(rect.origin.x, rect.origin.y, _waveformArea.frame.size.width * (currentTime / duration),
                  rect.size.height);
 }
 
@@ -249,6 +253,20 @@
         button.tag = 0;
       }
     }];
+  }
+}
+
+- (void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  UITouch *touch = [touches anyObject];
+  switch (touch.view.tag) {
+    case 1:
+      {
+        CGPoint point = [touch locationInView:_waveformArea];
+        float rate = point.x / self.frame.size.width;
+        [_musicManager seekWithRate:rate];
+        break;
+      }
   }
 }
 

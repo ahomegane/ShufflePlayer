@@ -20,6 +20,7 @@
     withPlayingBeforeChangeFlag:(BOOL)isPlaying;
 - (void)playSequenceOnPlaying:(float)currentTime
             withTrackDuration:(float)duration;
+- (void)endTrack;
 
 @end
 
@@ -35,6 +36,7 @@
          withInitFlag:(BOOL)isInit;
 - (void)prevTrack:(BOOL)isFrocePlay;
 - (void)nextTrack:(BOOL)isFrocePlay;
+- (void)seekWithRate:(float)rate;
 @property(retain, nonatomic) id<MusicManagerDelegate> delegate;
 @property(retain, nonatomic) NSArray *genreList;
 @property(readonly) BOOL playing;

@@ -15,6 +15,8 @@
 #import "OpeningView.h"
 
 @interface ViewController () {
+  
+  STDeferred* _deferredCompeleteInit;
 
   UIScrollView *_baseScrollView;
   TrackScrollView *_prevTrackScrollView;
@@ -189,7 +191,7 @@
   for (int i = 0; i < 3; i++) {
     TrackScrollView *trackScrollView =
         [[TrackScrollView alloc] initWithFrame:trackScrollViewFrame
-                    withAccountManagerInstance:self.accountManager];
+                    withAccountManagerInstance:self.accountManager withMusicManagerInstance:self.musicManager];
     trackScrollView.minimumZoomScale = 1.0;
     trackScrollView.maximumZoomScale = 1.0;
     trackScrollView.showsHorizontalScrollIndicator = NO;
@@ -320,7 +322,7 @@
   }
 }
 
-- (void)scrollPrev {
+- (void)scrollPrev:(BOOL)isForcePlay {
   // viewの入れ替え
   TrackScrollView *tmpView = _currentTrackScrollView;
 
@@ -332,14 +334,14 @@
   frame.origin.x -= frame.size.width;
   _prevTrackScrollView.frame = frame;
 
-  BOOL isPlay = self.musicManager.playing;
+  BOOL isPlay = isForcePlay ? YES : self.musicManager.playing;
   [self playStateToStop];
   [self.musicManager prevTrack:isPlay];
 
   [self changePrevTrackInfo];
 }
 
-- (void)scrollNext {
+- (void)scrollNext:(BOOL)isForcePlay {
   // viewの入れ替え
   TrackScrollView *tmpView = _currentTrackScrollView;
 
@@ -351,35 +353,43 @@
   frame.origin.x += frame.size.width;
   _nextTrackScrollView.frame = frame;
 
-  BOOL isPlay = self.musicManager.playing;
+  BOOL isPlay = isForcePlay ? YES : self.musicManager.playing;
   [self playStateToStop];
   [self.musicManager nextTrack:isPlay];
 
   [self changeNextTrackInfo];
 }
 
-- (void)touchPrevButton:(id)sender {
+- (void)prevTrack:(BOOL)isForcePlay {
   if (_trackScrollViewIndex == 0)
     return;
-
+  
   CGPoint point = _baseScrollView.contentOffset;
   point.x -= _baseScrollView.bounds.size.width;
   _baseScrollView.contentOffset = point;
-
+  
   _trackScrollViewIndex -= 1;
-  [self scrollPrev];
+  [self scrollPrev:isForcePlay];
 }
 
-- (void)touchNextButton:(id)sender {
+- (void)nextTrack:(BOOL)isForcePlay {
   if (_trackScrollViewIndex == _tracksCount - 1)
     return;
-
+  
   CGPoint point = _baseScrollView.contentOffset;
   point.x += _baseScrollView.bounds.size.width;
   _baseScrollView.contentOffset = point;
-
+  
   _trackScrollViewIndex += 1;
-  [self scrollNext];
+  [self scrollNext:isForcePlay];
+}
+
+- (void)touchPrevButton:(id)sender {
+  [self prevTrack:NO];
+}
+
+- (void)touchNextButton:(id)sender {
+  [self nextTrack:NO];
 }
 
 - (void)touchGenreButton:(id)sender {
@@ -395,11 +405,14 @@
 }
 
 - (void)beginOpening {
-  [_openingView fadeIn];
+  [[STDeferred when:[_openingView fadeIn], [self completeInit], nil] then:^(id ret) {
+    [_openingView fadeOut];
+  }];
 }
 
-- (void)endOpening {
-//  [_openingView fadeOut];
+- (STDeferred*)completeInit {
+  _deferredCompeleteInit = [STDeferred deferred];
+  return _deferredCompeleteInit;
 }
 
 - (void)beginLoading {
@@ -493,12 +506,12 @@
     if (delta > 0) {
       // the current page moved to right
       _trackScrollViewIndex += 1;
-      [self scrollNext];
+      [self scrollNext:NO];
 
     } else {
       // the current page moved to left
       _trackScrollViewIndex -= 1;
-      [self scrollPrev];
+      [self scrollPrev:NO];
     }
   }
 }
@@ -518,7 +531,7 @@
   [self changeAllTrackInfo];
   [self resetScrollView];
   if (isInit) {
-    [self endOpening];
+    [_deferredCompeleteInit resolve:nil];
   } else {
     [self endLoading];
   }
@@ -530,6 +543,10 @@
 
 - (void)getAudioDataReadyToPlay {
   [_currentTrackScrollView audioDataEndLoading];
+}
+
+- (void)endTrack {
+  [self nextTrack:YES];
 }
 
 - (void)didChangeTrack:(NSDictionary *)newTrack

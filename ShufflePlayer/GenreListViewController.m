@@ -12,6 +12,7 @@
 
   UIImageView * _blurImageView;
   UITableView* _tableView;
+  UIView *_backgroundView;
 
 }
 @end
@@ -26,6 +27,8 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+//      [UITableView appearance].separatorInset  = UIEdgeInsetsZero;
+      
       [self initElement];
     }
     return self;
@@ -54,7 +57,7 @@
 
 #pragma mark - View Element
 
-- (void)initElement {  
+- (void)initElement {
   UIColor * bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
   
   // ブラー処理用
@@ -93,13 +96,17 @@
   [titleArea addSubview:closeButton];
 
   //　テーブルビュー
+  _backgroundView = [[UIView alloc] init];
+  _backgroundView.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1.0];
+  
   int marginTop = 80;
   _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, marginTop, self.view.frame.size.width, self.view.frame.size.height - marginTop)];
   _tableView.delegate = self;
   _tableView.dataSource = self;
   _tableView.separatorColor = [UIColor whiteColor];
   _tableView.backgroundColor = [UIColor clearColor];
-
+  _tableView.rowHeight = 55;
+  
 //　border
 //  CALayer *bottorTop = [CALayer layer];
 //  bottorTop.frame = CGRectMake(0, 0, _tableView.frame.size.width, 0.5f);
@@ -120,7 +127,6 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   // Return the number of sections.
-  NSLog(@"calllllllllllllll");
   return 1;
 }
 
@@ -140,14 +146,15 @@
                                   reuseIdentifier:CellIdentifier];
   }
   
-  cell.textLabel.text = [self.genreData objectAtIndex:indexPath.row];
+  cell.textLabel.text = self.genreData[indexPath.row];
   cell.backgroundColor = [UIColor clearColor];
   cell.textLabel.textColor = [UIColor whiteColor];
+  cell.textLabel.highlightedTextColor = [UIColor colorWithRed:0.10196078431372549 green:0.10196078431372549 blue:0.10196078431372549 alpha:1.0];
   cell.textLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:18];
+  cell.selectedBackgroundView = _backgroundView;
   
   return cell;
 }
-
 
 /*
  // Override to support conditional editing of the table view.

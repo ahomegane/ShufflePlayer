@@ -19,6 +19,7 @@
   NSMutableArray *_tracks;
 
   NSTimer *_sequenceTimer;
+  BOOL _isSeekingFlag;
 }
 @end
 
@@ -49,11 +50,11 @@
   if (_player == nil) {
     [self getAudioData:[self fetchCurrentTrack] withLoadedCallback:^()
      {
-      [self setPlaySequence];
+      [self startPlaySequence];
       [_player play];
     }];
   } else {
-    [self setPlaySequence];
+    [self startPlaySequence];
     [_player play];
   }
   return YES;
@@ -65,24 +66,45 @@
   return YES;
 }
 
+- (void)seekWithRate:(float)rate {
+  float duration = CMTimeGetSeconds(_player.currentItem.asset.duration);
+  Float64 seconds = rate * duration;
+  
+  [self seekWithSeconds:seconds duration:duration];
+}
+
+- (void)seekWithSeconds:(Float64)seconds duration:(float)duration {
+  [self clearPlaySequence];
+  if(_player.status == AVPlayerStatusReadyToPlay &&
+     _player.currentItem.status == AVPlayerItemStatusReadyToPlay) {
+    CMTime targetTime = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
+    [_player seekToTime:targetTime
+            toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+    
+    [self.delegate playSequenceOnPlaying:seconds
+                       withTrackDuration:duration];
+  }
+  [self startPlaySequence];
+}
+
 - (BOOL)playing {
   return _player.rate != 0.0 ? YES : NO;
 }
 
 - (NSDictionary *)fetchCurrentTrack {
-  return [_tracks objectAtIndex:_trackIndex];
+  return _tracks[_trackIndex];
 }
 
 - (NSDictionary *)fetchPrevTrack {
   if (_trackIndex - 1 < 0)
     return nil;
-  return [_tracks objectAtIndex:_trackIndex - 1];
+  return _tracks[_trackIndex - 1];
 }
 
 - (NSDictionary *)fetchNextTrack {
   if (_trackIndex + 1 > [_tracks count] - 1)
     return nil;
-  return [_tracks objectAtIndex:_trackIndex + 1];
+  return _tracks[_trackIndex + 1];
 }
 
 - (void)changeGenre:(NSArray *)genres
@@ -134,16 +156,15 @@
 - (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
     NSDictionary *track = [tracks objectAtIndex:i];
-    //        int favorite = [[_track objectForKey:@"favoritings_count"]
+    //        int favorite = [_track[@"favoritings_count"]
     // intValue];
-    //        int contentSize = [[_track objectForKey:@"original_content_size"]
+    //        int contentSize = [_track[@"original_content_size"]
     // intValue] /  1000000;
-    BOOL streamable = [[track objectForKey:@"streamable"] boolValue];
-    NSString *format = [track objectForKey:@"original_format"];
-    NSString *sharing = [track objectForKey:@"sharing"];
+    BOOL streamable = [track[@"streamable"] boolValue];
+    NSString *format = track[@"original_format"];
+    NSString *sharing = track[@"sharing"];
     if (!streamable || [format isEqualToString:@"wav"] ||
-        ![sharing isEqualToString:@"public"]) { // contentSize > 7 || favorite <
-                                                // 3
+        ![sharing isEqualToString:@"public"]) {
       [tracks removeObjectAtIndex:i];
       i--;
     }
@@ -163,7 +184,7 @@
 - (void)changeTrack:(NSDictionary *)newTrack
     withFlagForcePlay:(BOOL)isForcePlay {
 
-  NSLog(@"%@", [newTrack objectForKey:@"original_format"]);
+  NSLog(@"%@", newTrack[@"original_format"]);
 
   // updateAudioData で _player が更新される前の状態を保存
   BOOL isPlaying = self.playing;
@@ -196,7 +217,7 @@
 
   NSString *streamUrl = [NSString
       stringWithFormat:@"%@?client_id=%@",
-                       [newTrack objectForKey:@"stream_url"], SC_CLIENT_ID];
+                       newTrack[@"stream_url"], SC_CLIENT_ID];
 
   NSLog(@"%@", streamUrl);
   _playerItem =
@@ -266,13 +287,13 @@
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
-  [self nextTrack:YES];
+  [self.delegate endTrack];
 }
 
 #pragma mark Play Sequence
 
 - (void)playSequence {
-  if (self.playing) {
+  if (self.playing && ! _isSeekingFlag) {
     float currentTime = CMTimeGetSeconds(_player.currentTime);
     float duration = CMTimeGetSeconds(_player.currentItem.asset.duration);
 
@@ -281,7 +302,7 @@
   }
 }
 
-- (void)setPlaySequence {
+- (void)startPlaySequence {
   _sequenceTimer =
       [NSTimer scheduledTimerWithTimeInterval:0.1
                                        target:self

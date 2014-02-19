@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "AccountManager.h"
+#import "MusicManager.h"
 
 @interface TrackScrollView : UIScrollView
 
-- (id)initWithFrame:(CGRect)frame withAccountManagerInstance:(AccountManager*) accountManager;
+- (id)initWithFrame:(CGRect)frame withAccountManagerInstance: (AccountManager*) accountManager withMusicManagerInstance: (MusicManager*) musicManager;
 - (void)initElement;
 - (void)setTrackInfo:(NSDictionary *)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;
