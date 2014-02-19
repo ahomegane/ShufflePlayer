@@ -31,17 +31,23 @@
   UIButton *_playButton;
   UIImage *_playImage;
   UIImage *_pauseImage;
-
+  
   // オープニング
   OpeningView *_openingView;
 
   // ローディング
   UIView *_loadingView;
   LoadIndicator *_indicator;
+
+  // エラー
+  UIView* _changeGenreErrorView;
+  
 }
 @end
 
 @implementation ViewController
+
+NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しました。\n他のジャンルを選択してください。";
 
 @synthesize accountManager, musicManager, alarmVC, lunchAlarmFlag;
 
@@ -146,71 +152,6 @@
   _baseScrollView.delegate = self;
   [self.view addSubview:_baseScrollView];
 
-  // navigationAreaを定義
-  _playImage = [UIImage imageNamed:@"button_play"];
-  _pauseImage = [UIImage imageNamed:@"button_pause"];
-
-  CGRect navigationAreaFrame =
-      CGRectMake(0, self.view.frame.size.height - 206,
-                 self.view.frame.size.width, _playImage.size.height);
-
-  _playButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  [_playButton setImage:_playImage forState:UIControlStateNormal];
-  _playButton.frame =
-      CGRectMake(navigationAreaFrame.size.width / 2 - _playImage.size.width / 2,
-                 navigationAreaFrame.origin.y, _playImage.size.width,
-                 _playImage.size.height);
-  [_playButton addTarget:self
-                  action:@selector(touchPlayButton:)
-        forControlEvents:UIControlEventTouchUpInside];
-  [self.view addSubview:_playButton];
-
-  //  UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
-  //  UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  //  prevButton.frame = CGRectMake(200, navigationAreaFrame.origin.y +
-  // navigationAreaFrame.size.height / 2 - prevImage.size.height / 2,
-  // prevImage.size.width, prevImage.size.height);
-  //  [prevButton setImage:prevImage forState:UIControlStateNormal];
-  //  [self.view addSubview:prevButton];
-  //  [prevButton addTarget:self
-  //                 action:@selector(touchPrevButton:)
-  //       forControlEvents:UIControlEventTouchUpInside];
-  //
-  //  UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
-  //  UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  //  nextButton.frame = CGRectMake(250, navigationAreaFrame.origin.y +
-  // navigationAreaFrame.size.height / 2 - nextImage.size.height / 2,
-  // nextImage.size.width, nextImage.size.height);
-  //  [nextButton setImage:nextImage forState:UIControlStateNormal];
-  //  [self.view addSubview:nextButton];
-  //  [nextButton addTarget:self
-  //                 action:@selector(touchNextButton:)
-  //       forControlEvents:UIControlEventTouchUpInside];
-
-  UIImage *genreImage = [UIImage imageNamed:@"button_genre"];
-  UIButton *genreButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  [genreButton setImage:genreImage forState:UIControlStateNormal];
-  genreButton.frame = CGRectMake(25, navigationAreaFrame.origin.y +
-                                         navigationAreaFrame.size.height / 2 -
-                                         genreImage.size.height / 2,
-                                 genreImage.size.width, genreImage.size.height);
-  [genreButton addTarget:self
-                  action:@selector(touchGenreButton:)
-        forControlEvents:UIControlEventTouchUpInside];
-  [self.view addSubview:genreButton];
-
-  UIImage *alarmImage = [UIImage imageNamed:@"button_alarm"];
-  UIButton *alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  [alarmButton setImage:alarmImage forState:UIControlStateNormal];
-  alarmButton.frame = CGRectMake(74, navigationAreaFrame.origin.y +
-                                         navigationAreaFrame.size.height / 2 -
-                                         alarmImage.size.height / 2,
-                                 alarmImage.size.width, alarmImage.size.height);
-  [alarmButton addTarget:self
-                  action:@selector(touchAlarmButton:)
-        forControlEvents:UIControlEventTouchUpInside];
-  [self.view addSubview:alarmButton];
-
   // TrackScrollView初期化
   _trackScrollViewIndex = 0;
 
@@ -248,6 +189,88 @@
 
     trackScrollViewFrame.origin.x += trackScrollViewFrame.size.width;
   }
+  
+  // navigationAreaを定義
+  _playImage = [UIImage imageNamed:@"button_play"];
+  _pauseImage = [UIImage imageNamed:@"button_pause"];
+  
+  CGRect navigationAreaFrame =
+  CGRectMake(0, self.view.frame.size.height - 206,
+             self.view.frame.size.width, _playImage.size.height);
+  
+  // 再生ボタン
+  _playButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [_playButton setImage:_playImage forState:UIControlStateNormal];
+  _playButton.frame =
+  CGRectMake(navigationAreaFrame.size.width / 2 - _playImage.size.width / 2,
+             navigationAreaFrame.origin.y, _playImage.size.width,
+             _playImage.size.height);
+  [_playButton addTarget:self
+                  action:@selector(touchPlayButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:_playButton];
+  
+  //  UIImage *prevImage = [UIImage imageNamed:@"button_prev.png"];
+  //  UIButton *prevButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  //  prevButton.frame = CGRectMake(200, navigationAreaFrame.origin.y +
+  // navigationAreaFrame.size.height / 2 - prevImage.size.height / 2,
+  // prevImage.size.width, prevImage.size.height);
+  //  [prevButton setImage:prevImage forState:UIControlStateNormal];
+  //  [self.view addSubview:prevButton];
+  //  [prevButton addTarget:self
+  //                 action:@selector(touchPrevButton:)
+  //       forControlEvents:UIControlEventTouchUpInside];
+  //
+  //  UIImage *nextImage = [UIImage imageNamed:@"button_next.png"];
+  //  UIButton *nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  //  nextButton.frame = CGRectMake(250, navigationAreaFrame.origin.y +
+  // navigationAreaFrame.size.height / 2 - nextImage.size.height / 2,
+  // nextImage.size.width, nextImage.size.height);
+  //  [nextButton setImage:nextImage forState:UIControlStateNormal];
+  //  [self.view addSubview:nextButton];
+  //  [nextButton addTarget:self
+  //                 action:@selector(touchNextButton:)
+  //       forControlEvents:UIControlEventTouchUpInside];
+  
+  // アラームボタン
+  UIImage *alarmImage = [UIImage imageNamed:@"button_alarm"];
+  UIButton *alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [alarmButton setImage:alarmImage forState:UIControlStateNormal];
+  alarmButton.frame = CGRectMake(74, navigationAreaFrame.origin.y +
+                                 navigationAreaFrame.size.height / 2 -
+                                 alarmImage.size.height / 2,
+                                 alarmImage.size.width, alarmImage.size.height);
+  [alarmButton addTarget:self
+                  action:@selector(touchAlarmButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:alarmButton];
+  
+  // チェンジジャンル　エラー画面
+  _changeGenreErrorView = [[UIView alloc] initWithFrame:self.view.bounds];
+  _changeGenreErrorView.backgroundColor = bgColorAlpha;
+  [self.view addSubview:_changeGenreErrorView];
+  
+  UILabel* errorLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 320)];
+  errorLabel.text = CHANGE_GENRE_ERROR_TEXT;
+  errorLabel.font = [UIFont systemFontOfSize:14];
+  errorLabel.textColor = [UIColor whiteColor];
+  errorLabel.numberOfLines = 2;
+  errorLabel.textAlignment = NSTextAlignmentCenter;
+  [_changeGenreErrorView addSubview:errorLabel];
+  _changeGenreErrorView.hidden = YES;
+  
+  // ジャンルボタン
+  UIImage *genreImage = [UIImage imageNamed:@"button_genre"];
+  UIButton *genreButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [genreButton setImage:genreImage forState:UIControlStateNormal];
+  genreButton.frame = CGRectMake(25, navigationAreaFrame.origin.y +
+                                 navigationAreaFrame.size.height / 2 -
+                                 genreImage.size.height / 2,
+                                 genreImage.size.width, genreImage.size.height);
+  [genreButton addTarget:self
+                  action:@selector(touchGenreButton:)
+        forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:genreButton];
 
   // ローディング
   _loadingView = [[UIView alloc] initWithFrame:self.view.bounds];
@@ -265,6 +288,7 @@
   _openingView = [[OpeningView alloc] initWithFrame:self.view.bounds];
   [self.view addSubview:_openingView];
   [self beginOpening];
+  
 }
 
 - (void)resetScrollView {
@@ -552,16 +576,22 @@
 
 - (void)changeGenreBefore:(BOOL)isInit {
   if (!isInit) {
+    _changeGenreErrorView.hidden = YES;
+    
     [self beginLoading];
   }
 }
 
-- (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit {
-  // update
-  _tracksCount = tracksCount;
-
-  [self changeAllTrackInfo];
-  [self resetScrollView];
+- (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit error:(NSError *)error {
+  if (error) {
+    _changeGenreErrorView.hidden = NO;
+  } else {
+    // update
+    _tracksCount = tracksCount;
+    
+    [self changeAllTrackInfo];
+    [self resetScrollView];
+  }
   if (isInit) {
     [_deferredCompeleteInit resolve:nil];
   } else {

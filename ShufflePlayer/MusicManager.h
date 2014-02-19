@@ -13,7 +13,7 @@
 @protocol MusicManagerDelegate
 
 - (void)changeGenreBefore:(BOOL)isInit;
-- (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit;
+- (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit error: (NSError *) error;
 - (void)getAudioDataBefore;
 - (void)getAudioDataReadyToPlay;
 - (void)didChangeTrack:(NSDictionary *)newTrack

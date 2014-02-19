@@ -169,7 +169,7 @@
 
     [self saveSelectedGenreToUserDefault:genreName];
 
-    [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit];
+    [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit error: error];
   };
   NSLog(@"%@", params);
   [SCRequest performMethod:SCRequestMethodGET
@@ -186,7 +186,7 @@
 
 - (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSDictionary *track = tracks[i];
+    NSMutableDictionary *track = tracks[i];
     BOOL streamable = [track[@"streamable"] boolValue];
     NSString *format = track[@"original_format"];
     NSString *sharing = track[@"sharing"];
@@ -195,6 +195,7 @@
       [tracks removeObjectAtIndex:i];
       i--;
     }
+    
   }
   return tracks;
 }
