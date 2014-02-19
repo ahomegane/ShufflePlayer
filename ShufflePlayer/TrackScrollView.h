@@ -12,13 +12,13 @@
 
 @interface TrackScrollView : UIScrollView
 
-- (id)initWithFrame:(CGRect)frame withAccountManagerInstance: (AccountManager*) accountManager withMusicManagerInstance: (MusicManager*) musicManager;
+- (id)initWithFrame:(CGRect)frame withAccountManagerInstance:(AccountManager*)accountManager withMusicManagerInstance:(MusicManager*)musicManager;
 - (void)initElement;
-- (void)setTrackInfo:(NSDictionary *)track;
+- (void)setTrackInfo:(NSDictionary*)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;
 - (void)audioDataBeginLoading;
 - (void)audioDataEndLoading;
-@property(retain, nonatomic) UIImage *artworkImage;
-@property(retain, nonatomic) NSString *title;
+@property(retain, nonatomic) UIImage* artworkImage;
+@property(retain, nonatomic) NSString* title;
 
 @end

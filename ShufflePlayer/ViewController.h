@@ -17,10 +17,10 @@
 @interface ViewController
     : UIViewController <AVAudioSessionDelegate, UIScrollViewDelegate, MusicManagerDelegate, AccountManagerDelegate, GenreListViewControllerDelegate, AlarmViewControllerDelegate>
 
-@property(retain, nonatomic) MusicManager *musicManager;
-@property(retain, nonatomic) AccountManager *accountManager;
-@property(retain, nonatomic) GenreListViewController *genreListVC;
-@property(retain, nonatomic) AlarmViewController *alarmVC;
+@property(retain, nonatomic) MusicManager* musicManager;
+@property(retain, nonatomic) AccountManager* accountManager;
+@property(retain, nonatomic) GenreListViewController* genreListVC;
+@property(retain, nonatomic) AlarmViewController* alarmVC;
 
 @property BOOL lunchAlarmFlag;
 

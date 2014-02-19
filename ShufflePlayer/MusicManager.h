@@ -16,7 +16,7 @@
 - (void)changeGenreComplete:(int)tracksCount withInitFlag:(BOOL)isInit;
 - (void)getAudioDataBefore;
 - (void)getAudioDataReadyToPlay;
-- (void)didChangeTrack:(NSDictionary *)newTrack
+- (void)didChangeTrack:(NSDictionary*)newTrack
     withPlayingBeforeChangeFlag:(BOOL)isPlaying;
 - (void)playSequenceOnPlaying:(float)currentTime
             withTrackDuration:(float)duration;
@@ -26,19 +26,21 @@
 
 @interface MusicManager : NSObject
 
-- (NSDictionary *)fetchCurrentTrack;
-- (NSDictionary *)fetchPrevTrack;
-- (NSDictionary *)fetchNextTrack;
+- (NSDictionary*)fetchCurrentTrack;
+- (NSDictionary*)fetchPrevTrack;
+- (NSDictionary*)fetchNextTrack;
 - (BOOL)play;
 - (BOOL)pause;
-- (void)changeGenre:(NSArray *)genres
+- (void)changeGenre:(NSString*)genreName
     withForcePlayFlag:(BOOL)isForcePlay
          withInitFlag:(BOOL)isInit;
 - (void)prevTrack:(BOOL)isFrocePlay;
 - (void)nextTrack:(BOOL)isFrocePlay;
 - (void)seekWithRate:(float)rate;
+- (NSString*)restoreSelectedGenreFromUserDefault;
 @property(retain, nonatomic) id<MusicManagerDelegate> delegate;
-@property(retain, nonatomic) NSArray *genreList;
+@property(retain, nonatomic) NSDictionary* genres;
+@property(retain, nonatomic) NSArray* genreNameList;
 @property(readonly) BOOL playing;
 
 @end
