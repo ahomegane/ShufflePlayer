@@ -53,12 +53,12 @@ NSString * const STDeferredErrorDomain = @"STDeferredErrorDomain";
         int index = i;
         [results insertObject:[NSNull null] atIndex:index];
         
-        STDeferred *childDeferred = deferreds[index];
+        STDeferred *childDeferred = [deferreds objectAtIndex:index];
         
         childDeferred
         .then(^(id resultObject) {
             if(resultObject) {
-                results[index] = resultObject;
+                [results replaceObjectAtIndex:index withObject:resultObject];
             }
             resolveCount++;
             if(resolveCount >= deferredsCount) {
