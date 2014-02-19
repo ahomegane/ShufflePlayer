@@ -13,20 +13,20 @@
 
 @interface TrackScrollView () {
 
-  AccountManager* _accountManager;
-  MusicManager* _musicManager;
+  AccountManager *_accountManager;
+  MusicManager *_musicManager;
 
-  UIView* _waveformArea;
-  UIImageView* _artworkImageView;
-  UIImageView* _waveformImageView;
-  UIImageView* _waveformSequenceView;
-  UIImageView* _waveformLoadView;
-  CABasicAnimation* _waveformLoadAnimation;
-  UIButton* _titleButton;
-  UIButton* _likeButton;
-  UIButton* _artworkScLogoButton;
-  UIImage* _likeImage;
-  UIImage* _likeImageOn;
+  UIView *_waveformArea;
+  UIImageView *_artworkImageView;
+  UIImageView *_waveformImageView;
+  UIImageView *_waveformSequenceView;
+  UIImageView *_waveformLoadView;
+  CABasicAnimation *_waveformLoadAnimation;
+  UIButton *_titleButton;
+  UIButton *_likeButton;
+  UIButton *_artworkScLogoButton;
+  UIImage *_likeImage;
+  UIImage *_likeImageOn;
 }
 @end
 
@@ -37,8 +37,8 @@
 #pragma mark - Initialize
 
 - (id)initWithFrame:(CGRect)frame
-    withAccountManagerInstance:(AccountManager*)accountManager
-      withMusicManagerInstance:(MusicManager*)musicManager {
+    withAccountManagerInstance:(AccountManager *)accountManager
+      withMusicManagerInstance:(MusicManager *)musicManager {
   self = [super initWithFrame:frame];
   if (self) {
     // Initialization code
@@ -57,7 +57,7 @@
   CGRect artworkFrame =
       CGRectMake(0, 0, self.frame.size.width, self.frame.size.width);
 
-  UIView* artworkArea = [[UIView alloc] initWithFrame:artworkFrame];
+  UIView *artworkArea = [[UIView alloc] initWithFrame:artworkFrame];
   [self addSubview:artworkArea];
 
   _artworkImageView = [[UIImageView alloc] init];
@@ -65,12 +65,11 @@
   _artworkImageView.contentMode = UIViewContentModeScaleAspectFit;
   [artworkArea addSubview:_artworkImageView];
 
-  UIImage* artworkScLogoImage = [UIImage imageNamed:@"artwork_sc_logo"];
+  UIImage *artworkScLogoImage = [UIImage imageNamed:@"artwork_sc_logo"];
   _artworkScLogoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  _artworkScLogoButton.frame = CGRectMake(artworkFrame.size.width - 60,
-                                          artworkFrame.size.height - 26,
-                                          artworkScLogoImage.size.width,
-                                          artworkScLogoImage.size.height);
+  _artworkScLogoButton.frame =
+      CGRectMake(artworkFrame.size.width - 60, artworkFrame.size.height - 26,
+                 artworkScLogoImage.size.width, artworkScLogoImage.size.height);
   [_artworkScLogoButton setImage:artworkScLogoImage
                         forState:UIControlStateNormal];
   [artworkArea addSubview:_artworkScLogoButton];
@@ -109,9 +108,9 @@
   _waveformLoadAnimation.beginTime = CACurrentMediaTime();
   _waveformLoadAnimation.fromValue = [NSValue
       valueWithCGPoint:CGPointMake(
-                           0, _waveformLoadView.center.y)];  // 絶対（中心座標）
+                           0, _waveformLoadView.center.y)]; // 絶対（中心座標）
   _waveformLoadAnimation.byValue = [NSValue
-      valueWithCGPoint:CGPointMake(waveformFrame.size.width / 2, 0)];  // 相対
+      valueWithCGPoint:CGPointMake(waveformFrame.size.width / 2, 0)]; // 相対
 
   // 波形　画像セット用
   waveformFrame.origin.x = 0;
@@ -122,10 +121,10 @@
 
   // タイトル
   _titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-  _titleButton.frame = CGRectMake(
-      self.frame.size.width / 2 - 125, self.frame.size.height - 130, 250, 14);
+  _titleButton.frame = CGRectMake(self.frame.size.width / 2 - 125,
+                                  self.frame.size.height - 130, 250, 14);
   _titleButton.titleLabel.font =
-      [UIFont fontWithName:@"HelveticaNeue-Light" size:14];  // UltraLight
+      [UIFont fontWithName:@"HelveticaNeue-Light" size:14]; // UltraLight
   _titleButton.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
   [_titleButton setTitleColor:[UIColor whiteColor]
                      forState:UIControlStateNormal];
@@ -141,8 +140,7 @@
   [_likeButton setImage:_likeImage forState:UIControlStateNormal];
   _likeButton.frame =
       CGRectMake(self.frame.size.width / 2 - _likeImage.size.width / 2,
-                 self.frame.size.height - 100,
-                 _likeImage.size.width,
+                 self.frame.size.height - 100, _likeImage.size.width,
                  _likeImage.size.height);
   [_likeButton addTarget:self
                   action:@selector(touchLikeButton:)
@@ -153,7 +151,7 @@
 
 #pragma mark - Instance Method
 
-- (void)setTrackInfo:(NSDictionary*)track {
+- (void)setTrackInfo:(NSDictionary *)track {
 
   if (track == nil) {
     self.hidden = YES;
@@ -163,13 +161,13 @@
   }
 
   // アートワーク
-  NSString* artworkUrl = track[@"artwork_url"];
+  NSString *artworkUrl = track[@"artwork_url"];
   if (![artworkUrl isEqual:[NSNull null]]) {
-    NSRegularExpression* regexp = [NSRegularExpression
+    NSRegularExpression *regexp = [NSRegularExpression
         regularExpressionWithPattern:@"^(.+?)\\-[^\\-]+?\\.(.+?)$"
                              options:0
                                error:nil];
-    NSString* artworkUrlLarge = [regexp
+    NSString *artworkUrlLarge = [regexp
         stringByReplacingMatchesInString:artworkUrl
                                  options:0
                                    range:NSMakeRange(0, artworkUrl.length)
@@ -177,7 +175,7 @@
                                 [NSString stringWithFormat:@"$1-%@.$2",
                                                            ARTWORK_IMAGE_SIZE]];
 
-    NSData* artworkData =
+    NSData *artworkData =
         [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrlLarge]];
     self.artworkImage = [[UIImage alloc] initWithData:artworkData];
   } else {
@@ -187,7 +185,7 @@
 
   // タイトルボタン
   self.title = track[@"title"];
-  NSString* permalinkUrl = track[@"permalink_url"];
+  NSString *permalinkUrl = track[@"permalink_url"];
 
   [_titleButton setTitle:self.title forState:UIControlStateNormal];
   [_titleButton setStringTag:permalinkUrl];
@@ -196,16 +194,16 @@
   [_artworkScLogoButton setStringTag:permalinkUrl];
 
   // ライク
-  NSString* trackId = track[@"id"];
+  NSString *trackId = track[@"id"];
   [_likeButton setStringTag:trackId];
   [_likeButton setImage:_likeImage forState:UIControlStateNormal];
   _likeButton.tag = 0;
 
   // 波形
-  NSString* waveformUrl = track[@"waveform_url"];
-  NSData* waveformData =
+  NSString *waveformUrl = track[@"waveform_url"];
+  NSData *waveformData =
       [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
-  UIImage* waveformImage = [[UIImage alloc] initWithData:waveformData];
+  UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
   _waveformImageView.image = waveformImage;
 
   CGRect rect = _waveformSequenceView.frame;
@@ -218,8 +216,7 @@
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration {
   CGRect rect = _waveformSequenceView.frame;
   _waveformSequenceView.frame =
-      CGRectMake(rect.origin.x,
-                 rect.origin.y,
+      CGRectMake(rect.origin.x, rect.origin.y,
                  _waveformArea.frame.size.width * (currentTime / duration),
                  rect.size.height);
 }
@@ -238,20 +235,20 @@
 #pragma mark Event Listener
 
 - (void)touchTitleButton:(id)sender {
-  UIButton* button = sender;
-  NSString* permalinkUrl = [button getStringTag];
+  UIButton *button = sender;
+  NSString *permalinkUrl = [button getStringTag];
   [self openUrlOnSafari:permalinkUrl];
 }
 
-- (void)openUrlOnSafari:(NSString*)permalinkUrl {
-  NSURL* url = [NSURL URLWithString:permalinkUrl];
+- (void)openUrlOnSafari:(NSString *)permalinkUrl {
+  NSURL *url = [NSURL URLWithString:permalinkUrl];
   [[UIApplication sharedApplication] openURL:url];
 }
 
 - (void)touchLikeButton:(id)sender {
-  UIButton* button = sender;
-  NSString* trackId = [button getStringTag];
-  if (button.tag == 0) {  // put
+  UIButton *button = sender;
+  NSString *trackId = [button getStringTag];
+  if (button.tag == 0) { // put
     [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error)
     {
       if (SC_CANCELED(error)) {
@@ -264,7 +261,7 @@
         button.tag = 1;
       }
     }];
-  } else {  // delete
+  } else { // delete
     [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
     {
       if (SC_CANCELED(error)) {
@@ -280,15 +277,15 @@
   }
 }
 
-- (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
-  UITouch* touch = [touches anyObject];
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+  UITouch *touch = [touches anyObject];
   switch (touch.view.tag) {
-    case 1: {
-      CGPoint point = [touch locationInView:_waveformArea];
-      float rate = point.x / self.frame.size.width;
-      [_musicManager seekWithRate:rate];
-      break;
-    }
+  case 1: {
+    CGPoint point = [touch locationInView:_waveformArea];
+    float rate = point.x / self.frame.size.width;
+    [_musicManager seekWithRate:rate];
+    break;
+  }
   }
 }
 

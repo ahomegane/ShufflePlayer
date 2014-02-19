@@ -10,10 +10,10 @@
 
 @interface GenreListViewController () {
 
-  UIImageView* _blurImageView;
-  UITableView* _tableView;
-  UIView* _backgroundView;
-  UIImageView* _checkImageView;
+  UIImageView *_blurImageView;
+  UITableView *_tableView;
+  UIView *_backgroundView;
+  UIImageView *_checkImageView;
 }
 @end
 
@@ -23,7 +23,8 @@
 
 #pragma mark - UIViewController
 
-- (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil {
+- (id)initWithNibName:(NSString *)nibNameOrNil
+               bundle:(NSBundle *)nibBundleOrNil {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     [self initElement];
@@ -46,37 +47,37 @@
 
 #pragma mark - Instance Method
 
-- (void)setBlurImage:(UIImage*)blurImage {
+- (void)setBlurImage:(UIImage *)blurImage {
   _blurImageView.image = blurImage;
 }
 
 #pragma mark - View Element
 
 - (void)initElement {
-  UIColor* bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+  UIColor *bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
 
   // ブラー処理用
   _blurImageView = [[UIImageView alloc] initWithFrame:self.view.frame];
   [self.view addSubview:_blurImageView];
 
   //　背景
-  UIView* bgView = [[UIView alloc] initWithFrame:self.view.frame];
+  UIView *bgView = [[UIView alloc] initWithFrame:self.view.frame];
   bgView.backgroundColor = bgColorAlpha;
   [self.view addSubview:bgView];
 
   // タイトル
-  UIFont* titleFont =
-      [UIFont fontWithName:@"HelveticaNeue-Light" size:18];  // UltraLight
+  UIFont *titleFont =
+      [UIFont fontWithName:@"HelveticaNeue-Light" size:18]; // UltraLight
 
-  UIView* titleArea =
+  UIView *titleArea =
       [[UIView alloc] initWithFrame:CGRectMake(15, 40, 290, 24)];
   [self.view addSubview:titleArea];
 
-  UIImage* iconImage = [UIImage imageNamed:@"title_genre"];
-  UIImageView* iconImageView = [[UIImageView alloc] initWithImage:iconImage];
+  UIImage *iconImage = [UIImage imageNamed:@"title_genre"];
+  UIImageView *iconImageView = [[UIImageView alloc] initWithImage:iconImage];
   [titleArea addSubview:iconImageView];
 
-  UILabel* title = [[UILabel alloc]
+  UILabel *title = [[UILabel alloc]
       initWithFrame:CGRectMake(32, 0, 230, titleArea.frame.size.height)];
   title.font = titleFont;
   title.textColor = [UIColor whiteColor];
@@ -84,14 +85,12 @@
   title.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
   [titleArea addSubview:title];
 
-  UIImage* closeImage = [UIImage imageNamed:@"button_close"];
-  UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  UIImage *closeImage = [UIImage imageNamed:@"button_close"];
+  UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [closeButton setImage:closeImage forState:UIControlStateNormal];
   closeButton.frame =
-      CGRectMake(titleArea.frame.size.width - closeImage.size.width,
-                 -3,
-                 closeImage.size.width,
-                 closeImage.size.height);
+      CGRectMake(titleArea.frame.size.width - closeImage.size.width, -3,
+                 closeImage.size.width, closeImage.size.height);
   [closeButton addTarget:self
                   action:@selector(touchCloseButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -104,9 +103,7 @@
 
   int marginTop = 80;
   _tableView = [[UITableView alloc]
-      initWithFrame:CGRectMake(0,
-                               marginTop,
-                               self.view.frame.size.width,
+      initWithFrame:CGRectMake(0, marginTop, self.view.frame.size.width,
                                self.view.frame.size.height - marginTop)];
   _tableView.delegate = self;
   _tableView.dataSource = self;
@@ -134,22 +131,22 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   // Return the number of sections.
   return 1;
 }
 
-- (NSInteger)tableView:(UITableView*)tableView
+- (NSInteger)tableView:(UITableView *)tableView
     numberOfRowsInSection:(NSInteger)section {
   // Return the number of rows in the section.
   return [self.genreData count];
 }
 
-- (UITableViewCell*)tableView:(UITableView*)tableView
-        cellForRowAtIndexPath:(NSIndexPath*)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
   NSLog(@"call");
-  static NSString* CellIdentifier = @"Cell";
-  UITableViewCell* cell =
+  static NSString *CellIdentifier = @"Cell";
+  UITableViewCell *cell =
       [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
   if (cell == nil) {
     cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
@@ -171,8 +168,7 @@
     CGRect frame = _checkImageView.frame;
     _checkImageView.frame =
         CGRectMake(cell.frame.size.width - frame.size.width - 15,
-                   cell.center.y - frame.size.height / 2,
-                   frame.size.width,
+                   cell.center.y - frame.size.height / 2, frame.size.width,
                    frame.size.height);
   }
 
@@ -233,13 +229,13 @@
 
 // In a xib-based application, navigation from a table can be handled in
 // -tableView:didSelectRowAtIndexPath:
-- (void)tableView:(UITableView*)tableView
-    didSelectRowAtIndexPath:(NSIndexPath*)indexPath {
+- (void)tableView:(UITableView *)tableView
+    didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
 
   [_checkImageView removeFromSuperview];
 
-  UITableViewCell* cell = [_tableView cellForRowAtIndexPath:indexPath];
+  UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
   [cell addSubview:_checkImageView];
   NSLog(@"%@", cell.textLabel.text);
   [self.delegate selectGenre:cell.textLabel.text];

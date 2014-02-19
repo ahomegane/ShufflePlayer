@@ -16,28 +16,28 @@
 
 @interface ViewController () {
 
-  STDeferred* _deferredCompeleteInit;
+  STDeferred *_deferredCompeleteInit;
 
-  UIScrollView* _baseScrollView;
-  TrackScrollView* _prevTrackScrollView;
-  TrackScrollView* _currentTrackScrollView;
-  TrackScrollView* _nextTrackScrollView;
+  UIScrollView *_baseScrollView;
+  TrackScrollView *_prevTrackScrollView;
+  TrackScrollView *_currentTrackScrollView;
+  TrackScrollView *_nextTrackScrollView;
 
   int _trackScrollViewIndex;
   int _tracksCount;
 
   BOOL _isInterruptionBeginInPlayFlag;
 
-  UIButton* _playButton;
-  UIImage* _playImage;
-  UIImage* _pauseImage;
+  UIButton *_playButton;
+  UIImage *_playImage;
+  UIImage *_pauseImage;
 
   // オープニング
-  OpeningView* _openingView;
+  OpeningView *_openingView;
 
   // ローディング
-  UIView* _loadingView;
-  LoadIndicator* _indicator;
+  UIView *_loadingView;
+  LoadIndicator *_indicator;
 }
 @end
 
@@ -52,8 +52,8 @@
 
   NSLog(@"ViewDidLoad");
 
-  AppDelegate* appDelegate =
-      (AppDelegate*)[[UIApplication sharedApplication] delegate];
+  AppDelegate *appDelegate =
+      (AppDelegate *)[[UIApplication sharedApplication] delegate];
   appDelegate.viewController = self;
 
   // MusicManager
@@ -78,12 +78,12 @@
   self.alarmVC.delegate = self;
 
   // バックグラウンド再生
-  AVAudioSession* audioSession = [AVAudioSession sharedInstance];
+  AVAudioSession *audioSession = [AVAudioSession sharedInstance];
   [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
   [audioSession setActive:YES error:nil];
 
   // 音楽再生の割り込み
-  NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
   [center addObserver:self
              selector:@selector(sessionDidInterrupt:)
                  name:AVAudioSessionInterruptionNotification
@@ -100,7 +100,7 @@
   [self initElement];
 
   // ジェンルリクエスト
-  NSString* selectedGenre =
+  NSString *selectedGenre =
       [self.musicManager restoreSelectedGenreFromUserDefault];
   if (selectedGenre == nil) {
     selectedGenre = @"All";
@@ -130,8 +130,8 @@
 
 - (void)initElement {
 
-  UIColor* bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
-  UIColor* bgImage =
+  UIColor *bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+  UIColor *bgImage =
       [UIColor colorWithPatternImage:[UIImage imageNamed:@"opening_bg"]];
 
   // 背景指定
@@ -150,17 +150,15 @@
   _playImage = [UIImage imageNamed:@"button_play"];
   _pauseImage = [UIImage imageNamed:@"button_pause"];
 
-  CGRect navigationAreaFrame = CGRectMake(0,
-                                          self.view.frame.size.height - 206,
-                                          self.view.frame.size.width,
-                                          _playImage.size.height);
+  CGRect navigationAreaFrame =
+      CGRectMake(0, self.view.frame.size.height - 206,
+                 self.view.frame.size.width, _playImage.size.height);
 
   _playButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [_playButton setImage:_playImage forState:UIControlStateNormal];
   _playButton.frame =
       CGRectMake(navigationAreaFrame.size.width / 2 - _playImage.size.width / 2,
-                 navigationAreaFrame.origin.y,
-                 _playImage.size.width,
+                 navigationAreaFrame.origin.y, _playImage.size.width,
                  _playImage.size.height);
   [_playButton addTarget:self
                   action:@selector(touchPlayButton:)
@@ -189,29 +187,25 @@
   //                 action:@selector(touchNextButton:)
   //       forControlEvents:UIControlEventTouchUpInside];
 
-  UIImage* genreImage = [UIImage imageNamed:@"button_genre"];
-  UIButton* genreButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  UIImage *genreImage = [UIImage imageNamed:@"button_genre"];
+  UIButton *genreButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [genreButton setImage:genreImage forState:UIControlStateNormal];
-  genreButton.frame = CGRectMake(25,
-                                 navigationAreaFrame.origin.y +
-                                     navigationAreaFrame.size.height / 2 -
-                                     genreImage.size.height / 2,
-                                 genreImage.size.width,
-                                 genreImage.size.height);
+  genreButton.frame = CGRectMake(25, navigationAreaFrame.origin.y +
+                                         navigationAreaFrame.size.height / 2 -
+                                         genreImage.size.height / 2,
+                                 genreImage.size.width, genreImage.size.height);
   [genreButton addTarget:self
                   action:@selector(touchGenreButton:)
         forControlEvents:UIControlEventTouchUpInside];
   [self.view addSubview:genreButton];
 
-  UIImage* alarmImage = [UIImage imageNamed:@"button_alarm"];
-  UIButton* alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  UIImage *alarmImage = [UIImage imageNamed:@"button_alarm"];
+  UIButton *alarmButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [alarmButton setImage:alarmImage forState:UIControlStateNormal];
-  alarmButton.frame = CGRectMake(74,
-                                 navigationAreaFrame.origin.y +
-                                     navigationAreaFrame.size.height / 2 -
-                                     alarmImage.size.height / 2,
-                                 alarmImage.size.width,
-                                 alarmImage.size.height);
+  alarmButton.frame = CGRectMake(74, navigationAreaFrame.origin.y +
+                                         navigationAreaFrame.size.height / 2 -
+                                         alarmImage.size.height / 2,
+                                 alarmImage.size.width, alarmImage.size.height);
   [alarmButton addTarget:self
                   action:@selector(touchAlarmButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -226,7 +220,7 @@
       (_trackScrollViewIndex - 1) * trackScrollViewFrame.size.width;
 
   for (int i = 0; i < 3; i++) {
-    TrackScrollView* trackScrollView =
+    TrackScrollView *trackScrollView =
         [[TrackScrollView alloc] initWithFrame:trackScrollViewFrame
                     withAccountManagerInstance:self.accountManager
                       withMusicManagerInstance:self.musicManager];
@@ -238,18 +232,18 @@
     [_baseScrollView addSubview:trackScrollView];
 
     switch (i) {
-      case 0:
-        _prevTrackScrollView = trackScrollView;
-        //      _prevTrackScrollView.backgroundColor = [UIColor blueColor];
-        break;
-      case 1:
-        _currentTrackScrollView = trackScrollView;
-        //      _currentTrackScrollView.backgroundColor = [UIColor redColor];
-        break;
-      case 2:
-        _nextTrackScrollView = trackScrollView;
-        //      _nextTrackScrollView.backgroundColor = [UIColor yellowColor];
-        break;
+    case 0:
+      _prevTrackScrollView = trackScrollView;
+      //      _prevTrackScrollView.backgroundColor = [UIColor blueColor];
+      break;
+    case 1:
+      _currentTrackScrollView = trackScrollView;
+      //      _currentTrackScrollView.backgroundColor = [UIColor redColor];
+      break;
+    case 2:
+      _nextTrackScrollView = trackScrollView;
+      //      _nextTrackScrollView.backgroundColor = [UIColor yellowColor];
+      break;
     }
 
     trackScrollViewFrame.origin.x += trackScrollViewFrame.size.width;
@@ -285,15 +279,15 @@
   for (int i = 0; i < 3; i++) {
 
     switch (i) {
-      case 0:
-        _prevTrackScrollView.frame = frame;
-        break;
-      case 1:
-        _currentTrackScrollView.frame = frame;
-        break;
-      case 2:
-        _nextTrackScrollView.frame = frame;
-        break;
+    case 0:
+      _prevTrackScrollView.frame = frame;
+      break;
+    case 1:
+      _currentTrackScrollView.frame = frame;
+      break;
+    case 2:
+      _nextTrackScrollView.frame = frame;
+      break;
     }
 
     frame.origin.x += frame.size.width;
@@ -306,13 +300,13 @@
 }
 
 - (void)changeAllTrackInfo {
-  NSDictionary* prevTrack = [self.musicManager fetchPrevTrack];
+  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
 
-  NSDictionary* currentTrack = [self.musicManager fetchCurrentTrack];
+  NSDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
   [_currentTrackScrollView setTrackInfo:currentTrack];
 
-  NSDictionary* nextTrack = [self.musicManager fetchNextTrack];
+  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
 
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
@@ -320,7 +314,7 @@
 }
 
 - (void)changePrevTrackInfo {
-  NSDictionary* prevTrack = [self.musicManager fetchPrevTrack];
+  NSDictionary *prevTrack = [self.musicManager fetchPrevTrack];
   [_prevTrackScrollView setTrackInfo:prevTrack];
 
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
@@ -328,7 +322,7 @@
 }
 
 - (void)changeNextTrackInfo {
-  NSDictionary* nextTrack = [self.musicManager fetchNextTrack];
+  NSDictionary *nextTrack = [self.musicManager fetchNextTrack];
   [_nextTrackScrollView setTrackInfo:nextTrack];
 
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
@@ -361,7 +355,7 @@
 
 - (void)scrollPrev:(BOOL)isForcePlay {
   // viewの入れ替え
-  TrackScrollView* tmpView = _currentTrackScrollView;
+  TrackScrollView *tmpView = _currentTrackScrollView;
 
   _currentTrackScrollView = _prevTrackScrollView;
   _prevTrackScrollView = _nextTrackScrollView;
@@ -380,7 +374,7 @@
 
 - (void)scrollNext:(BOOL)isForcePlay {
   // viewの入れ替え
-  TrackScrollView* tmpView = _currentTrackScrollView;
+  TrackScrollView *tmpView = _currentTrackScrollView;
 
   _currentTrackScrollView = _nextTrackScrollView;
   _nextTrackScrollView = _prevTrackScrollView;
@@ -448,7 +442,7 @@
   }];
 }
 
-- (STDeferred*)completeInit {
+- (STDeferred *)completeInit {
   _deferredCompeleteInit = [STDeferred deferred];
   return _deferredCompeleteInit;
 }
@@ -466,27 +460,27 @@
 #pragma mark RemoteEvent Control
 
 // ロック画面からのイベントを受け取る
-- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent {
+- (void)remoteControlReceivedWithEvent:(UIEvent *)receivedEvent {
   if (receivedEvent.type == UIEventTypeRemoteControl) {
 
     switch (receivedEvent.subtype) {
 
-      case UIEventSubtypeRemoteControlPlay:
-      case UIEventSubtypeRemoteControlPause:
-      case UIEventSubtypeRemoteControlTogglePlayPause:
-        [self touchPlayButton:nil];
-        break;
+    case UIEventSubtypeRemoteControlPlay:
+    case UIEventSubtypeRemoteControlPause:
+    case UIEventSubtypeRemoteControlTogglePlayPause:
+      [self touchPlayButton:nil];
+      break;
 
-      case UIEventSubtypeRemoteControlNextTrack:
-        [self touchNextButton:nil];
-        break;
+    case UIEventSubtypeRemoteControlNextTrack:
+      [self touchNextButton:nil];
+      break;
 
-      case UIEventSubtypeRemoteControlPreviousTrack:
-        [self touchPrevButton:nil];
-        break;
+    case UIEventSubtypeRemoteControlPreviousTrack:
+      [self touchPrevButton:nil];
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
   }
 }
@@ -498,34 +492,34 @@
 }
 
 // 音楽再生の割り込み
-- (void)sessionDidInterrupt:(NSNotification*)notification {
+- (void)sessionDidInterrupt:(NSNotification *)notification {
   switch ([notification.userInfo[AVAudioSessionInterruptionTypeKey] intValue]) {
-    case AVAudioSessionInterruptionTypeEnded:  // 電話 割り込みend
-      NSLog(_isInterruptionBeginInPlayFlag ? @"YES" : @"NO");
-      if (_isInterruptionBeginInPlayFlag) {
-        [self playStateToPlay];
-      } else {
-        [self playStateToStop];
-      }
-      break;
-    case AVAudioSessionInterruptionTypeBegan:  // 電話/ipod 割り込みstart
-    default:
-      [_playButton setImage:_playImage forState:UIControlStateNormal];
-      break;
+  case AVAudioSessionInterruptionTypeEnded: // 電話 割り込みend
+    NSLog(_isInterruptionBeginInPlayFlag ? @"YES" : @"NO");
+    if (_isInterruptionBeginInPlayFlag) {
+      [self playStateToPlay];
+    } else {
+      [self playStateToStop];
+    }
+    break;
+  case AVAudioSessionInterruptionTypeBegan: // 電話/ipod 割り込みstart
+  default:
+    [_playButton setImage:_playImage forState:UIControlStateNormal];
+    break;
   }
 }
 // イヤホンジャック抜いたとき
-- (void)sessionRouteDidChange:(NSNotification*)notification {
+- (void)sessionRouteDidChange:(NSNotification *)notification {
   NSLog(@"%@", NSStringFromSelector(_cmd));
   [_playButton setImage:_playImage forState:UIControlStateNormal];
 }
 
 // ロック画面の音楽情報を更新
-- (void)setSongInfoToDefaultCenter:(UIImage*)artworkImage
-                             title:(NSString*)title {
-  MPMediaItemArtwork* artwork =
+- (void)setSongInfoToDefaultCenter:(UIImage *)artworkImage
+                             title:(NSString *)title {
+  MPMediaItemArtwork *artwork =
       [[MPMediaItemArtwork alloc] initWithImage:artworkImage];
-  NSDictionary* songInfo = @{
+  NSDictionary *songInfo = @{
     MPMediaItemPropertyArtwork : artwork, MPMediaItemPropertyTitle : title
   };
   [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
@@ -533,7 +527,7 @@
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView*)scrollView {
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
   //  NSLog(@"****** scrollViewDidEndDecelerating");
 
   CGFloat position = scrollView.contentOffset.x / scrollView.bounds.size.width;
@@ -587,7 +581,7 @@
   [self nextTrack:YES];
 }
 
-- (void)didChangeTrack:(NSDictionary*)newTrack
+- (void)didChangeTrack:(NSDictionary *)newTrack
     withPlayingBeforeChangeFlag:(BOOL)isPlaying {
   if (isPlaying) {
     [self playStateToPlay];
@@ -610,7 +604,7 @@
 
 #pragma mark - GenreListViewControllerDelegate
 
-- (void)selectGenre:(NSString*)genreName {
+- (void)selectGenre:(NSString *)genreName {
   [self.musicManager changeGenre:genreName
                withForcePlayFlag:NO
                     withInitFlag:NO];
@@ -634,18 +628,18 @@
 
 #pragma mark - Utility
 
-- (UIImage*)blurImageFromView:(UIView*)view {
+- (UIImage *)blurImageFromView:(UIView *)view {
   UIGraphicsBeginImageContextWithOptions(view.frame.size, YES, 0);
   CGContextRef context = UIGraphicsGetCurrentContext();
 
   CGContextTranslateCTM(context, -view.frame.origin.x, -view.frame.origin.y);
   [view.layer renderInContext:context];
-  UIImage* renderedImage = UIGraphicsGetImageFromCurrentImageContext();
+  UIImage *renderedImage = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
 
   CGRect frame =
       CGRectMake(0, 0, renderedImage.size.width, renderedImage.size.height);
-  UIImage* blurImage = [renderedImage applyLightEffectAtFrame:frame];
+  UIImage *blurImage = [renderedImage applyLightEffectAtFrame:frame];
 
   return blurImage;
 }

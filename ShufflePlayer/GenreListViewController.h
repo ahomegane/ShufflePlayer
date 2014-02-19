@@ -10,17 +10,17 @@
 
 @protocol GenreListViewControllerDelegate
 
-- (void)selectGenre:(NSString*)genreName;
+- (void)selectGenre:(NSString *)genreName;
 - (void)hideGenreView;
 
 @end
 
 @interface GenreListViewController
-    : UIViewController<UITableViewDataSource, UITableViewDelegate>
+    : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
-- (void)setBlurImage:(UIImage*)blurImage;
+- (void)setBlurImage:(UIImage *)blurImage;
 @property(retain, nonatomic) id<GenreListViewControllerDelegate> delegate;
-@property(nonatomic, retain) NSArray* genreData;
+@property(nonatomic, retain) NSArray *genreData;
 @property int selectedGenreIndex;
 
 @end

@@ -12,13 +12,13 @@
 
 @interface MusicManager () {
 
-  AVPlayer* _player;
-  AVPlayerItem* _playerItem;
+  AVPlayer *_player;
+  AVPlayerItem *_playerItem;
 
   int _trackIndex;
-  NSMutableArray* _tracks;
+  NSMutableArray *_tracks;
 
-  NSTimer* _sequenceTimer;
+  NSTimer *_sequenceTimer;
 }
 @end
 
@@ -48,7 +48,7 @@
       @"Japanese"
     ];
     // genreList
-    NSMutableDictionary* tmp =
+    NSMutableDictionary *tmp =
         [@{
            @"Techno" : @[ @"techno,drumn,minimaltechno" ],
            @"House" : @[ @"house,disco,techhouse" ],
@@ -67,11 +67,11 @@
            @"Japanese" : @[ @"japanese,jpop" ]
          } mutableCopy];
 
-    NSMutableArray* all = [@[] mutableCopy];
+    NSMutableArray *all = [@[] mutableCopy];
     for (id key in [tmp keyEnumerator]) {
       [all addObjectsFromArray:tmp[key]];
     }
-    tmp[@"All"] = (NSArray*)all;
+    tmp[@"All"] = (NSArray *)all;
     self.genres = tmp;
   }
   return self;
@@ -124,28 +124,28 @@
   return _player.rate != 0.0 ? YES : NO;
 }
 
-- (NSDictionary*)fetchCurrentTrack {
+- (NSDictionary *)fetchCurrentTrack {
   return _tracks[_trackIndex];
 }
 
-- (NSDictionary*)fetchPrevTrack {
+- (NSDictionary *)fetchPrevTrack {
   if (_trackIndex - 1 < 0)
     return nil;
   return _tracks[_trackIndex - 1];
 }
 
-- (NSDictionary*)fetchNextTrack {
+- (NSDictionary *)fetchNextTrack {
   if (_trackIndex + 1 > [_tracks count] - 1)
     return nil;
   return _tracks[_trackIndex + 1];
 }
 
-- (void)changeGenre:(NSString*)genreName
+- (void)changeGenre:(NSString *)genreName
     withForcePlayFlag:(BOOL)isForcePlay
          withInitFlag:(BOOL)isInit {
   [self.delegate changeGenreBefore:isInit];
 
-  NSDictionary* params = @{
+  NSDictionary *params = @{
     @"client_id" : SC_CLIENT_ID,
     @"tags" : [self.genres[genreName] componentsJoinedByString:@","],
     @"order" : @"created_at",
@@ -155,13 +155,13 @@
 
   SCRequestResponseHandler handler =
       ^(NSURLResponse * response, NSData * data, NSError * error) {
-    NSError* jsonError = nil;
-    NSJSONSerialization* jsonResponse =
+    NSError *jsonError = nil;
+    NSJSONSerialization *jsonResponse =
         [NSJSONSerialization JSONObjectWithData:data
                                         options:0
                                           error:&jsonError];
     if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
-      _tracks = [(NSArray*)jsonResponse mutableCopy];
+      _tracks = [(NSArray *)jsonResponse mutableCopy];
       _tracks = [self randomSortTracks:[self filterTracks:_tracks]];
       _trackIndex = 0;
       [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
@@ -184,12 +184,12 @@
 
 #pragma mark Init Tracks JSON
 
-- (NSMutableArray*)filterTracks:(NSMutableArray*)tracks {
+- (NSMutableArray *)filterTracks:(NSMutableArray *)tracks {
   for (int i = 0; i < [tracks count]; i++) {
-    NSDictionary* track = tracks[i];
+    NSDictionary *track = tracks[i];
     BOOL streamable = [track[@"streamable"] boolValue];
-    NSString* format = track[@"original_format"];
-    NSString* sharing = track[@"sharing"];
+    NSString *format = track[@"original_format"];
+    NSString *sharing = track[@"sharing"];
     if (!streamable || [format isEqualToString:@"wav"] ||
         ![sharing isEqualToString:@"public"]) {
       [tracks removeObjectAtIndex:i];
@@ -199,7 +199,7 @@
   return tracks;
 }
 
-- (NSMutableArray*)randomSortTracks:(NSMutableArray*)tracks {
+- (NSMutableArray *)randomSortTracks:(NSMutableArray *)tracks {
   int count = [tracks count];
   for (int i = count - 1; i > 0; i--) {
     int randomNum = arc4random() % i;
@@ -208,7 +208,7 @@
   return tracks;
 }
 
-- (void)changeTrack:(NSDictionary*)newTrack
+- (void)changeTrack:(NSDictionary *)newTrack
     withFlagForcePlay:(BOOL)isForcePlay {
 
   NSLog(@"%@", newTrack[@"original_format"]);
@@ -238,18 +238,18 @@
 
 #pragma mark MusicPlayer Instance
 
-- (void)getAudioData:(NSDictionary*)newTrack
+- (void)getAudioData:(NSDictionary *)newTrack
     withLoadedCallback:(void (^)())callback {
   [self.delegate getAudioDataBefore];
 
-  NSString* streamUrl = [NSString stringWithFormat:@"%@?client_id=%@",
-                                                   newTrack[@"stream_url"],
-                                                   SC_CLIENT_ID];
+  NSString *streamUrl =
+      [NSString stringWithFormat:@"%@?client_id=%@", newTrack[@"stream_url"],
+                                 SC_CLIENT_ID];
 
   NSLog(@"%@", streamUrl);
   _playerItem =
       [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:streamUrl]];
-  NSString* ItemStatusContext;
+  NSString *ItemStatusContext;
   [_playerItem addObserver:self
                 forKeyPath:@"status"
                    options:0
@@ -267,10 +267,10 @@
   }
 }
 
-- (void)observeValueForKeyPath:(NSString*)keyPath
+- (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
-                        change:(NSDictionary*)change
-                       context:(void*)context {
+                        change:(NSDictionary *)change
+                       context:(void *)context {
   NSLog(@"%@", NSStringFromSelector(_cmd));
   if (object == _playerItem && [keyPath isEqualToString:@"status"]) {
 
@@ -313,7 +313,7 @@
   }
 }
 
-- (void)playerItemDidReachEnd:(NSNotification*)notification {
+- (void)playerItemDidReachEnd:(NSNotification *)notification {
   [self.delegate endTrack];
 }
 
@@ -345,16 +345,16 @@
 
 #pragma mark - UserDefault Control
 
-- (BOOL)saveSelectedGenreToUserDefault:(NSString*)genreName {
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+- (BOOL)saveSelectedGenreToUserDefault:(NSString *)genreName {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults setObject:genreName forKey:@"genreName"];
   BOOL isSuccess = [defaults synchronize];
   return isSuccess;
 }
 
-- (NSString*)restoreSelectedGenreFromUserDefault {
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-  NSString* genreName = [defaults objectForKey:@"genreName"];
+- (NSString *)restoreSelectedGenreFromUserDefault {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSString *genreName = [defaults objectForKey:@"genreName"];
   return genreName;
 }
 

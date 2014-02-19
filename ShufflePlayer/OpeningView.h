@@ -12,6 +12,6 @@
 @interface OpeningView : UIView
 
 - (void)fadeOut;
-- (STDeferred*)fadeIn;
+- (STDeferred *)fadeIn;
 
 @end

@@ -10,29 +10,29 @@
 #import "STDeferred.h"
 
 @interface AlarmViewController () {
-  NSTimer* _timer;
+  NSTimer *_timer;
 
-  UILabel* _selectedTimeLabel;
-  UILabel* _timeLabelMessage;
-  UIDatePicker* _picker;
-  NSDateFormatter* _formatter;
-  UIImageView* _blurImageView;
+  UILabel *_selectedTimeLabel;
+  UILabel *_timeLabelMessage;
+  UIDatePicker *_picker;
+  NSDateFormatter *_formatter;
+  UIImageView *_blurImageView;
 
-  MusicManager* _musicManager;
+  MusicManager *_musicManager;
 }
 @end
 
 @implementation AlarmViewController
 
-NSString* const CLEAR_TEXT = @"-- : --";
+NSString *const CLEAR_TEXT = @"-- : --";
 
 @synthesize delegate, selectedTime;
 
 #pragma mark - ViewController
 
-- (id)initWithNibName:(NSString*)nibNameOrNil
-                      bundle:(NSBundle*)nibBundleOrNil
-    withMusicManagerInstance:(MusicManager*)musicManager {
+- (id)initWithNibName:(NSString *)nibNameOrNil
+                      bundle:(NSBundle *)nibBundleOrNil
+    withMusicManagerInstance:(MusicManager *)musicManager {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     _musicManager = musicManager;
@@ -68,11 +68,11 @@ NSString* const CLEAR_TEXT = @"-- : --";
 
 #pragma mark - Instance Method
 
-- (void)setBlurImage:(UIImage*)blurImage {
+- (void)setBlurImage:(UIImage *)blurImage {
   _blurImageView.image = blurImage;
 }
 
-- (void)overrideSelectedTime:(NSDate*)date {
+- (void)overrideSelectedTime:(NSDate *)date {
   NSLog(@"overrideSelectedTime");
   self.selectedTime = date;
 }
@@ -81,12 +81,12 @@ NSString* const CLEAR_TEXT = @"-- : --";
 
 - (void)initElement {
 
-  UIColor* bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
-  UIColor* linkColor = [UIColor colorWithRed:0.3803921568627451
+  UIColor *bgColorAlpha = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+  UIColor *linkColor = [UIColor colorWithRed:0.3803921568627451
                                        green:0.8
                                         blue:0.8588235294117647
                                        alpha:1.0];
-  UIColor* bgPickerView =
+  UIColor *bgPickerView =
       [UIColor colorWithRed:0.624 green:0.624 blue:0.624 alpha:1];
 
   // ブラー処理用
@@ -94,23 +94,23 @@ NSString* const CLEAR_TEXT = @"-- : --";
   [self.view addSubview:_blurImageView];
 
   //　背景
-  UIView* bgView = [[UIView alloc] initWithFrame:self.view.frame];
+  UIView *bgView = [[UIView alloc] initWithFrame:self.view.frame];
   bgView.backgroundColor = bgColorAlpha;
   [self.view addSubview:bgView];
 
   // タイトル
-  UIFont* titleFont =
-      [UIFont fontWithName:@"HelveticaNeue-Light" size:18];  // UltraLight
+  UIFont *titleFont =
+      [UIFont fontWithName:@"HelveticaNeue-Light" size:18]; // UltraLight
 
-  UIView* titleArea =
+  UIView *titleArea =
       [[UIView alloc] initWithFrame:CGRectMake(15, 40, 290, 24)];
   [self.view addSubview:titleArea];
 
-  UIImage* iconImage = [UIImage imageNamed:@"title_alarm"];
-  UIImageView* iconImageView = [[UIImageView alloc] initWithImage:iconImage];
+  UIImage *iconImage = [UIImage imageNamed:@"title_alarm"];
+  UIImageView *iconImageView = [[UIImageView alloc] initWithImage:iconImage];
   [titleArea addSubview:iconImageView];
 
-  UILabel* title = [[UILabel alloc]
+  UILabel *title = [[UILabel alloc]
       initWithFrame:CGRectMake(32, 0, 230, titleArea.frame.size.height)];
   title.font = titleFont;
   title.textColor = [UIColor whiteColor];
@@ -118,14 +118,12 @@ NSString* const CLEAR_TEXT = @"-- : --";
   title.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
   [titleArea addSubview:title];
 
-  UIImage* closeImage = [UIImage imageNamed:@"button_close"];
-  UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  UIImage *closeImage = [UIImage imageNamed:@"button_close"];
+  UIButton *closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [closeButton setImage:closeImage forState:UIControlStateNormal];
   closeButton.frame =
-      CGRectMake(titleArea.frame.size.width - closeImage.size.width,
-                 -3,
-                 closeImage.size.width,
-                 closeImage.size.height);
+      CGRectMake(titleArea.frame.size.width - closeImage.size.width, -3,
+                 closeImage.size.width, closeImage.size.height);
   [closeButton addTarget:self
                   action:@selector(touchCloseButton:)
         forControlEvents:UIControlEventTouchUpInside];
@@ -152,10 +150,10 @@ NSString* const CLEAR_TEXT = @"-- : --";
   // ボタン
   CGRect frameButton = CGRectMake(0, 0, 50, 20);
   CGPoint buttonCenter = CGPointMake(100, self.view.frame.size.height - 260);
-  UIFont* buttonFont =
-      [UIFont fontWithName:@"HelveticaNeue-Light" size:20];  // UltraLight
+  UIFont *buttonFont =
+      [UIFont fontWithName:@"HelveticaNeue-Light" size:20]; // UltraLight
 
-  UIButton* saveButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  UIButton *saveButton = [UIButton buttonWithType:UIButtonTypeCustom];
   saveButton.frame = frameButton;
   saveButton.center = buttonCenter;
   saveButton.titleLabel.font = buttonFont;
@@ -166,7 +164,7 @@ NSString* const CLEAR_TEXT = @"-- : --";
                  action:@selector(touchSaveButton:)
        forControlEvents:UIControlEventTouchUpInside];
 
-  UIButton* clearButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  UIButton *clearButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
   clearButton.frame = frameButton;
   buttonCenter.x = self.view.frame.size.width - buttonCenter.x;
   clearButton.center = buttonCenter;
@@ -191,7 +189,7 @@ NSString* const CLEAR_TEXT = @"-- : --";
   frame.size.height += margin * 2;
   frame.origin.y = self.view.frame.size.height - frame.size.height;
 
-  UIView* pickerView = [[UIView alloc] initWithFrame:frame];
+  UIView *pickerView = [[UIView alloc] initWithFrame:frame];
   pickerView.backgroundColor = bgPickerView;
 
   frame = _picker.frame;
@@ -222,9 +220,9 @@ NSString* const CLEAR_TEXT = @"-- : --";
   [self.delegate hideAlarmView];
 }
 
-- (void)updateTimeLabel:(NSDate*)time {
+- (void)updateTimeLabel:(NSDate *)time {
   if (time != nil) {
-    NSString* str = [self formatDate:time];
+    NSString *str = [self formatDate:time];
     _selectedTimeLabel.text = str;
     _timeLabelMessage.text =
         [NSString stringWithFormat:@"%@ に自動再生を開始します", str];
@@ -254,18 +252,18 @@ NSString* const CLEAR_TEXT = @"-- : --";
   [self clearNotification];
 }
 
-- (void)timeChecker:(NSTimer*)timer {
+- (void)timeChecker:(NSTimer *)timer {
   if (_musicManager.playing)
     return;
 
-  NSDate* now = [NSDate date];
+  NSDate *now = [NSDate date];
 
-  NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
+  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
   [formatter setDateFormat:@"HH:mm"];
-  NSString* nowStr = [formatter stringFromDate:now];
+  NSString *nowStr = [formatter stringFromDate:now];
   //  NSLog(@"%@", nowStr);
 
-  NSString* selectedTimeStr = [formatter stringFromDate:self.selectedTime];
+  NSString *selectedTimeStr = [formatter stringFromDate:self.selectedTime];
   if ([nowStr isEqualToString:selectedTimeStr]) {
 
     [self clearTimer];
@@ -280,17 +278,17 @@ NSString* const CLEAR_TEXT = @"-- : --";
 
 #pragma mark - LocalNotification
 
-- (void)setNotification:(NSDate*)fireDate {
+- (void)setNotification:(NSDate *)fireDate {
   [self clearNotification];
 
-  UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+  UILocalNotification *localNotification = [[UILocalNotification alloc] init];
   localNotification.fireDate = fireDate;
   localNotification.repeatInterval = NSDayCalendarUnit;
   localNotification.alertBody = @"Time To Play Music";
   localNotification.timeZone = [NSTimeZone localTimeZone];
   localNotification.soundName = UILocalNotificationDefaultSoundName;
   localNotification.alertAction = @"OPEN";
-  localNotification.userInfo = @{@"id" : @"alarm"};
+  localNotification.userInfo = @{ @"id" : @"alarm" };
   [[UIApplication sharedApplication]
       scheduleLocalNotification:localNotification];
 }
@@ -301,22 +299,22 @@ NSString* const CLEAR_TEXT = @"-- : --";
 
 #pragma mark - UserDefault Control
 
-- (BOOL)saveSelectedTimeToUserDefault:(NSDate*)date {
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+- (BOOL)saveSelectedTimeToUserDefault:(NSDate *)date {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults setObject:date forKey:@"alarmTime"];
   BOOL isSuccess = [defaults synchronize];
   return isSuccess;
 }
 
-- (NSDate*)restoreSelectedTimeFromUserDefault {
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-  NSDate* date = [defaults objectForKey:@"alarmTime"];
+- (NSDate *)restoreSelectedTimeFromUserDefault {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSDate *date = [defaults objectForKey:@"alarmTime"];
   return date;
 }
 
 #pragma mark - utility
 
-- (NSString*)formatDate:(NSDate*)date {
+- (NSString *)formatDate:(NSDate *)date {
   if (_formatter == nil) {
     _formatter = [[NSDateFormatter alloc] init];
     [_formatter setDateFormat:@"HH:mm"];

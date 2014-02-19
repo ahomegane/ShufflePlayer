@@ -18,12 +18,12 @@
 
 @interface AlarmViewController : UIViewController
 
-- (id)initWithNibName:(NSString*)nibNameOrNil
-                      bundle:(NSBundle*)nibBundleOrNil
-    withMusicManagerInstance:(MusicManager*)musicManager;
-- (void)setBlurImage:(UIImage*)blurImage;
-- (void)overrideSelectedTime:(NSDate*)date;
-@property NSDate* selectedTime;
+- (id)initWithNibName:(NSString *)nibNameOrNil
+                      bundle:(NSBundle *)nibBundleOrNil
+    withMusicManagerInstance:(MusicManager *)musicManager;
+- (void)setBlurImage:(UIImage *)blurImage;
+- (void)overrideSelectedTime:(NSDate *)date;
+@property NSDate *selectedTime;
 @property(retain, nonatomic) id<AlarmViewControllerDelegate> delegate;
 
 @end

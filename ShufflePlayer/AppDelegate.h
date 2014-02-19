@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "ViewController.h"
 
-@interface AppDelegate : UIResponder<UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property(strong, nonatomic) UIWindow* window;
-@property(retain, nonatomic) ViewController* viewController;
+@property(strong, nonatomic) UIWindow *window;
+@property(retain, nonatomic) ViewController *viewController;
 
 @end

@@ -11,7 +11,7 @@
 #import "Constants.h"
 
 @interface AccountManager () {
-  SCAccount* _scAccount;
+  SCAccount *_scAccount;
 }
 @end
 
@@ -31,10 +31,10 @@
 
 #pragma mark - Instance Method
 
-- (void)sendLike:(NSString*)trackId
-                  method:(NSString*)method
-    withCompleteCallback:(void (^)(NSError* error))callback {
-  NSString* resourcetURL =
+- (void)sendLike:(NSString *)trackId
+                  method:(NSString *)method
+    withCompleteCallback:(void (^)(NSError *error))callback {
+  NSString *resourcetURL =
       [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
 
   SCRequestResponseHandler handler =
@@ -42,7 +42,7 @@
     if (SC_CANCELED(error)) {
 
     } else if (error) {
-      NSString* errorStr = [error localizedDescription];
+      NSString *errorStr = [error localizedDescription];
 
       // 有効期限切れ?
       if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
@@ -75,7 +75,7 @@
 #pragma mark - Private Method
 
 - (void)getScAccount:(void (^)())callback {
-  SCAccount* scAccount;
+  SCAccount *scAccount;
 
   if (_scAccount == nil) {
 
@@ -85,10 +85,10 @@
       [self login: nil withLoginedCallback:^()
       {
 
-        SCAccount* scAccount = [SCSoundCloud account];
+        SCAccount *scAccount = [SCSoundCloud account];
 
         if (scAccount == nil) {
-          UIAlertView* alert =
+          UIAlertView *alert =
               [[UIAlertView alloc] initWithTitle:@"Not Logged In"
                                          message:@"You must login"
                                         delegate:nil
@@ -131,7 +131,7 @@
 
   [SCSoundCloud requestAccessWithPreparedAuthorizationURLHandler:^(NSURL *preparedURL)
   {
-    SCLoginViewController* loginViewController;
+    SCLoginViewController *loginViewController;
 
     loginViewController =
         [SCLoginViewController loginViewControllerWithPreparedURL:preparedURL
@@ -142,21 +142,21 @@
 
 #pragma mark - UserDefault Control
 
-- (BOOL)saveScAccount:(SCAccount*)scAccount {
-  NSData* data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+- (BOOL)saveScAccount:(SCAccount *)scAccount {
+  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:scAccount];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults setObject:data forKey:@"scAccount"];
   BOOL isSuccess = [defaults synchronize];
   return isSuccess;
 }
 
-- (SCAccount*)restoreScAccount {
-  NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-  NSData* data = [defaults dataForKey:@"scAccount"];
+- (SCAccount *)restoreScAccount {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSData *data = [defaults dataForKey:@"scAccount"];
   if (data == nil) {
     return nil;
   }
-  SCAccount* scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  SCAccount *scAccount = [NSKeyedUnarchiver unarchiveObjectWithData:data];
   return scAccount;
 }
 

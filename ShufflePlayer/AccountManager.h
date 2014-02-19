@@ -16,9 +16,9 @@
 
 @interface AccountManager : NSObject
 
-- (void)sendLike:(NSString*)trackId
-                  method:(NSString*)method
-    withCompleteCallback:(void (^)(NSError* error))callback;
+- (void)sendLike:(NSString *)trackId
+                  method:(NSString *)method
+    withCompleteCallback:(void (^)(NSError *error))callback;
 @property(retain, nonatomic) id<AccountManagerDelegate> delegate;
 
 @end
