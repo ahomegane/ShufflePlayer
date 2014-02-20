@@ -48,7 +48,7 @@
 
 @implementation ViewController
 
-NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しました。\n他のジャンルを選択してください。";
+NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しました。\nジャンルを選択してください。";
 
 @synthesize accountManager, musicManager, alarmVC, lunchAlarmFlag;
 
@@ -63,14 +63,14 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
       (AppDelegate *)[[UIApplication sharedApplication] delegate];
   appDelegate.viewController = self;
 
-  // MusicManager
-  self.musicManager = [[MusicManager alloc] init];
-  self.musicManager.delegate = self;
-
   // AccountManager
   self.accountManager = [[AccountManager alloc] init];
   self.accountManager.delegate = self;
 
+  // MusicManager
+  self.musicManager = [[MusicManager alloc] init];
+  self.musicManager.delegate = self;
+  
   // GenreListViewControler
   self.genreListVC =
       [[GenreListViewController alloc] initWithNibName:nil bundle:nil];
@@ -115,7 +115,6 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
   for (int i = 0; i < [self.musicManager.genreNameList count]; i++) {
     if ([self.genreListVC.genreData[i] isEqualToString:selectedGenre]) {
       self.genreListVC.selectedGenreIndex = i;
-      NSLog(@"%d", i);
       break;
     }
   }

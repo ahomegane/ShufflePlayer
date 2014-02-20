@@ -21,7 +21,6 @@
                         AlarmViewControllerDelegate>
 
 @property(retain, nonatomic) MusicManager *musicManager;
-@property(retain, nonatomic) AccountManager *accountManager;
 @property(retain, nonatomic) GenreListViewController *genreListVC;
 @property(retain, nonatomic) AlarmViewController *alarmVC;
 

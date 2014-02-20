@@ -163,13 +163,19 @@
     if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
       _tracks = [(NSArray *)jsonResponse mutableCopy];
       _tracks = [self randomSortTracks:[self filterTracks:_tracks]];
-      _trackIndex = 0;
-      [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
+      
+      [self.delegate.accountManager getUserLiked:^(NSMutableArray* likedIdList, NSError* error) {
+        
+        [self tracksAddLikedFlag:likedIdList];
+
+        _trackIndex = 0;
+        [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
+        
+        [self saveSelectedGenreToUserDefault:genreName];
+        [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit error: error];
+        
+      }];
     }
-
-    [self saveSelectedGenreToUserDefault:genreName];
-
-    [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit error: error];
   };
   NSLog(@"%@", params);
   [SCRequest performMethod:SCRequestMethodGET
@@ -194,6 +200,29 @@
   return url;
 }
 
+- (void)tracksAddLikedFlag:(NSMutableArray*)likedIdList {
+  NSString* likedIdStr;
+  if (likedIdList != nil) {
+    likedIdStr = [likedIdList componentsJoinedByString:@","];
+  }
+  
+  for (int i = 0; i < [_tracks count]; i++) {
+    NSMutableDictionary *track = _tracks[i];
+    
+    if (likedIdList != nil) {
+      NSRange match = [likedIdStr rangeOfString:[NSString stringWithFormat:@"%@",track[@"id"]]];
+      
+      if (match.location != NSNotFound) {
+        track[@"_likedFlag"] = @1;
+      } else {
+        track[@"_likedFlag"] = @0;
+      }
+    } else {
+      track[@"_likedFlag"] = @0;
+    }
+  }
+}
+
 #pragma mark - Private Method
 
 #pragma mark Init Tracks JSON
@@ -204,6 +233,8 @@
     BOOL streamable = [track[@"streamable"] boolValue];
     NSString *format = track[@"original_format"];
     NSString *sharing = track[@"sharing"];
+
+    // 削除
     if (!streamable || [format isEqualToString:@"wav"] ||
         ![sharing isEqualToString:@"public"]) {
       [tracks removeObjectAtIndex:i];

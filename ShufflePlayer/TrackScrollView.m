@@ -192,8 +192,13 @@
   // ライク
   NSString *trackId = track[@"id"];
   [_likeButton setStringTag:trackId];
-  [_likeButton setImage:_likeImage forState:UIControlStateNormal];
-  _likeButton.tag = 0;
+  if ([track[@"_likedFlag"] boolValue]) {
+    [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
+    _likeButton.tag = 1;
+  } else {
+    [_likeButton setImage:_likeImage forState:UIControlStateNormal];
+    _likeButton.tag = 0;
+  }
 
   // 波形
   NSString *waveformUrl = track[@"waveform_url"];
@@ -257,11 +262,9 @@
 - (void)touchLikeButton:(id)sender {
   UIButton *button = sender;
   
-  [_accountManager getUserLiked];
-  
   NSString *trackId = [button getStringTag];
   if (button.tag == 0) { // put
-    [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error)
+    [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error, BOOL didLoginFlag)
     {
       if (error) {
         NSLog(@"Error: %@", [error localizedDescription]);
@@ -270,9 +273,10 @@
         [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
         button.tag = 1;
       }
+      
     }];
   } else { // delete
-    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
+    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error, BOOL didLoginFlag)
     {
       if (error) {
         NSLog(@"Error: %@", [error localizedDescription]);
@@ -281,6 +285,7 @@
         [_likeButton setImage:_likeImage forState:UIControlStateNormal];
         button.tag = 0;
       }
+      
     }];
   }
 }
