@@ -60,9 +60,7 @@
      
     if (scAccount != nil) {
       _scAccount = scAccount;
-      [SCRequest performMethod:[method isEqualToString:@"delete"]
-       ? SCRequestMethodDELETE
-                              : SCRequestMethodPUT
+      [SCRequest performMethod:[method isEqualToString:@"delete"] ? SCRequestMethodDELETE : SCRequestMethodPUT
                     onResource:[NSURL URLWithString:resourcetURL]
                usingParameters:nil
                    withAccount:_scAccount

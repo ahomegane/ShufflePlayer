@@ -267,7 +267,19 @@
   UIButton *button = sender;
   
   NSString *trackId = [button getStringTag];
-  if (button.tag == 0) { // put
+  if ([_track[@"_likedFlag"] boolValue]) { // delete
+    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
+     {
+       if (error) {
+         NSLog(@"Error touchLikeButton-delete: %@", [error localizedDescription]);
+       } else {
+         NSLog(@"Like deleted track: %@", trackId);
+         [_likeButton setImage:_likeImage forState:UIControlStateNormal];
+         _track[@"_likedFlag"] = @0;
+       }
+       
+     }];
+  } else { // put
     [_accountManager sendLike:trackId method:@"put" withCompleteCallback:^(NSError * error)
     {
       if (error) {
@@ -276,18 +288,6 @@
         NSLog(@"Liked track: %@", trackId);
         [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
         _track[@"_likedFlag"] = @1;
-      }
-      
-    }];
-  } else { // delete
-    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
-    {
-      if (error) {
-        NSLog(@"Error touchLikeButton-delete: %@", [error localizedDescription]);
-      } else {
-        NSLog(@"Like deleted track: %@", trackId);
-        [_likeButton setImage:_likeImage forState:UIControlStateNormal];
-        _track[@"_likedFlag"] = @0;
       }
       
     }];
