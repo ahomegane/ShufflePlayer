@@ -36,7 +36,6 @@
 		04A021261815A6C00002B91B /* button_next.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021221815A6C00002B91B /* button_next.png */; };
 		04A021281815A6C00002B91B /* button_prev.png in Resources */ = {isa = PBXBuildFile; fileRef = 04A021241815A6C00002B91B /* button_prev.png */; };
 		04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E4F1810164C001839A8 /* SoundCloud.bundle */; };
-		04C00E5C181019F7001839A8 /* example.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 04C00E5B181019F7001839A8 /* example.mp3 */; };
 		04C00E5E18101AA3001839A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C00E5D18101AA3001839A8 /* AVFoundation.framework */; };
 		04E3EB2B18B109E3007F1711 /* artwork_no_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB1C18B109E3007F1711 /* artwork_no_image.png */; };
 		04E3EB2D18B109E3007F1711 /* button_alarm.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB1E18B109E3007F1711 /* button_alarm.png */; };
@@ -56,6 +55,8 @@
 		04E3EB5518B109F3007F1711 /* title_alarm@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB4618B109F3007F1711 /* title_alarm@2x.png */; };
 		04E3EB5618B109F3007F1711 /* title_genre@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04E3EB4718B109F3007F1711 /* title_genre@2x.png */; };
 		D0417E5218A91D6300E0B295 /* UIButton+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = D0417E5118A91D6300E0B295 /* UIButton+Helper.m */; };
+		D05408CE18B5D3D5003A0931 /* opening_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = D05408CC18B5D3D5003A0931 /* opening_logo.png */; };
+		D05408CF18B5D3D5003A0931 /* opening_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D05408CD18B5D3D5003A0931 /* opening_logo@2x.png */; };
 		D068D86D18B4A8F200658043 /* icon_table_selected.png in Resources */ = {isa = PBXBuildFile; fileRef = D068D86C18B4A8F200658043 /* icon_table_selected.png */; };
 		D068D86F18B4A8FA00658043 /* icon_table_selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D068D86E18B4A8FA00658043 /* icon_table_selected@2x.png */; };
 		D06DAE3318B31EDF00CD2BA3 /* loading_indicator.png in Resources */ = {isa = PBXBuildFile; fileRef = D06DAE3218B31EDF00CD2BA3 /* loading_indicator.png */; };
@@ -81,8 +82,6 @@
 		D0B886B018B33CBD001EC0F5 /* artwork_sc_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B886AF18B33CBD001EC0F5 /* artwork_sc_logo.png */; };
 		D0B886B218B33CC4001EC0F5 /* artwork_sc_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B886B118B33CC4001EC0F5 /* artwork_sc_logo@2x.png */; };
 		D0B886B718B34242001EC0F5 /* OpeningView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0B886B618B34242001EC0F5 /* OpeningView.m */; };
-		D0B886BB18B34682001EC0F5 /* opening_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B886B918B34682001EC0F5 /* opening_logo.png */; };
-		D0B886BF18B3468D001EC0F5 /* opening_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D0B886BD18B3468D001EC0F5 /* opening_logo@2x.png */; };
 		D0DA93F818B21E9F00877F56 /* GenreListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DA93F718B21E9F00877F56 /* GenreListViewController.m */; };
 		D0E78B9318B1B7F400C8C4F5 /* UIImage+BlurredFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E78B9018B1B7F400C8C4F5 /* UIImage+BlurredFrame.m */; };
 		D0E78B9418B1B7F400C8C4F5 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E78B9218B1B7F400C8C4F5 /* UIImage+ImageEffects.m */; };
@@ -232,7 +231,6 @@
 		04A021221815A6C00002B91B /* button_next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_next.png; sourceTree = "<group>"; };
 		04A021241815A6C00002B91B /* button_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_prev.png; sourceTree = "<group>"; };
 		04C00E4F1810164C001839A8 /* SoundCloud.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = SoundCloud.bundle; sourceTree = "<group>"; };
-		04C00E5B181019F7001839A8 /* example.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = example.mp3; sourceTree = "<group>"; };
 		04C00E5D18101AA3001839A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		04E3EB1C18B109E3007F1711 /* artwork_no_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = artwork_no_image.png; sourceTree = "<group>"; };
 		04E3EB1E18B109E3007F1711 /* button_alarm.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button_alarm.png; sourceTree = "<group>"; };
@@ -253,6 +251,8 @@
 		04E3EB4718B109F3007F1711 /* title_genre@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "title_genre@2x.png"; sourceTree = "<group>"; };
 		D0417E5018A91D6300E0B295 /* UIButton+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Helper.h"; sourceTree = "<group>"; };
 		D0417E5118A91D6300E0B295 /* UIButton+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Helper.m"; sourceTree = "<group>"; };
+		D05408CC18B5D3D5003A0931 /* opening_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = opening_logo.png; sourceTree = "<group>"; };
+		D05408CD18B5D3D5003A0931 /* opening_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "opening_logo@2x.png"; sourceTree = "<group>"; };
 		D068D86C18B4A8F200658043 /* icon_table_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_table_selected.png; sourceTree = "<group>"; };
 		D068D86E18B4A8FA00658043 /* icon_table_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_table_selected@2x.png"; sourceTree = "<group>"; };
 		D06DAE3218B31EDF00CD2BA3 /* loading_indicator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = loading_indicator.png; sourceTree = "<group>"; };
@@ -288,8 +288,6 @@
 		D0B886B118B33CC4001EC0F5 /* artwork_sc_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "artwork_sc_logo@2x.png"; sourceTree = "<group>"; };
 		D0B886B518B34242001EC0F5 /* OpeningView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpeningView.h; sourceTree = "<group>"; };
 		D0B886B618B34242001EC0F5 /* OpeningView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpeningView.m; sourceTree = "<group>"; };
-		D0B886B918B34682001EC0F5 /* opening_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = opening_logo.png; sourceTree = "<group>"; };
-		D0B886BD18B3468D001EC0F5 /* opening_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "opening_logo@2x.png"; sourceTree = "<group>"; };
 		D0DA93F618B21E9F00877F56 /* GenreListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenreListViewController.h; sourceTree = "<group>"; };
 		D0DA93F718B21E9F00877F56 /* GenreListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GenreListViewController.m; sourceTree = "<group>"; };
 		D0E78B8F18B1B7F400C8C4F5 /* UIImage+BlurredFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+BlurredFrame.h"; sourceTree = "<group>"; };
@@ -339,7 +337,6 @@
 		042851B21810145D008CBA33 = {
 			isa = PBXGroup;
 			children = (
-				04C00E5B181019F7001839A8 /* example.mp3 */,
 				0428521718101521008CBA33 /* OHAttributedLabel.xcodeproj */,
 				0428520E18101513008CBA33 /* OAuth2Client.xcodeproj */,
 				042852051810150A008CBA33 /* JSONKit.xcodeproj */,
@@ -484,9 +481,10 @@
 				04E3EB4318B109F3007F1711 /* opening_bg@2x.png */,
 				D068D86E18B4A8FA00658043 /* icon_table_selected@2x.png */,
 				D0AE069B18B39C4400DBC10D /* opening_sc_logo@2x.png */,
+				D05408CC18B5D3D5003A0931 /* opening_logo.png */,
+				D05408CD18B5D3D5003A0931 /* opening_logo@2x.png */,
 				04E3EB4618B109F3007F1711 /* title_alarm@2x.png */,
 				04E3EB4718B109F3007F1711 /* title_genre@2x.png */,
-				D0B886BD18B3468D001EC0F5 /* opening_logo@2x.png */,
 				D0B886AA18B339A8001EC0F5 /* button_like_on.png */,
 				D0B886AB18B339A8001EC0F5 /* button_like.png */,
 				D0B886A118B32FE9001EC0F5 /* waveform_loading.png */,
@@ -498,7 +496,6 @@
 				04E3EB2018B109E3007F1711 /* button_genre.png */,
 				04E3EB2318B109E3007F1711 /* button_pause.png */,
 				04E3EB2418B109E3007F1711 /* button_play.png */,
-				D0B886B918B34682001EC0F5 /* opening_logo.png */,
 				04E3EB2518B109E3007F1711 /* opening_bg.png */,
 				04E3EB2718B109E3007F1711 /* opening_sc_logo.png */,
 				04E3EB2818B109E3007F1711 /* title_alarm.png */,
@@ -525,22 +522,22 @@
 			children = (
 				D0417E5318A91E3800E0B295 /* Helper */,
 				D098313C18A4BB5900A6BEC8 /* SoundCloudAPIAdditions */,
+				D098313418A4B59400A6BEC8 /* Constants.h */,
+				D098313518A4B59400A6BEC8 /* Constants.m */,
+				042851CD1810145D008CBA33 /* AppDelegate.h */,
+				042851CE1810145D008CBA33 /* AppDelegate.m */,
 				042851D31810145D008CBA33 /* ViewController.h */,
 				042851D41810145D008CBA33 /* ViewController.m */,
 				D0DA93F618B21E9F00877F56 /* GenreListViewController.h */,
 				D0DA93F718B21E9F00877F56 /* GenreListViewController.m */,
 				D097304318AC7EA700DE1700 /* AlarmViewController.h */,
 				D097304418AC7EA700DE1700 /* AlarmViewController.m */,
-				D098313418A4B59400A6BEC8 /* Constants.h */,
-				D098313518A4B59400A6BEC8 /* Constants.m */,
 				048E530F18AA21AA0029DE86 /* TrackScrollView.h */,
 				048E531018AA21AA0029DE86 /* TrackScrollView.m */,
 				D0B886B518B34242001EC0F5 /* OpeningView.h */,
 				D0B886B618B34242001EC0F5 /* OpeningView.m */,
 				D06DAE3D18B3234E00CD2BA3 /* LoadIndicator.h */,
 				D06DAE3E18B3234E00CD2BA3 /* LoadIndicator.m */,
-				042851CD1810145D008CBA33 /* AppDelegate.h */,
-				042851CE1810145D008CBA33 /* AppDelegate.m */,
 				D098313718A4BA8100A6BEC8 /* MusicManager.h */,
 				D098313818A4BA8100A6BEC8 /* MusicManager.m */,
 				D098313D18A4C09200A6BEC8 /* AccountManager.h */,
@@ -769,21 +766,19 @@
 				04E3EB5218B109F3007F1711 /* opening_bg@2x.png in Resources */,
 				D06DAE3318B31EDF00CD2BA3 /* loading_indicator.png in Resources */,
 				D068D86D18B4A8F200658043 /* icon_table_selected.png in Resources */,
+				D05408CE18B5D3D5003A0931 /* opening_logo.png in Resources */,
 				04E3EB5018B109F3007F1711 /* button_pause@2x.png in Resources */,
 				D0AE069A18B39C1800DBC10D /* button_like@2x.png in Resources */,
 				042851D71810145D008CBA33 /* Images.xcassets in Resources */,
 				D06DAE3918B31EEA00CD2BA3 /* loading_indicator@2x.png in Resources */,
 				D0B886A818B333E8001EC0F5 /* button_close@2x.png in Resources */,
 				04C00E501810164C001839A8 /* SoundCloud.bundle in Resources */,
-				D0B886BB18B34682001EC0F5 /* opening_logo.png in Resources */,
-				04C00E5C181019F7001839A8 /* example.mp3 in Resources */,
 				D0B886A418B33003001EC0F5 /* waveform_loading@2x.png in Resources */,
 				04E3EB3318B109E3007F1711 /* button_play.png in Resources */,
 				D0B886AE18B339A8001EC0F5 /* button_like.png in Resources */,
 				04A021261815A6C00002B91B /* button_next.png in Resources */,
 				D0AE069C18B39C4400DBC10D /* opening_sc_logo@2x.png in Resources */,
 				04E3EB2B18B109E3007F1711 /* artwork_no_image.png in Resources */,
-				D0B886BF18B3468D001EC0F5 /* opening_logo@2x.png in Resources */,
 				D068D86F18B4A8FA00658043 /* icon_table_selected@2x.png in Resources */,
 				042851C91810145D008CBA33 /* InfoPlist.strings in Resources */,
 				04E3EB2F18B109E3007F1711 /* button_genre.png in Resources */,
@@ -792,6 +787,7 @@
 				04E3EB3718B109E3007F1711 /* title_alarm.png in Resources */,
 				D0B886A618B333DE001EC0F5 /* button_close.png in Resources */,
 				D0B886B018B33CBD001EC0F5 /* artwork_sc_logo.png in Resources */,
+				D05408CF18B5D3D5003A0931 /* opening_logo@2x.png in Resources */,
 				04A021281815A6C00002B91B /* button_prev.png in Resources */,
 				04E3EB5518B109F3007F1711 /* title_alarm@2x.png in Resources */,
 				04E3EB3618B109E3007F1711 /* opening_sc_logo.png in Resources */,

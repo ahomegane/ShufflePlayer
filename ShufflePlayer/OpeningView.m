@@ -36,7 +36,7 @@
 
   UIImage *logoImage = [UIImage imageNamed:@"opening_logo"];
 
-  CGRect logoFrame = CGRectMake(self.center.x - logoImage.size.width / 2, 154,
+  CGRect logoFrame = CGRectMake(self.center.x - logoImage.size.width / 2, 320 / 2 - logoImage.size.height / 2,
                                 logoImage.size.width, logoImage.size.height);
 
   _logo = [[UIImageView alloc] initWithImage:logoImage];
