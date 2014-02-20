@@ -54,7 +54,7 @@
            @"House" : @[ @"house,disco" ],
            @"HipHop / BreakBeats" : @[ @"hiphop,breakbeats,rap,triphop" ],
            @"Electronica / Experimental" :
-           @[ @"electronica,experimental,postrock,minimal" ],
+           @[ @"electronica,experimental,postrock" ],
            @"Downtempo / Ambient" :
            @[ @"downtempo,ambient,chill,soudtrack,mellow" ],
            @"Rock / Punk" : @[ @"rock,punk,metal" ],
