@@ -51,7 +51,6 @@ NSString *const CLEAR_TEXT = @"-- : --";
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  NSLog(@"viewWillAppear");
   if (_picker) {
     _picker.date = [NSDate date];
   }
@@ -73,7 +72,6 @@ NSString *const CLEAR_TEXT = @"-- : --";
 }
 
 - (void)overrideSelectedTime:(NSDate *)date {
-  NSLog(@"overrideSelectedTime");
   self.selectedTime = date;
 }
 
@@ -261,7 +259,6 @@ NSString *const CLEAR_TEXT = @"-- : --";
   NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
   [formatter setDateFormat:@"HH:mm"];
   NSString *nowStr = [formatter stringFromDate:now];
-  //  NSLog(@"%@", nowStr);
 
   NSString *selectedTimeStr = [formatter stringFromDate:self.selectedTime];
   if ([nowStr isEqualToString:selectedTimeStr]) {

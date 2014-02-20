@@ -18,7 +18,7 @@
 - (void)initElement;
 - (void)setTrackInfo:(NSMutableDictionary *)track;
 - (void)updateWaveform:(float)currentTime withTrackDuration:(float)duration;
-- (void)updateArtworkImageToLarge:(NSMutableDictionary *)track;
+- (void)updateArtworkImageToLarge;
 - (void)audioDataBeginLoading;
 - (void)audioDataEndLoading;
 @property(retain, nonatomic) UIImage *artworkImage;

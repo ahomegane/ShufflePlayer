@@ -245,7 +245,6 @@
 
   UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
   [cell addSubview:_checkImageView];
-  NSLog(@"%@", cell.textLabel.text);
   [self.delegate selectGenre:cell.textLabel.text];
 }
 

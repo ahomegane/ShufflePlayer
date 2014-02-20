@@ -24,14 +24,13 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
 
-  NSLog(@"didFinishLaunchingWithOptions");
-
   // 自動ロック／スリープの禁止
   [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 
   NSDictionary *userInfo =
       launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
 
+  NSLog(@"didFinishLaunchingWithOptions");
   if (userInfo != nil) {
     if ([userInfo[@"id"] isEqualToString:@"alarm"]) {
       self.viewController.lunchAlarmFlag = YES;

@@ -29,25 +29,20 @@
   return self;
 }
 
--(void)accountsDidChangeNotification {
-  [self clearUserDefault];
-}
-
 #pragma mark - Instance Method
 
 - (void)sendLike:(NSString *)trackId
                   method:(NSString *)method
-    withCompleteCallback:(void (^)(NSError *error, BOOL didLoginFlag))callback {
+    withCompleteCallback:(void (^)(NSError *error))callback {
   NSString *resourcetURL =
       [NSString stringWithFormat:@"%@%@", SC_LIKE_URL, trackId];
 
-  [self getScAccount: ^(SCAccount * scAccount, BOOL didLoginFlag)
+  [self getScAccount: ^(SCAccount * scAccount)
    {
   
      SCRequestResponseHandler handler =
      ^(NSURLResponse * response, NSData * data, NSError * error) {
        if (error) {
-         NSLog(@"sendLike %@", [error localizedDescription]);
          NSString *errorStr = [error localizedDescription];
          
          if ([errorStr isEqualToString:@"HTTP Error: 401"]) {
@@ -60,7 +55,7 @@
        }
        
        if (callback != nil)
-         callback(error, didLoginFlag);
+         callback(error);
      };
      
     if (scAccount != nil) {
@@ -74,60 +69,20 @@
         sendingProgressHandler:nil
                responseHandler:handler];
     }
-  } requestLoginFlag:YES];
-}
-
-- (void)getUserLiked:(void (^)(NSMutableArray* likedIdList, NSError *error))callback {
-  NSString *resourcetURL = SC_LIKE_URL;
-  
-  SCRequestResponseHandler handler =
-  ^(NSURLResponse * response, NSData * data, NSError * error) {
-    NSError *jsonError = nil;
-    NSJSONSerialization *jsonResponse =
-    [NSJSONSerialization JSONObjectWithData:data
-                                    options:0
-                                      error:&jsonError];
-    NSLog(@"getUserLiked %@", [error localizedDescription]);
-    if (!jsonError && [jsonResponse isKindOfClass:[NSArray class]]) {
-      NSMutableArray* likedIdList = [@[] mutableCopy];
-      NSMutableArray* likedTraks = [(NSArray *)jsonResponse mutableCopy];
-      for (int i = 0; i < [likedTraks count]; i++) {
-        NSDictionary *track = likedTraks[i];
-        [likedIdList addObject:track[@"id"]];
-      }
-      
-      if (callback)
-        callback(likedIdList, error);
-    }
-  };
-  
-  [self getScAccount: ^(SCAccount * scAccount, BOOL didLoginFlag)
-   {
-     if (scAccount != nil) {
-       _scAccount = scAccount;
-       [SCRequest performMethod:SCRequestMethodGET
-                     onResource:[NSURL URLWithString:resourcetURL]
-                usingParameters:nil
-                    withAccount:_scAccount
-         sendingProgressHandler:nil
-                responseHandler:handler];
-     } else {
-       if (callback)
-         callback(nil, nil);
-     }
-   } requestLoginFlag:NO];
+  }];
 }
 
 #pragma mark - Private Method
 
-- (void)getScAccount:(void (^)(SCAccount* scAccount, BOOL didLoginFlag))callback requestLoginFlag:(BOOL)requestLoginFlag {
+- (void)getScAccount:(void (^)(SCAccount* scAccount))callback {
   SCAccount *scAccount;
 
   if (_scAccount == nil) {
-
+    
+    NSLog(@"scAccount restore from UserDefaults");
     scAccount = [self restoreScAccount];
 
-    if (scAccount == nil && requestLoginFlag) {
+    if (scAccount == nil) {
       [self login: nil withLoginedCallback:^()
       {
 
@@ -138,29 +93,28 @@
           NSLog(@"scAccount save to UserDefaults");
         }
         if (callback != nil)
-          callback(scAccount, YES);
+          callback(scAccount);
       }];
 
     } else {
-      NSLog(@"scAccount restore from UserDefaults");
       if (callback != nil)
-        callback(scAccount, NO);
+        callback(scAccount);
     }
 
   } else {
     scAccount = _scAccount;
 
     if (callback != nil)
-      callback(scAccount, NO);
+      callback(scAccount);
   }
 }
 
 - (void)login:(id)sender withLoginedCallback:(void (^)())callback {
   SCLoginViewControllerCompletionHandler handler = ^(NSError * error) {
     if (SC_CANCELED(error)) {
-      NSLog(@"Canceled!");
+      NSLog(@"login Canceled!");
     } else if (error) {
-      NSLog(@"Error: %@", [error localizedDescription]);
+      NSLog(@"Error login: %@", [error localizedDescription]);
     } else {
       if (callback != nil)
         callback();

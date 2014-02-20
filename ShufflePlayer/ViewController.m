@@ -14,6 +14,13 @@
 #import "LoadIndicator.h"
 #import "OpeningView.h"
 
+#pragma mark - TODO
+// TODO: likeボタンとアカウントの同期
+// TODO: likeボタンを押した際の oauthConnection Error: {"error":"invalid_grant"} (401判定の暫定対応)
+// TODO: alarm機能 アプリを落とし、ロック画面にローカル通知がきた際の処理が正しく動かない
+
+#pragma mark -
+
 @interface ViewController () {
 
   STDeferred *_deferredCompeleteInit;
@@ -56,8 +63,6 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-
-  NSLog(@"ViewDidLoad");
 
   AppDelegate *appDelegate =
       (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -370,8 +375,7 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 }
 
 - (void)updateCurrentViewArtwork {
-  NSMutableDictionary *currentTrack = [self.musicManager fetchCurrentTrack];
-  [_currentTrackScrollView updateArtworkImageToLarge:currentTrack];
+  [_currentTrackScrollView updateArtworkImageToLarge];
   
   [self setSongInfoToDefaultCenter:_currentTrackScrollView.artworkImage
                              title:_currentTrackScrollView.title];
@@ -543,7 +547,6 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 - (void)sessionDidInterrupt:(NSNotification *)notification {
   switch ([notification.userInfo[AVAudioSessionInterruptionTypeKey] intValue]) {
   case AVAudioSessionInterruptionTypeEnded: // 電話 割り込みend
-    NSLog(_isInterruptionBeginInPlayFlag ? @"YES" : @"NO");
     if (_isInterruptionBeginInPlayFlag) {
       [self playStateToPlay];
     } else {
@@ -558,7 +561,6 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 }
 // イヤホンジャック抜いたとき
 - (void)sessionRouteDidChange:(NSNotification *)notification {
-  NSLog(@"%@", NSStringFromSelector(_cmd));
   [_playButton setImage:_playImage forState:UIControlStateNormal];
 }
 
@@ -576,8 +578,6 @@ NSString *const CHANGE_GENRE_ERROR_TEXT = @"通信中にエラーが発生しま
 #pragma mark - UIScrollViewDelegate
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-  //  NSLog(@"****** scrollViewDidEndDecelerating");
-
   CGFloat position = scrollView.contentOffset.x / scrollView.bounds.size.width;
   CGFloat delta = position - (CGFloat)_trackScrollViewIndex;
 

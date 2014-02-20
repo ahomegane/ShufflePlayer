@@ -41,7 +41,6 @@
 - (void)seekWithRate:(float)rate;
 - (NSString *)restoreSelectedGenreFromUserDefault;
 - (NSString *)replaceArtworkSize:(NSString*)defaultUrl withReplaceSize:(NSString*) replaceSize;
-- (void)tracksAddLikedFlag:(NSMutableArray*)likedIdList;
 @property(retain, nonatomic) id<MusicManagerDelegate> delegate;
 @property(retain, nonatomic) NSDictionary *genres;
 @property(retain, nonatomic) NSArray *genreNameList;

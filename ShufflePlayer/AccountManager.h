@@ -18,8 +18,7 @@
 
 - (void)sendLike:(NSString *)trackId
                   method:(NSString *)method
-    withCompleteCallback:(void (^)(NSError *error, BOOL didLoginFlag))callback;
-- (void)getUserLiked:(void (^)(NSMutableArray* likedIdList, NSError *error))callback;
+    withCompleteCallback:(void (^)(NSError *error))callback;
 @property(retain, nonatomic) id<AccountManagerDelegate> delegate;
 
 @end

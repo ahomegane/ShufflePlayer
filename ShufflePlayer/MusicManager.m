@@ -50,19 +50,19 @@
     // genreList
     NSMutableDictionary *tmp =
         [@{
-           @"Techno" : @[ @"techno,drumn,minimaltechno" ],
-           @"House" : @[ @"house,disco,techhouse" ],
+           @"Techno" : @[ @"techno,drumn" ],
+           @"House" : @[ @"house,disco" ],
            @"HipHop / BreakBeats" : @[ @"hiphop,breakbeats,rap,triphop" ],
            @"Electronica / Experimental" :
            @[ @"electronica,experimental,postrock,minimal" ],
            @"Downtempo / Ambient" :
-           @[ @"downtempo,ambient,classical,chill,wave,soudtrack,mellow" ],
+           @[ @"downtempo,ambient,chill,soudtrack,mellow" ],
            @"Rock / Punk" : @[ @"rock,punk,metal" ],
-           @"Reggae / Dub" : @[ @"reggae,dub,riddim" ],
-           @"Soul / R&B" : @[ @"soul,r&b,blues,nujazz" ],
-           @"Jazz / Funk" : @[ @"jazz,funk,piano,afro" ],
+           @"Reggae / Dub" : @[ @"reggae,dub" ],
+           @"Soul / R&B" : @[ @"soul,r&b,blues" ],
+           @"Jazz / Funk" : @[ @"jazz,funk" ],
            @"Acoustic / World" :
-           @[ @"acoustic,folk,countroy,samba,bossanova" ],
+           @[ @"acoustic,folk,countroy,samba,bossanova,afro" ],
            @"Pop" : @[ @"pop" ],
            @"Japanese" : @[ @"japanese,jpop" ]
          } mutableCopy];
@@ -164,17 +164,11 @@
       _tracks = [(NSArray *)jsonResponse mutableCopy];
       _tracks = [self randomSortTracks:[self filterTracks:_tracks]];
       
-      [self.delegate.accountManager getUserLiked:^(NSMutableArray* likedIdList, NSError* error) {
+      _trackIndex = 0;
+      [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
         
-        [self tracksAddLikedFlag:likedIdList];
-
-        _trackIndex = 0;
-        [self changeTrack:[self fetchCurrentTrack] withFlagForcePlay:isForcePlay];
-        
-        [self saveSelectedGenreToUserDefault:genreName];
-        [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit error: error];
-        
-      }];
+      [self saveSelectedGenreToUserDefault:genreName];
+      [self.delegate changeGenreComplete:[_tracks count] withInitFlag:isInit error: error];
     }
   };
   NSLog(@"%@", params);
@@ -198,29 +192,6 @@
                                [NSString stringWithFormat:@"$1-%@.$2",
                                 replaceSize]];
   return url;
-}
-
-- (void)tracksAddLikedFlag:(NSMutableArray*)likedIdList {
-  NSString* likedIdStr;
-  if (likedIdList != nil) {
-    likedIdStr = [likedIdList componentsJoinedByString:@","];
-  }
-  
-  for (int i = 0; i < [_tracks count]; i++) {
-    NSMutableDictionary *track = _tracks[i];
-    
-    if (likedIdList != nil) {
-      NSRange match = [likedIdStr rangeOfString:[NSString stringWithFormat:@"%@",track[@"id"]]];
-      
-      if (match.location != NSNotFound) {
-        track[@"_likedFlag"] = @1;
-      } else {
-        track[@"_likedFlag"] = @0;
-      }
-    } else {
-      track[@"_likedFlag"] = @0;
-    }
-  }
 }
 
 #pragma mark - Private Method

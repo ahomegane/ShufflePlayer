@@ -48,8 +48,6 @@
   animation.beginTime = CACurrentMediaTime();
   animation.fromValue = @0.0f;                             // 開始時の角度
   animation.toValue = [NSNumber numberWithFloat:2 * M_PI]; // 終了時の角度
-  //  animation.timingFunction = [CAMediaTimingFunction functionWithName:
-  // kCAMediaTimingFunctionEaseIn];
   return animation;
 }
 

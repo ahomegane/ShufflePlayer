@@ -16,6 +16,8 @@
   AccountManager *_accountManager;
   MusicManager *_musicManager;
 
+  NSMutableDictionary* _track;
+  
   UIView *_waveformArea;
   UIImageView *_artworkImageView;
   UIImageView *_waveformImageView;
@@ -28,6 +30,7 @@
   UIImage *_artworkNoImage;
   UIImage *_likeImage;
   UIImage *_likeImageOn;
+
 }
 @end
 
@@ -159,29 +162,30 @@
   if (track == nil) {
     self.hidden = YES;
     return;
-  } else {
-    self.hidden = NO;
   }
 
+  _track = track;
+  self.hidden = NO;
+
   // アートワーク
-  if (track[@"_artworkImageLarge"]) {
-    self.artworkImage = track[@"_artworkImageLarge"];
+  if (_track[@"_artworkImageLarge"]) {
+    self.artworkImage = _track[@"_artworkImageLarge"];
   } else {
-    NSString *artworkUrl = track[@"artwork_url"];
+    NSString *artworkUrl = _track[@"artwork_url"];
     if (![artworkUrl isEqual:[NSNull null]]) {
       artworkUrl = [_musicManager replaceArtworkSize:artworkUrl withReplaceSize:ARTWORK_IMAGE_SIZE_SMALL];
       NSData *artworkData =
       [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
       self.artworkImage = [[UIImage alloc] initWithData:artworkData];
     } else {
-      self.artworkImage = track[@"_artworkImageLarge"] = [_artworkNoImage copy];
+      self.artworkImage = _track[@"_artworkImageLarge"] = [_artworkNoImage copy];
     }
   }
   _artworkImageView.image = self.artworkImage;
 
   // タイトルボタン
-  self.title = track[@"title"];
-  NSString *permalinkUrl = track[@"permalink_url"];
+  self.title = _track[@"title"];
+  NSString *permalinkUrl = _track[@"permalink_url"];
 
   [_titleButton setTitle:self.title forState:UIControlStateNormal];
   [_titleButton setStringTag:permalinkUrl];
@@ -190,18 +194,16 @@
   [_artworkScLogoButton setStringTag:permalinkUrl];
 
   // ライク
-  NSString *trackId = track[@"id"];
+  NSString *trackId = _track[@"id"];
   [_likeButton setStringTag:trackId];
-  if ([track[@"_likedFlag"] boolValue]) {
+  if ([_track[@"_likedFlag"] boolValue]) {
     [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
-    _likeButton.tag = 1;
   } else {
     [_likeButton setImage:_likeImage forState:UIControlStateNormal];
-    _likeButton.tag = 0;
   }
 
   // 波形
-  NSString *waveformUrl = track[@"waveform_url"];
+  NSString *waveformUrl = _track[@"waveform_url"];
   NSData *waveformData =
       [NSData dataWithContentsOfURL:[NSURL URLWithString:waveformUrl]];
   UIImage *waveformImage = [[UIImage alloc] initWithData:waveformData];
@@ -214,14 +216,16 @@
   _waveformLoadView.hidden = NO;
 }
 
-- (void)updateArtworkImageToLarge:(NSMutableDictionary *)track {
+- (void)updateArtworkImageToLarge {
+  if (!_track) return;
+  
   // アートワーク
-  NSString *artworkUrl = track[@"artwork_url"];
-  if (track[@"_artworkImageLarge"] == nil && ![artworkUrl isEqual:[NSNull null]]) {
+  NSString *artworkUrl = _track[@"artwork_url"];
+  if (_track[@"_artworkImageLarge"] == nil && ![artworkUrl isEqual:[NSNull null]]) {
     artworkUrl = [_musicManager replaceArtworkSize:artworkUrl withReplaceSize:ARTWORK_IMAGE_SIZE];
     NSData *artworkData =
     [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
-    self.artworkImage = track[@"_artworkImageLarge"] = [[UIImage alloc] initWithData:artworkData];
+    self.artworkImage = _track[@"_artworkImageLarge"] = [[UIImage alloc] initWithData:artworkData];
     _artworkImageView.image = self.artworkImage;
   }
 
@@ -264,26 +268,26 @@
   
   NSString *trackId = [button getStringTag];
   if (button.tag == 0) { // put
-    [_accountManager sendLike:trackId method:@"post" withCompleteCallback:^(NSError * error, BOOL didLoginFlag)
+    [_accountManager sendLike:trackId method:@"put" withCompleteCallback:^(NSError * error)
     {
       if (error) {
-        NSLog(@"Error: %@", [error localizedDescription]);
+        NSLog(@"Error touchLikeButton-put: %@", [error localizedDescription]);
       } else {
         NSLog(@"Liked track: %@", trackId);
         [_likeButton setImage:_likeImageOn forState:UIControlStateNormal];
-        button.tag = 1;
+        _track[@"_likedFlag"] = @1;
       }
       
     }];
   } else { // delete
-    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error, BOOL didLoginFlag)
+    [_accountManager sendLike:trackId method:@"delete" withCompleteCallback:^(NSError * error)
     {
       if (error) {
-        NSLog(@"Error: %@", [error localizedDescription]);
+        NSLog(@"Error touchLikeButton-delete: %@", [error localizedDescription]);
       } else {
         NSLog(@"Like deleted track: %@", trackId);
         [_likeButton setImage:_likeImage forState:UIControlStateNormal];
-        button.tag = 0;
+        _track[@"_likedFlag"] = @0;
       }
       
     }];
